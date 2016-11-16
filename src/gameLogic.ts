@@ -784,11 +784,16 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
          endPieceEmpty &&
          deltaFrom.col === deltaTo.col
         ) || (
-         diffRow === 1 &&
+         diffRow === 1 && 
          diffCol === 1 &&
          endPieceTeam !== getTurn(turnIndex) &&
+         !endPieceEmpty
+        ) || (
+         diffRow === 1 && 
+         diffCol === 1 &&
+         endPieceEmpty &&
          enpassantPosition &&
-         enpassantPosition.row && //XXX issue here
+         enpassantPosition.row &&
          enpassantPosition.col &&
          deltaFrom.row === enpassantPosition.row &&
          Math.abs(deltaFrom.col - enpassantPosition.col) === 1
