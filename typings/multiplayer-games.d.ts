@@ -85,7 +85,7 @@ interface IUpdateUI extends IStateTransition {
 interface IGame {
   minNumberOfPlayers: number;
   maxNumberOfPlayers: number;
-  isMoveOk(move: IStateTransition): boolean; 
+  isMoveOk(stateTransition: IStateTransition): Boolean; 
   //NEW: checkMoveOk(stateTransition: IStateTransition): void; 
   updateUI(update: IUpdateUI): void;
   gotMessageFromPlatform(message: any): void;
