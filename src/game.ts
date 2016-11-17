@@ -310,7 +310,7 @@ module game {
                                                    enpassantPosition);
     let draggingPieceAvailableMoves:any = [];
     let index = cellInPossibleMoves(row, col, possibleMoves);
-    if (index) {
+    if (index !== -1) {
       let availableMoves = possibleMoves[index][1];
       for (let i = 0; i < availableMoves.length; i++) {
         let availablePos = availableMoves[i];
