@@ -114,7 +114,7 @@ module game {
     });
 	}
 
-  function sendComputerMove() { //AI
+  function sendComputerMove() {
     let possibleMoves = gameLogic.getPossibleMoves(board,
                                                    turnIndex,
                                                    isUnderCheck,
@@ -127,16 +127,15 @@ module game {
       let index2 = Math.floor(Math.random() * pm[1].length);
       deltaFrom = pm[0];
       deltaTo = pm[1][index2];
-      let move = gameLogic.createMove(board,
-                                      deltaFrom,
-                                      deltaTo,
-                                      turnIndex,
-                                      isUnderCheck,
-                                      canCastleKing,
-                                      canCastleQueen,
-                                      enpassantPosition,
-                                      promoteTo);
-      gameService.makeMove(move);
+      gameService.makeMove(gameLogic.createMove(board,
+                                                deltaFrom,
+                                                deltaTo,
+                                                turnIndex,
+                                                isUnderCheck,
+                                                canCastleKing,
+                                                canCastleQueen,
+                                                enpassantPosition,
+                                                promoteTo));
     } else {
       console.log("There is no possible move");
     }
@@ -197,8 +196,6 @@ module game {
         return;
       }
       if (type === "touchend") {
-        var audio = new Audio('sounds/piece_drop.wav');
-        audio.play();
         dragDone(draggingStartedRowCol, {row: row, col: col});
       } else { // Drag continue
         setDraggingPieceTopLeft(getSquareTopLeft(row, col));
@@ -313,7 +310,7 @@ module game {
                                                    enpassantPosition);
     let draggingPieceAvailableMoves:any = [];
     let index = cellInPossibleMoves(row, col, possibleMoves);
-    if (index) {
+    if (index !== -1) {
       let availableMoves = possibleMoves[index][1];
       for (let i = 0; i < availableMoves.length; i++) {
         let availablePos = availableMoves[i];
@@ -426,10 +423,9 @@ module game {
                                                        canCastleKing,
                                                        canCastleQueen,
                                                        enpassantPosition);
-        return cellInPossibleMoves(row, col, possibleMoves); //XXX bad design ! ?
-      } else {
-        return false;
+        return cellInPossibleMoves(row, col, possibleMoves) !== -1;
       }
+      return false;
     }
   };
 
@@ -440,13 +436,13 @@ module game {
     return 'B';
   }
 
-  function cellInPossibleMoves(row:any, col:any, possibleMoves:any):any {
+  function cellInPossibleMoves(row:number, col:number, possibleMoves:any):any {
     for (let i = 0; i < possibleMoves.length; i++) {
       if (angular.equals({row: row, col: col}, possibleMoves[i][0])) {
         return i;
       }
     }
-    return false; //XXX should be an error ?
+    return -1;
   }
 
   export let isBlackPiece = function(row:any, col:any) {
