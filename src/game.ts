@@ -115,7 +115,6 @@ module game {
 	}
 
   function sendComputerMove() {
-    //XXX is this necessary ?
     let possibleMoves = gameLogic.getPossibleMoves(board,
                                                    turnIndex,
                                                    isUnderCheck,
@@ -424,10 +423,9 @@ module game {
                                                        canCastleKing,
                                                        canCastleQueen,
                                                        enpassantPosition);
-        return cellInPossibleMoves(row, col, possibleMoves); //XXX bad design ! ?
-      } else {
-        return false;
+        return cellInPossibleMoves(row, col, possibleMoves) !== -1;
       }
+      return false;
     }
   };
 
@@ -438,13 +436,13 @@ module game {
     return 'B';
   }
 
-  function cellInPossibleMoves(row:any, col:any, possibleMoves:any):any {
+  function cellInPossibleMoves(row:number, col:number, possibleMoves:any):any {
     for (let i = 0; i < possibleMoves.length; i++) {
       if (angular.equals({row: row, col: col}, possibleMoves[i][0])) {
         return i;
       }
     }
-    return false; //XXX should be an error ?
+    return -1;
   }
 
   export let isBlackPiece = function(row:any, col:any) {

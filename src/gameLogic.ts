@@ -857,7 +857,7 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
       }
       endPos.col = i;
       if (canPawnMove(board, startPos, endPos, turnIndex, enpassantPosition)) {
-        console.log("found one: from "+startPos.row+","+startPos.col+" to "+endPos.row+","+endPos.col);
+        //console.log("found one: from "+startPos.row+","+startPos.col+" to "+endPos.row+","+endPos.col);
         toPos.push({row: endPos.row, col: endPos.col}); //enpassant move and regular
       }
     }
