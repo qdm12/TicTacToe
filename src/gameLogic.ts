@@ -3,10 +3,10 @@ type Pos = {row:number, col:number};
 
 interface IState {  //this has to be used for ismoveok()
   board:Board;
-  isUnderCheck: [Boolean, Boolean];
-  canCastleKing: [Boolean, Boolean];
-  canCastleQueen: [Boolean, Boolean];
-  enpassantPosition:Pos;
+  isUnderCheck: Boolean;
+  canCastleKing: Boolean;
+  canCastleQueen: Boolean;
+  enpassantPosition:any;
 }
 
 interface IMove2{ //this has to be used for ismoveok()
@@ -784,11 +784,16 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
          endPieceEmpty &&
          deltaFrom.col === deltaTo.col
         ) || (
-         diffRow === 1 &&
+         diffRow === 1 && 
          diffCol === 1 &&
          endPieceTeam !== getTurn(turnIndex) &&
+         !endPieceEmpty
+        ) || (
+         diffRow === 1 && 
+         diffCol === 1 &&
+         endPieceEmpty &&
          enpassantPosition &&
-         enpassantPosition.row && //XXX issue here
+         enpassantPosition.row &&
          enpassantPosition.col &&
          deltaFrom.row === enpassantPosition.row &&
          Math.abs(deltaFrom.col - enpassantPosition.col) === 1
@@ -852,7 +857,7 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
       }
       endPos.col = i;
       if (canPawnMove(board, startPos, endPos, turnIndex, enpassantPosition)) {
-        console.log("found one: from "+startPos.row+","+startPos.col+" to "+endPos.row+","+endPos.col);
+        //console.log("found one: from "+startPos.row+","+startPos.col+" to "+endPos.row+","+endPos.col);
         toPos.push({row: endPos.row, col: endPos.col}); //enpassant move and regular
       }
     }
@@ -911,7 +916,7 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
 
   // Returns true if move is ok
   // params contains move, stateBeforeMove and turnIndexBeforeMove
-  export function isMoveOk(params:IIsMoveOk) {
+  export function isMoveOk(params:any) {
     try {
       let deltaFrom = params.move[2].set.value;
       let deltaTo = params.move[3].set.value;
