@@ -3,9 +3,9 @@ type Pos = {row:number, col:number};
 
 interface IState {  //this has to be used for ismoveok()
   board:Board;
-  isUnderCheck: Boolean;
-  canCastleKing: Boolean;
-  canCastleQueen: Boolean;
+  isUnderCheck: [Boolean, Boolean];
+  canCastleKing: [Boolean, Boolean];
+  canCastleQueen: [Boolean, Boolean];
   enpassantPosition:any;
 }
 
@@ -915,27 +915,26 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
 
 
   // Returns true if move is ok
-  // params contains move, stateBeforeMove and turnIndexBeforeMove
-  export function isMoveOk(params:any) {
+  export function isMoveOk(stateTransition:IStateTransition): Boolean {
     try {
-      let deltaFrom = params.move[2].set.value;
-      let deltaTo = params.move[3].set.value;
-      let promoteTo = params.move[8].set.value;
-      let board = params.stateBeforeMove.board;
-      let isUnderCheck = params.stateBeforeMove.isUnderCheck;
-      let canCastleKing = params.stateBeforeMove.canCastleKing;
-      let canCastleQueen = params.stateBeforeMove.canCastleQueen;
-      let enpassantPosition = params.stateBeforeMove.enpassantPosition;
+      let deltaFrom = stateTransition.move[2].set.value;
+      let deltaTo = stateTransition.move[3].set.value;
+      let promoteTo = stateTransition.move[8].set.value;
+      let board = stateTransition.stateBeforeMove.board;
+      let isUnderCheck = stateTransition.stateBeforeMove.isUnderCheck;
+      let canCastleKing = stateTransition.stateBeforeMove.canCastleKing;
+      let canCastleQueen = stateTransition.stateBeforeMove.canCastleQueen;
+      let enpassantPosition = stateTransition.stateBeforeMove.enpassantPosition;
       let expectedMove = createMove(board,
                                     deltaFrom,
                                     deltaTo,
-                                    params.turnIndexBeforeMove,
+                                    stateTransition.turnIndexBeforeMove,
                                     isUnderCheck,
                                     canCastleKing,
                                     canCastleQueen,
                                     enpassantPosition,
                                     promoteTo);
-      if (!angular.equals(params.move, expectedMove)) {
+      if (!angular.equals(stateTransition.move, expectedMove)) {
         return false;
       }
     } catch (e) {

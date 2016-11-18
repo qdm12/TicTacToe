@@ -57,13 +57,10 @@ declare type IMove = IOperation[];
 //  turnIndexAfterMove: number;
 //  stateAfterMove: IState;
 //}
-interface IState {
-  [index: string]: any;
- }
 
 
 
-interface IIsMoveOk {
+interface IStateTransition {
   turnIndexBeforeMove : number;
   turnIndexAfterMove: number; //NEW: removed
   stateBeforeMove: IState;
@@ -77,7 +74,7 @@ interface IPlayerInfo {
   playerId: string;
 }
 declare type PlayMode = string | number;
-interface IUpdateUI extends IIsMoveOk { //NEW: extens IStateTransition
+interface IUpdateUI extends IStateTransition {
   playersInfo: IPlayerInfo[];
   yourPlayerIndex: number;
   playMode: PlayMode;
@@ -88,7 +85,7 @@ interface IUpdateUI extends IIsMoveOk { //NEW: extens IStateTransition
 interface IGame {
   minNumberOfPlayers: number;
   maxNumberOfPlayers: number;
-  isMoveOk(move: IIsMoveOk): boolean; 
+  isMoveOk(stateTransition: IStateTransition): Boolean; 
   //NEW: checkMoveOk(stateTransition: IStateTransition): void; 
   updateUI(update: IUpdateUI): void;
   gotMessageFromPlatform(message: any): void;
