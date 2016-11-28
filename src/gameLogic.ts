@@ -6,12 +6,17 @@ interface IState {  //this has to be used for ismoveok()
   isUnderCheck: [Boolean, Boolean];
   canCastleKing: [Boolean, Boolean];
   canCastleQueen: [Boolean, Boolean];
-  enpassantPosition:any;
+  enpassantPosition:Pos;
 }
 
 interface IMove2{ //this has to be used for ismoveok()
+  board:Board; //NEW: Should be removed
   deltaFrom:Pos;
   deltaTo:Pos;
+  isUnderCheck: [Boolean, Boolean]; //NEW: Should be removed
+  canCastleKing: [Boolean, Boolean]; //NEW: Should be removed
+  canCastleQueen: [Boolean, Boolean]; //NEW: Should be removed
+  enpassantPosition:Pos; //NEW: Should be removed
   promoteTo:string;
 }
 
@@ -133,7 +138,7 @@ module gameLogic {
  // Returns the move that should be performed when player givin a state
 export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBeforeMove:number,
                            isUnderCheck:[Boolean,Boolean], canCastleKing:[Boolean,Boolean], canCastleQueen:[Boolean,Boolean], 
-                           enpassantPosition:Pos, promoteTo:string) {    
+                           enpassantPosition:Pos, promoteTo:string): IMove {    
     // initialize all variables
     if (!board) { board = getInitialBoard(); }
     if (!isUnderCheck) { isUnderCheck = [false, false]; }
@@ -309,16 +314,17 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
     } else { //games continues
       firstOperation = {setTurn: {turnIndex: turnIndexAfterMove}};
     }
-    return [firstOperation,
-            {set: {key: 'board', value: boardAfterMove}},
-            {set: {key: 'deltaFrom', value: {row: deltaFrom.row, col: deltaFrom.col}}},
-            {set: {key: 'deltaTo', value: {row: deltaTo.row, col: deltaTo.col}}},
-            {set: {key: 'isUnderCheck', value: isUnderCheckAfterMove}},
-            {set: {key: 'canCastleKing', value: canCastleKingAfterMove}},
-            {set: {key: 'canCastleQueen', value: canCastleQueenAfterMove}},
-            {set: {key: 'enpassantPosition', value: enpassantPositionAfterMove}},
-            {set: {key: 'promoteTo', value: promoteToAfterMove}},
-            ];
+    let move:IMove = [firstOperation,
+                      {set: {key: 'board', value: boardAfterMove}},
+                      {set: {key: 'deltaFrom', value: {row: deltaFrom.row, col: deltaFrom.col}}},
+                      {set: {key: 'deltaTo', value: {row: deltaTo.row, col: deltaTo.col}}},
+                      {set: {key: 'isUnderCheck', value: isUnderCheckAfterMove}},
+                      {set: {key: 'canCastleKing', value: canCastleKingAfterMove}},
+                      {set: {key: 'canCastleQueen', value: canCastleQueenAfterMove}},
+                      {set: {key: 'enpassantPosition', value: enpassantPositionAfterMove}},
+                      {set: {key: 'promoteTo', value: promoteToAfterMove}},
+                     ];
+    return move;
   }
 
   // Returns true if the conditions of castle to king side satisfied

@@ -35,10 +35,10 @@ interface IOperation {
   set?: ISet;
   setVisibility?: ISetVisibility;
   setRandomInteger?: ISetRandomInteger;
-  delete?: IDelete;
-  shuffle?: IShuffle;
-  setTurn?: ISetTurn;
-  endMatch?: IEndMatch;
+  delete?: string;
+  shuffle?: string[];
+  setTurn?: number;
+  endMatch?: number[];
 }
 // END OF OLD CODE
 
@@ -78,9 +78,9 @@ interface IUpdateUI extends IStateTransition {
   playersInfo: IPlayerInfo[];
   yourPlayerIndex: number;
   playMode: PlayMode;
-  moveNumber: number; //NEW: removed
-  randomSeed: string; //NEW: removed
-  endMatchScores?: number[]; //NEW: removed
+  //moveNumber: number; //NEW: removed
+  //randomSeed: string; //NEW: removed
+  //endMatchScores?: number[]; //NEW: removed
 }
 interface IGame {
   minNumberOfPlayers: number;
