@@ -452,7 +452,7 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
         }
         let PieceEmpty = (board[i][j] === '');
         let PieceTeam = board[i][j].charAt(0);
-        if (!PieceEmpty && PieceTeam !== getTurn(turnIndex)) {
+        if (PieceEmpty || PieceTeam !== getTurn(turnIndex)) {
           if (moveAndCheck(board, turnIndex, startPos, curPos)) {
             destinations.push(curPos);
           }
