@@ -274,7 +274,7 @@ var gameLogic;
         else {
             firstOperation = { setTurn: { turnIndex: turnIndexAfterMove } };
         }
-        return [firstOperation,
+        var move = [firstOperation,
             { set: { key: 'board', value: boardAfterMove } },
             { set: { key: 'deltaFrom', value: { row: deltaFrom.row, col: deltaFrom.col } } },
             { set: { key: 'deltaTo', value: { row: deltaTo.row, col: deltaTo.col } } },
@@ -284,6 +284,7 @@ var gameLogic;
             { set: { key: 'enpassantPosition', value: enpassantPositionAfterMove } },
             { set: { key: 'promoteTo', value: promoteToAfterMove } },
         ];
+        return move;
     }
     gameLogic.createMove = createMove;
     // Returns true if the conditions of castle to king side satisfied
@@ -399,7 +400,7 @@ var gameLogic;
                 }
                 var PieceEmpty = (board[i][j] === '');
                 var PieceTeam = board[i][j].charAt(0);
-                if (!PieceEmpty && PieceTeam !== getTurn(turnIndex)) {
+                if (PieceEmpty || PieceTeam !== getTurn(turnIndex)) {
                     if (moveAndCheck(board, turnIndex, startPos, curPos)) {
                         destinations.push(curPos);
                     }
@@ -856,19 +857,18 @@ var gameLogic;
         return false;
     }
     // Returns true if move is ok
-    // params contains move, stateBeforeMove and turnIndexBeforeMove
-    function isMoveOk(params) {
+    function isMoveOk(stateTransition) {
         try {
-            var deltaFrom = params.move[2].set.value;
-            var deltaTo = params.move[3].set.value;
-            var promoteTo = params.move[8].set.value;
-            var board = params.stateBeforeMove.board;
-            var isUnderCheck = params.stateBeforeMove.isUnderCheck;
-            var canCastleKing = params.stateBeforeMove.canCastleKing;
-            var canCastleQueen = params.stateBeforeMove.canCastleQueen;
-            var enpassantPosition = params.stateBeforeMove.enpassantPosition;
-            var expectedMove = createMove(board, deltaFrom, deltaTo, params.turnIndexBeforeMove, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition, promoteTo);
-            if (!angular.equals(params.move, expectedMove)) {
+            var deltaFrom = stateTransition.move[2].set.value;
+            var deltaTo = stateTransition.move[3].set.value;
+            var promoteTo = stateTransition.move[8].set.value;
+            var board = stateTransition.stateBeforeMove.board;
+            var isUnderCheck = stateTransition.stateBeforeMove.isUnderCheck;
+            var canCastleKing = stateTransition.stateBeforeMove.canCastleKing;
+            var canCastleQueen = stateTransition.stateBeforeMove.canCastleQueen;
+            var enpassantPosition = stateTransition.stateBeforeMove.enpassantPosition;
+            var expectedMove = createMove(board, deltaFrom, deltaTo, stateTransition.turnIndexBeforeMove, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition, promoteTo);
+            if (!angular.equals(stateTransition.move, expectedMove)) {
                 return false;
             }
         }

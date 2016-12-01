@@ -3,7 +3,6 @@ var game;
 (function (game) {
     game.rowsNum = 8;
     game.colsNum = 8;
-    var selectedCells = []; // record the clicked cells
     var gameArea = document.getElementById("gameArea");
     var draggingStartedRowCol = null; // The {row: YY, col: XX} where dragging started.
     var draggingPiece = null;
@@ -89,7 +88,6 @@ var game;
         if (params.playMode === "playBlack") {
             rotate = true;
         }
-        selectedCells = []; // clear up the selectedCells and waiting for next valid move
     }
     function animationEndedCallback() {
         $rootScope.$apply(function () {
@@ -168,6 +166,8 @@ var game;
                 return;
             }
             if (type === "touchend") {
+                var audio = new Audio('sounds/piece_drop.wav');
+                audio.play();
                 dragDone(draggingStartedRowCol, { row: row, col: col });
             }
             else {
