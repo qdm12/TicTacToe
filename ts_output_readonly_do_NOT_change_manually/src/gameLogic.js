@@ -738,6 +738,9 @@ var gameLogic;
             deltaFrom.col === deltaTo.col) || (diffRow === 1 &&
             diffCol === 1 &&
             endPieceTeam !== getTurn(turnIndex) &&
+            !endPieceEmpty) || (diffRow === 1 &&
+            diffCol === 1 &&
+            endPieceEmpty &&
             enpassantPosition &&
             enpassantPosition.row &&
             enpassantPosition.col &&
@@ -800,7 +803,7 @@ var gameLogic;
             }
             endPos.col = i;
             if (canPawnMove(board, startPos, endPos, turnIndex, enpassantPosition)) {
-                console.log("found one: from " + startPos.row + "," + startPos.col + " to " + endPos.row + "," + endPos.col);
+                //console.log("found one: from "+startPos.row+","+startPos.col+" to "+endPos.row+","+endPos.col);
                 toPos.push({ row: endPos.row, col: endPos.col }); //enpassant move and regular
             }
         }

@@ -100,7 +100,6 @@ var game;
         });
     }
     function sendComputerMove() {
-        //XXX is this necessary ?
         var possibleMoves = gameLogic.getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
         if (possibleMoves.length) {
             var index1 = Math.floor(Math.random() * possibleMoves.length);
@@ -169,8 +168,6 @@ var game;
                 return;
             }
             if (type === "touchend") {
-                var audio = new Audio('sounds/piece_drop.wav');
-                audio.play();
                 dragDone(draggingStartedRowCol, { row: row, col: col });
             }
             else {
@@ -265,7 +262,7 @@ var game;
         var possibleMoves = gameLogic.getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
         var draggingPieceAvailableMoves = [];
         var index = cellInPossibleMoves(row, col, possibleMoves);
-        if (index) {
+        if (index !== -1) {
             var availableMoves = possibleMoves[index][1];
             for (var i = 0; i < availableMoves.length; i++) {
                 var availablePos = availableMoves[i];
@@ -371,11 +368,9 @@ var game;
                     enpassantPosition = { row: null, col: null };
                 }
                 var possibleMoves = gameLogic.getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
-                return cellInPossibleMoves(row, col, possibleMoves); //XXX bad design ! ?
+                return cellInPossibleMoves(row, col, possibleMoves) !== -1;
             }
-            else {
-                return false;
-            }
+            return false;
         }
     };
     function getTurn(turnIndex) {
@@ -390,7 +385,7 @@ var game;
                 return i;
             }
         }
-        return false; //XXX should be an error ?
+        return -1;
     }
     game.isBlackPiece = function (row, col) {
         if (rotate) {
