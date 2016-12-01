@@ -12,7 +12,6 @@ interface Translations {
 module game {
       export let rowsNum = 8;
       export let colsNum = 8;
-      let selectedCells:any = [];       // record the clicked cells
       let gameArea:any = document.getElementById("gameArea");
       let draggingStartedRowCol:any = null; // The {row: YY, col: XX} where dragging started.
       let draggingPiece:any = null;
@@ -27,7 +26,7 @@ module game {
       let isUnderCheck:any = null;
       let canCastleKing:any = null;
       let canCastleQueen:any = null;
-      let enpassantPosition:any = null;
+      let enpassantPosition:Pos = null;
       let deltaFrom:any = null;
       let deltaTo:any = null;
       let promoteTo:any = null;
@@ -102,7 +101,6 @@ module game {
     if (params.playMode === "playBlack") {
 		  rotate = true;
 	  }
-	  selectedCells = []; // clear up the selectedCells and waiting for next valid move
 	}
 
 	function animationEndedCallback() {

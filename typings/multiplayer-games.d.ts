@@ -35,10 +35,10 @@ interface IOperation {
   set?: ISet;
   setVisibility?: ISetVisibility;
   setRandomInteger?: ISetRandomInteger;
-  delete?: IDelete;
-  shuffle?: IShuffle;
-  setTurn?: ISetTurn;
-  endMatch?: IEndMatch;
+  delete?: string;
+  shuffle?: string[];
+  setTurn?: number;
+  endMatch?: number[];
 }
 // END OF OLD CODE
 
@@ -57,13 +57,10 @@ declare type IMove = IOperation[];
 //  turnIndexAfterMove: number;
 //  stateAfterMove: IState;
 //}
-interface IState {
-  [index: string]: any;
- }
 
 
 
-interface IIsMoveOk {
+interface IStateTransition {
   turnIndexBeforeMove : number;
   turnIndexAfterMove: number; //NEW: removed
   stateBeforeMove: IState;
@@ -77,18 +74,18 @@ interface IPlayerInfo {
   playerId: string;
 }
 declare type PlayMode = string | number;
-interface IUpdateUI extends IIsMoveOk { //NEW: extens IStateTransition
+interface IUpdateUI extends IStateTransition {
   playersInfo: IPlayerInfo[];
   yourPlayerIndex: number;
   playMode: PlayMode;
-  moveNumber: number; //NEW: removed
-  randomSeed: string; //NEW: removed
-  endMatchScores?: number[]; //NEW: removed
+  //moveNumber: number; //NEW: removed
+  //randomSeed: string; //NEW: removed
+  //endMatchScores?: number[]; //NEW: removed
 }
 interface IGame {
   minNumberOfPlayers: number;
   maxNumberOfPlayers: number;
-  isMoveOk(move: IIsMoveOk): boolean; 
+  isMoveOk(stateTransition: IStateTransition): Boolean; 
   //NEW: checkMoveOk(stateTransition: IStateTransition): void; 
   updateUI(update: IUpdateUI): void;
   gotMessageFromPlatform(message: any): void;

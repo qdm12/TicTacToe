@@ -3,15 +3,20 @@ type Pos = {row:number, col:number};
 
 interface IState {  //this has to be used for ismoveok()
   board:Board;
-  isUnderCheck: Boolean;
-  canCastleKing: Boolean;
-  canCastleQueen: Boolean;
-  enpassantPosition:any;
+  isUnderCheck: [Boolean, Boolean];
+  canCastleKing: [Boolean, Boolean];
+  canCastleQueen: [Boolean, Boolean];
+  enpassantPosition:Pos;
 }
 
 interface IMove2{ //this has to be used for ismoveok()
+  board:Board; //NEW: Should be removed
   deltaFrom:Pos;
   deltaTo:Pos;
+  isUnderCheck: [Boolean, Boolean]; //NEW: Should be removed
+  canCastleKing: [Boolean, Boolean]; //NEW: Should be removed
+  canCastleQueen: [Boolean, Boolean]; //NEW: Should be removed
+  enpassantPosition:Pos; //NEW: Should be removed
   promoteTo:string;
 }
 
@@ -133,7 +138,7 @@ module gameLogic {
  // Returns the move that should be performed when player givin a state
 export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBeforeMove:number,
                            isUnderCheck:[Boolean,Boolean], canCastleKing:[Boolean,Boolean], canCastleQueen:[Boolean,Boolean], 
-                           enpassantPosition:Pos, promoteTo:string) {    
+                           enpassantPosition:Pos, promoteTo:string): IMove {    
     // initialize all variables
     if (!board) { board = getInitialBoard(); }
     if (!isUnderCheck) { isUnderCheck = [false, false]; }
@@ -309,16 +314,17 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
     } else { //games continues
       firstOperation = {setTurn: {turnIndex: turnIndexAfterMove}};
     }
-    return [firstOperation,
-            {set: {key: 'board', value: boardAfterMove}},
-            {set: {key: 'deltaFrom', value: {row: deltaFrom.row, col: deltaFrom.col}}},
-            {set: {key: 'deltaTo', value: {row: deltaTo.row, col: deltaTo.col}}},
-            {set: {key: 'isUnderCheck', value: isUnderCheckAfterMove}},
-            {set: {key: 'canCastleKing', value: canCastleKingAfterMove}},
-            {set: {key: 'canCastleQueen', value: canCastleQueenAfterMove}},
-            {set: {key: 'enpassantPosition', value: enpassantPositionAfterMove}},
-            {set: {key: 'promoteTo', value: promoteToAfterMove}},
-            ];
+    let move:IMove = [firstOperation,
+                      {set: {key: 'board', value: boardAfterMove}},
+                      {set: {key: 'deltaFrom', value: {row: deltaFrom.row, col: deltaFrom.col}}},
+                      {set: {key: 'deltaTo', value: {row: deltaTo.row, col: deltaTo.col}}},
+                      {set: {key: 'isUnderCheck', value: isUnderCheckAfterMove}},
+                      {set: {key: 'canCastleKing', value: canCastleKingAfterMove}},
+                      {set: {key: 'canCastleQueen', value: canCastleQueenAfterMove}},
+                      {set: {key: 'enpassantPosition', value: enpassantPositionAfterMove}},
+                      {set: {key: 'promoteTo', value: promoteToAfterMove}},
+                     ];
+    return move;
   }
 
   // Returns true if the conditions of castle to king side satisfied
@@ -446,7 +452,7 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
         }
         let PieceEmpty = (board[i][j] === '');
         let PieceTeam = board[i][j].charAt(0);
-        if (!PieceEmpty && PieceTeam !== getTurn(turnIndex)) {
+        if (PieceEmpty || PieceTeam !== getTurn(turnIndex)) {
           if (moveAndCheck(board, turnIndex, startPos, curPos)) {
             destinations.push(curPos);
           }
@@ -915,27 +921,26 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
 
 
   // Returns true if move is ok
-  // params contains move, stateBeforeMove and turnIndexBeforeMove
-  export function isMoveOk(params:any) {
+  export function isMoveOk(stateTransition:IStateTransition): Boolean {
     try {
-      let deltaFrom = params.move[2].set.value;
-      let deltaTo = params.move[3].set.value;
-      let promoteTo = params.move[8].set.value;
-      let board = params.stateBeforeMove.board;
-      let isUnderCheck = params.stateBeforeMove.isUnderCheck;
-      let canCastleKing = params.stateBeforeMove.canCastleKing;
-      let canCastleQueen = params.stateBeforeMove.canCastleQueen;
-      let enpassantPosition = params.stateBeforeMove.enpassantPosition;
+      let deltaFrom = stateTransition.move[2].set.value;
+      let deltaTo = stateTransition.move[3].set.value;
+      let promoteTo = stateTransition.move[8].set.value;
+      let board = stateTransition.stateBeforeMove.board;
+      let isUnderCheck = stateTransition.stateBeforeMove.isUnderCheck;
+      let canCastleKing = stateTransition.stateBeforeMove.canCastleKing;
+      let canCastleQueen = stateTransition.stateBeforeMove.canCastleQueen;
+      let enpassantPosition = stateTransition.stateBeforeMove.enpassantPosition;
       let expectedMove = createMove(board,
                                     deltaFrom,
                                     deltaTo,
-                                    params.turnIndexBeforeMove,
+                                    stateTransition.turnIndexBeforeMove,
                                     isUnderCheck,
                                     canCastleKing,
                                     canCastleQueen,
                                     enpassantPosition,
                                     promoteTo);
-      if (!angular.equals(params.move, expectedMove)) {
+      if (!angular.equals(stateTransition.move, expectedMove)) {
         return false;
       }
     } catch (e) {
