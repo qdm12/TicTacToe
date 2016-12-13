@@ -1,10 +1,6 @@
 ;
 var game;
 (function (game) {
-    game.rowsNum = 8;
-    game.colsNum = 8;
-    game.rows = [0, 1, 2, 3, 4, 5, 6, 7];
-    game.cols = [0, 1, 2, 3, 4, 5, 6, 7];
     var gameArea = document.getElementById("gameArea");
     var draggingStartedRowCol = null; // The {row: YY, col: XX} where dragging started.
     var draggingPiece = null;
@@ -137,8 +133,8 @@ var game;
         }
         else {
             // Inside gameArea. Let's find the containing square's row and col
-            var col = Math.floor(game.colsNum * x / gameArea.clientWidth);
-            var row = Math.floor(game.rowsNum * y / gameArea.clientHeight);
+            var col = Math.floor(8 * x / gameArea.clientWidth);
+            var row = Math.floor(8 * y / gameArea.clientHeight);
             var r_row = row;
             var r_col = col;
             if (rotate) {

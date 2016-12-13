@@ -10,10 +10,6 @@ interface Translations {
 }
 
 module game {
-    export let rowsNum = 8;
-    export let colsNum = 8;
-    export let rows:any = [0,1,2,3,4,5,6,7];
-    export let cols:any = [0,1,2,3,4,5,6,7];
     let gameArea:any = document.getElementById("gameArea");
     let draggingStartedRowCol:Pos = null; // The {row: YY, col: XX} where dragging started.
     let draggingPiece:any = null;
@@ -170,8 +166,8 @@ module game {
             }
         } else {
             // Inside gameArea. Let's find the containing square's row and col
-            let col:number = Math.floor(colsNum * x / gameArea.clientWidth);
-            let row:number = Math.floor(rowsNum * y / gameArea.clientHeight);
+            let col:number = Math.floor(8 * x / gameArea.clientWidth);
+            let row:number = Math.floor(8 * y / gameArea.clientHeight);
             let r_row:number = row;
             let r_col:number = col;
             if (rotate) {

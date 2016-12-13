@@ -18,7 +18,6 @@
   <script src="lib/angular.min.js"></script>
   <script src="lib/angular-touch.min.js"></script>
   <script src="lib/ui-bootstrap-tpls.min.js"></script>
-  
 
   <!-- build:js js/everything.min.js -->
   <script src="lib/angular.min.js"></script>
@@ -30,37 +29,29 @@
 
   <script>window.angularTranslationLanguages = ['en', 'zh'];</script>
 </head>
-
-
-
-
+<body ng-cloak>
     <div id="gameArea">
-      <section id="board">
-        <div ng-repeat="row in game.rows"
-            style="position:absolute; top:{{row * 100 / game.rowsNum}}%; left:0; width:100%; height:{{100 / game.rowsNum}}%;">
-          <div ng-repeat="col in game.cols" class="square"
-              style="position:absolute; top:0; left:{{col * 100 / game.colsNum}}%; width:{{100 / game.colsNum}}%; height:100%;"
-              id="{{'e2e_test_div_' + row + 'x' + col}}">
-            <svg width="100%" height="100%"
-              style="position:absolute;"
-              ng-show="true">
-              <!-- background image -->
-              <rect width="100%" height="100%" ng-attr-fill="{{game.getBackgroundFill(row, col)}}" id="MyBackground{{row}}x{{col}}" />
-              <div class="img-wrap" id="MyPiece{{row}}x{{col}}">
-                <!--The image of the piece get wrapped upon background img-->
-                <img ng-class="{piece: true,
-                                canSelect: game.canSelect(row, col),
-                                isBlackPiece: game.isBlackPiece(row, col),
-                                isWhitePiece: !game.isBlackPiece(row, col)}"
-                  ng-show="game.shouldShowImage(row, col)"
-                  ng-src="{{game.getImageSrc(row, col)}}"
-                  id="{{'e2e_test_img_' + game.getPieceKindInId(row, col) + '_' + row + 'x' + col}}">
-              </div>
-            </svg>
-          </div>
+        <div ng-repeat="row in [0, 1, 2, 3, 4, 5, 6, 7]"
+            style="position:absolute; top:{{row * 12.5}}%; left:0; width:100%; height:12.5%;">
+            <div ng-repeat="col in [0, 1, 2, 3, 4, 5, 6, 7]" class="square"
+                style="position:absolute; top:0; left:{{col * 12.5}}%; width:12.5%; height:100%;"
+                id="{{'e2e_test_div_' + row + 'x' + col}}">
+                <svg width="100%" height="100%" style="position:absolute;" ng-show="true">
+                    <!-- background image -->
+                    <rect width="100%" height="100%" ng-attr-fill="{{game.getBackgroundFill(row, col)}}" id="MyBackground{{row}}x{{col}}" />
+                    <div class="img-wrap" id="MyPiece{{row}}x{{col}}">
+                        <!--The image of the piece get wrapped upon background img-->
+                        <img ng-class="{piece: true,
+                                        canSelect: game.canSelect(row, col),
+                                        isBlackPiece: game.isBlackPiece(row, col),
+                                        isWhitePiece: !game.isBlackPiece(row, col)}"
+                             ng-show="game.shouldShowImage(row, col)"
+                             ng-src="{{game.getImageSrc(row, col)}}"
+                             id="{{'e2e_test_img_' + game.getPieceKindInId(row, col) + '_' + row + 'x' + col}}">
+                    </div>
+                </svg>
+            </div>
         </div>
-      </section>
     </div>
-
 </body>
 </html>
