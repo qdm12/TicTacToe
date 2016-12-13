@@ -9,15 +9,17 @@
   <meta name="description" content="Chess game">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-  <script src="lib/angular.min.js"></script>
-  <script src="lib/angular-touch.min.js"></script>
-  <script src="lib/ui-bootstrap-tpls.min.js"></script>
-  <link rel="stylesheet" href="css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/bootstrap-theme.min.css">
-  
+  <!-- To ensure CSS files are downloaded in parallel, always include external CSS before external JavaScript. -->
   <!-- build:[href] css/everything.min.css -->
   <link rel="stylesheet" type="text/css" href="css/game.css">
   <!-- /build -->
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+  <script src="lib/angular.min.js"></script>
+  <script src="lib/angular-touch.min.js"></script>
+  <script src="lib/ui-bootstrap-tpls.min.js"></script>
+  
+
   <!-- build:js js/everything.min.js -->
   <script src="lib/angular.min.js"></script>
   <script src="lib/turnBasedServices.3.js"></script>
