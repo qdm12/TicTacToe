@@ -1,23 +1,11 @@
 type Board = string[][];
 type Pos = {row:number, col:number};
-
 interface IState {  //this has to be used for ismoveok()
   board:Board;
   isUnderCheck: [Boolean, Boolean];
   canCastleKing: [Boolean, Boolean];
   canCastleQueen: [Boolean, Boolean];
   enpassantPosition:Pos;
-}
-
-interface IMove2{ //this has to be used for ismoveok()
-  board:Board; //NEW: Should be removed
-  deltaFrom:Pos;
-  deltaTo:Pos;
-  isUnderCheck: [Boolean, Boolean]; //NEW: Should be removed
-  canCastleKing: [Boolean, Boolean]; //NEW: Should be removed
-  canCastleQueen: [Boolean, Boolean]; //NEW: Should be removed
-  enpassantPosition:Pos; //NEW: Should be removed
-  promoteTo:string;
 }
 
 module gameLogic {
@@ -35,8 +23,11 @@ module gameLogic {
   }
 
   // Returns true if the game ended in a tie because there are no available moves for any pieces
-  function isTie(board:Board, turnIndex:number, isUnderCheck:[Boolean,Boolean], canCastleKing:[Boolean,Boolean], canCastleQueen:[Boolean,Boolean], enpassantPosition:Pos) {
-    if (isUnderCheck[turnIndex]) {
+  function isTie(board:Board, turnIndex:number, 
+                 isUnderCheck:[Boolean,Boolean],
+                 canCastleKing:[Boolean,Boolean],
+                 canCastleQueen:[Boolean,Boolean], enpassantPosition:Pos){
+    if (isUnderCheck[turnIndex]){
       return false;
     }
     for (let i = 0; i < 8; i++) {
@@ -83,18 +74,18 @@ module gameLogic {
   }
 
   // Returns the winner (either 'W' or 'B') or '' if there is no winner
-  function getWinner(board:Board, turnIndex:number, isUnderCheck:[Boolean,Boolean], canCastleKing:[Boolean,Boolean], canCastleQueen:[Boolean,Boolean], enpassantPosition:Pos):string {
+  function getWinner(board:Board, turnIndex:number,
+                     isUnderCheck:[Boolean,Boolean],
+                     canCastleKing:[Boolean,Boolean],
+                     canCastleQueen:[Boolean,Boolean],
+                     enpassantPosition:Pos):string {
     if (!isUnderCheck[turnIndex]) {
       return '';
     }
     let kingsPosition = findKingsPosition(board, turnIndex);
     // if there is no available moves for king
-    if (!canKingMoveAnywhere(board, 
-                             turnIndex,
-                             kingsPosition,
-                             isUnderCheck,
-                             canCastleKing,
-                             canCastleQueen)) {
+    if (!canKingMoveAnywhere(board, turnIndex, kingsPosition, isUnderCheck,
+                             canCastleKing, canCastleQueen)) {
       for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
           let PieceEmpty = (board[i][j] === '');
@@ -122,7 +113,7 @@ module gameLogic {
                 }
                 break;
               case 'P':
-                if (canPawnMoveAnywhere(board, turnIndex, {row: i, col: j}, enpassantPosition)) {
+                if (canPawnMoveAnywhere(board, turnIndex, {row:i, col:j}, enpassantPosition)) {
                   return '';
                 }
                 break;
@@ -135,10 +126,13 @@ module gameLogic {
     }
  }
 
- // Returns the move that should be performed when player givin a state
-export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBeforeMove:number,
-                           isUnderCheck:[Boolean,Boolean], canCastleKing:[Boolean,Boolean], canCastleQueen:[Boolean,Boolean], 
-                           enpassantPosition:Pos, promoteTo:string): IMove {    
+ // Returns the move that should be performed
+export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, 
+                           turnIndex:number, 
+                           isUnderCheck:[Boolean,Boolean],
+                           canCastleKing:[Boolean,Boolean],
+                           canCastleQueen:[Boolean,Boolean], 
+                           enpassantPosition:Pos, promoteTo:string): IMove{    
     // initialize all variables
     if (!board) { board = getInitialBoard(); }
     if (!isUnderCheck) { isUnderCheck = [false, false]; }
@@ -146,28 +140,19 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
     if (!canCastleQueen) { canCastleQueen = [true, true]; }
     if (!enpassantPosition) { enpassantPosition = {row: null, col: null}; }
     if (!promoteTo) { promoteTo = ''; }
-    
-    if (deltaFrom.row === deltaTo.row && deltaFrom.col === deltaTo.col) {
+    if (deltaFrom.row === deltaTo.row && deltaFrom.col === deltaTo.col){
       throw new Error ("Cannot move to the same position.");
     }
     let PieceEmpty = (board[deltaTo.row][deltaTo.col] === '');
     let PieceTeam = board[deltaTo.row][deltaTo.col].charAt(0);
-    if (!PieceEmpty && PieceTeam === getTurn(turnIndexBeforeMove)) {
+    if (!PieceEmpty && PieceTeam === getTurn(turnIndex)){
       throw new Error("One can only make a move in an empty position or capture opponent's piece!");
     }
-    if (getWinner(board,
-                  turnIndexBeforeMove,
-                  isUnderCheck,
-                  canCastleKing,
-                  canCastleQueen,
-                  enpassantPosition) //there is a winner 'W' or 'B'
+    if (getWinner(board, turnIndex, isUnderCheck, canCastleKing,
+                  canCastleQueen, enpassantPosition)
         ||
-        isTie(board,
-              turnIndexBeforeMove,
-              isUnderCheck,
-              canCastleKing,
-              canCastleQueen,
-              enpassantPosition)) {
+        isTie(board, turnIndex, isUnderCheck, canCastleKing,
+              canCastleQueen, enpassantPosition)){
       throw new Error("Can only make a move if the game is not over!");
     }
     let boardAfterMove = angular.copy(board),
@@ -176,30 +161,30 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
         canCastleQueenAfterMove = angular.copy(canCastleQueen),
         enpassantPositionAfterMove = angular.copy(enpassantPosition),
         promoteToAfterMove = angular.copy(promoteTo);
-    if (getTurn(turnIndexBeforeMove) !== board[deltaFrom.row][deltaFrom.col].charAt(0)) {
+    if (getTurn(turnIndex) !== board[deltaFrom.row][deltaFrom.col].charAt(0)) {
       throw new Error("Illegal to move this piece!");
     }
 
     // update the board according to the moving piece
     switch(board[deltaFrom.row][deltaFrom.col].charAt(1)) {
       case 'K':
-        if (isCastlingKing(board, deltaFrom, deltaTo, turnIndexBeforeMove, canCastleKing)) {
+        if (isCastlingKing(board, deltaFrom, deltaTo, turnIndex, canCastleKing)) {
           boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
           boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
-          boardAfterMove[deltaTo.row][deltaTo.col - 1] = getTurn(turnIndexBeforeMove) + 'R';
+          boardAfterMove[deltaTo.row][deltaTo.col - 1] = getTurn(turnIndex) + 'R';
           boardAfterMove[deltaTo.row][7] = '';
-          canCastleKingAfterMove[turnIndexBeforeMove] = false;
-          canCastleQueenAfterMove[turnIndexBeforeMove] = false;
+          canCastleKingAfterMove[turnIndex] = false;
+          canCastleQueenAfterMove[turnIndex] = false;
         }
-        else if (isCastlingQueen(board, deltaFrom, deltaTo, turnIndexBeforeMove, canCastleQueen)) {
+        else if (isCastlingQueen(board, deltaFrom, deltaTo, turnIndex, canCastleQueen)) {
           boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
           boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
-          boardAfterMove[deltaTo.row][deltaTo.col + 1] = getTurn(turnIndexBeforeMove) + 'R';
+          boardAfterMove[deltaTo.row][deltaTo.col + 1] = getTurn(turnIndex) + 'R';
           boardAfterMove[deltaTo.row][0] = '';
-          canCastleKingAfterMove[turnIndexBeforeMove] = false;
-          canCastleQueenAfterMove[turnIndexBeforeMove] = false;
+          canCastleKingAfterMove[turnIndex] = false;
+          canCastleQueenAfterMove[turnIndex] = false;
         }
-        else if(canKingMove(board, deltaFrom, deltaTo, turnIndexBeforeMove)) {
+        else if(canKingMove(board, deltaFrom, deltaTo, turnIndex)) {
           boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
           boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
         } else {
@@ -207,7 +192,7 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
         }
         break;
       case 'Q':
-        if(canQueenMove(board, deltaFrom, deltaTo, turnIndexBeforeMove)) {
+        if(canQueenMove(board, deltaFrom, deltaTo, turnIndex)) {
             boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
             boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
         } else {
@@ -215,7 +200,7 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
         }
         break;
       case 'R':
-        if(canRookMove(board, deltaFrom, deltaTo, turnIndexBeforeMove)) {
+        if(canRookMove(board, deltaFrom, deltaTo, turnIndex)) {
             boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
             boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
         } else {
@@ -223,7 +208,7 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
         }
         break;
       case 'B':
-        if(canBishopMove(board, deltaFrom, deltaTo, turnIndexBeforeMove)) {
+        if(canBishopMove(board, deltaFrom, deltaTo, turnIndex)) {
           boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
           boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
         } else {
@@ -231,7 +216,7 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
         }
         break;
       case 'N':
-        if(canKnightMove(board, deltaFrom, deltaTo, turnIndexBeforeMove)) {
+        if(canKnightMove(board, deltaFrom, deltaTo, turnIndex)) {
           boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
           boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
         } else {
@@ -239,7 +224,7 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
         }
         break;
       case 'P':
-        if(canPawnMove(board, deltaFrom, deltaTo, turnIndexBeforeMove, enpassantPosition)) {
+        if(canPawnMove(board, deltaFrom, deltaTo, turnIndex, enpassantPosition)) {
           boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
           // capture the opponent pawn with enpassant
           if (enpassantPosition.row &&
@@ -253,16 +238,13 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
           enpassantPositionAfterMove.col = null;
 
           // check for enpassant
-          if (getTurn(turnIndexBeforeMove) === "W" &&
-              deltaTo.row === 4) {
+          if (getTurn(turnIndex) === "W" && deltaTo.row === 4){
             if (boardAfterMove[deltaTo.row][deltaTo.col - 1] === "BP" ||
                 boardAfterMove[deltaTo.row][deltaTo.col + 1] === "BP") {
               enpassantPositionAfterMove.row = deltaTo.row;
               enpassantPositionAfterMove.col = deltaTo.col;
             }
-          }
-          if (getTurn(turnIndexBeforeMove) === "B" &&
-              deltaTo.row === 3) {
+          }else if (getTurn(turnIndex) === "B" && deltaTo.row === 3) {
             if (boardAfterMove[deltaTo.row][deltaTo.col - 1] === "WP" ||
                 boardAfterMove[deltaTo.row][deltaTo.col + 1] === "WP") {
               enpassantPositionAfterMove.row = deltaTo.row;
@@ -272,8 +254,10 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
 
           // check for promotion
           if (deltaTo.row === 0 || deltaTo.row === 7) {
-            if (!promoteToAfterMove){
-              promoteToAfterMove = getTurn(turnIndexBeforeMove) + "Q"
+            let audio = new Audio('sounds/piece_promote.mp3');
+            audio.play();
+            if (promoteToAfterMove == ''){
+              promoteToAfterMove = getTurn(turnIndex) + "Q"; //XXX eventually give choice later on
             }
             boardAfterMove[deltaTo.row][deltaTo.col] = promoteToAfterMove;
             // promoteToAfterMove = '';
@@ -285,12 +269,12 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
       default:
         throw new Error("Unknown piece type!");
     }
-    let turnIndexAfterMove = 1 - turnIndexBeforeMove;
-    if (isUnderCheckByPositions(boardAfterMove, turnIndexAfterMove)) {
-      isUnderCheckAfterMove[turnIndexAfterMove] = true;
+    turnIndex = 1 - turnIndex;
+    if (isUnderCheckByPositions(boardAfterMove, turnIndex)) {
+      isUnderCheckAfterMove[turnIndex] = true;
     }
     let winner = getWinner(boardAfterMove,
-                           turnIndexAfterMove,
+                           turnIndex,
                            isUnderCheckAfterMove,
                            canCastleKingAfterMove,
                            canCastleQueenAfterMove,
@@ -301,7 +285,7 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
     } else if (winner == 'B'){
       scores = [0,1];
     } else if (isTie(boardAfterMove,
-                     turnIndexAfterMove,
+                     turnIndex,
                      isUnderCheckAfterMove,
                      canCastleKingAfterMove,
                      canCastleQueenAfterMove,
@@ -312,7 +296,7 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
     if(scores != null){ //game is over
       firstOperation = {endMatch: {endMatchScores: scores}};
     } else { //games continues
-      firstOperation = {setTurn: {turnIndex: turnIndexAfterMove}};
+      firstOperation = {setTurn: {turnIndex: turnIndex}};
     }
     let move:IMove = [firstOperation,
                       {set: {key: 'board', value: boardAfterMove}},
@@ -951,7 +935,11 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndexBef
 
   /* Returns all the possible moves for the given state and turnIndex.
    * Returns an empty array if the game is over. */
-  export function getPossibleMoves(board:Board, turnIndex:number, isUnderCheck:[Boolean,Boolean], canCastleKing:[Boolean,Boolean], canCastleQueen:[Boolean,Boolean], enpassantPosition:Pos) {
+  export function getPossibleMoves(board:Board, turnIndex:number, 
+                                   isUnderCheck:[Boolean,Boolean],
+                                   canCastleKing:[Boolean,Boolean],
+                                   canCastleQueen:[Boolean,Boolean],
+                                   enpassantPosition:Pos) {
     if (!board) {
       return [];
     }

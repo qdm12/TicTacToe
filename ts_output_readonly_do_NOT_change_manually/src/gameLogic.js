@@ -106,8 +106,8 @@ var gameLogic;
             return getOpponent(turnIndex);
         }
     }
-    // Returns the move that should be performed when player givin a state
-    function createMove(board, deltaFrom, deltaTo, turnIndexBeforeMove, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition, promoteTo) {
+    // Returns the move that should be performed
+    function createMove(board, deltaFrom, deltaTo, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition, promoteTo) {
         // initialize all variables
         if (!board) {
             board = getInitialBoard();
@@ -132,38 +132,38 @@ var gameLogic;
         }
         var PieceEmpty = (board[deltaTo.row][deltaTo.col] === '');
         var PieceTeam = board[deltaTo.row][deltaTo.col].charAt(0);
-        if (!PieceEmpty && PieceTeam === getTurn(turnIndexBeforeMove)) {
+        if (!PieceEmpty && PieceTeam === getTurn(turnIndex)) {
             throw new Error("One can only make a move in an empty position or capture opponent's piece!");
         }
-        if (getWinner(board, turnIndexBeforeMove, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition) //there is a winner 'W' or 'B'
+        if (getWinner(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition)
             ||
-                isTie(board, turnIndexBeforeMove, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition)) {
+                isTie(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition)) {
             throw new Error("Can only make a move if the game is not over!");
         }
         var boardAfterMove = angular.copy(board), isUnderCheckAfterMove = angular.copy(isUnderCheck), canCastleKingAfterMove = angular.copy(canCastleKing), canCastleQueenAfterMove = angular.copy(canCastleQueen), enpassantPositionAfterMove = angular.copy(enpassantPosition), promoteToAfterMove = angular.copy(promoteTo);
-        if (getTurn(turnIndexBeforeMove) !== board[deltaFrom.row][deltaFrom.col].charAt(0)) {
+        if (getTurn(turnIndex) !== board[deltaFrom.row][deltaFrom.col].charAt(0)) {
             throw new Error("Illegal to move this piece!");
         }
         // update the board according to the moving piece
         switch (board[deltaFrom.row][deltaFrom.col].charAt(1)) {
             case 'K':
-                if (isCastlingKing(board, deltaFrom, deltaTo, turnIndexBeforeMove, canCastleKing)) {
+                if (isCastlingKing(board, deltaFrom, deltaTo, turnIndex, canCastleKing)) {
                     boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
                     boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
-                    boardAfterMove[deltaTo.row][deltaTo.col - 1] = getTurn(turnIndexBeforeMove) + 'R';
+                    boardAfterMove[deltaTo.row][deltaTo.col - 1] = getTurn(turnIndex) + 'R';
                     boardAfterMove[deltaTo.row][7] = '';
-                    canCastleKingAfterMove[turnIndexBeforeMove] = false;
-                    canCastleQueenAfterMove[turnIndexBeforeMove] = false;
+                    canCastleKingAfterMove[turnIndex] = false;
+                    canCastleQueenAfterMove[turnIndex] = false;
                 }
-                else if (isCastlingQueen(board, deltaFrom, deltaTo, turnIndexBeforeMove, canCastleQueen)) {
+                else if (isCastlingQueen(board, deltaFrom, deltaTo, turnIndex, canCastleQueen)) {
                     boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
                     boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
-                    boardAfterMove[deltaTo.row][deltaTo.col + 1] = getTurn(turnIndexBeforeMove) + 'R';
+                    boardAfterMove[deltaTo.row][deltaTo.col + 1] = getTurn(turnIndex) + 'R';
                     boardAfterMove[deltaTo.row][0] = '';
-                    canCastleKingAfterMove[turnIndexBeforeMove] = false;
-                    canCastleQueenAfterMove[turnIndexBeforeMove] = false;
+                    canCastleKingAfterMove[turnIndex] = false;
+                    canCastleQueenAfterMove[turnIndex] = false;
                 }
-                else if (canKingMove(board, deltaFrom, deltaTo, turnIndexBeforeMove)) {
+                else if (canKingMove(board, deltaFrom, deltaTo, turnIndex)) {
                     boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
                     boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
                 }
@@ -172,7 +172,7 @@ var gameLogic;
                 }
                 break;
             case 'Q':
-                if (canQueenMove(board, deltaFrom, deltaTo, turnIndexBeforeMove)) {
+                if (canQueenMove(board, deltaFrom, deltaTo, turnIndex)) {
                     boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
                     boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
                 }
@@ -181,7 +181,7 @@ var gameLogic;
                 }
                 break;
             case 'R':
-                if (canRookMove(board, deltaFrom, deltaTo, turnIndexBeforeMove)) {
+                if (canRookMove(board, deltaFrom, deltaTo, turnIndex)) {
                     boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
                     boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
                 }
@@ -190,7 +190,7 @@ var gameLogic;
                 }
                 break;
             case 'B':
-                if (canBishopMove(board, deltaFrom, deltaTo, turnIndexBeforeMove)) {
+                if (canBishopMove(board, deltaFrom, deltaTo, turnIndex)) {
                     boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
                     boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
                 }
@@ -199,7 +199,7 @@ var gameLogic;
                 }
                 break;
             case 'N':
-                if (canKnightMove(board, deltaFrom, deltaTo, turnIndexBeforeMove)) {
+                if (canKnightMove(board, deltaFrom, deltaTo, turnIndex)) {
                     boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
                     boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
                 }
@@ -208,7 +208,7 @@ var gameLogic;
                 }
                 break;
             case 'P':
-                if (canPawnMove(board, deltaFrom, deltaTo, turnIndexBeforeMove, enpassantPosition)) {
+                if (canPawnMove(board, deltaFrom, deltaTo, turnIndex, enpassantPosition)) {
                     boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
                     // capture the opponent pawn with enpassant
                     if (enpassantPosition.row &&
@@ -221,16 +221,14 @@ var gameLogic;
                     enpassantPositionAfterMove.row = null;
                     enpassantPositionAfterMove.col = null;
                     // check for enpassant
-                    if (getTurn(turnIndexBeforeMove) === "W" &&
-                        deltaTo.row === 4) {
+                    if (getTurn(turnIndex) === "W" && deltaTo.row === 4) {
                         if (boardAfterMove[deltaTo.row][deltaTo.col - 1] === "BP" ||
                             boardAfterMove[deltaTo.row][deltaTo.col + 1] === "BP") {
                             enpassantPositionAfterMove.row = deltaTo.row;
                             enpassantPositionAfterMove.col = deltaTo.col;
                         }
                     }
-                    if (getTurn(turnIndexBeforeMove) === "B" &&
-                        deltaTo.row === 3) {
+                    else if (getTurn(turnIndex) === "B" && deltaTo.row === 3) {
                         if (boardAfterMove[deltaTo.row][deltaTo.col - 1] === "WP" ||
                             boardAfterMove[deltaTo.row][deltaTo.col + 1] === "WP") {
                             enpassantPositionAfterMove.row = deltaTo.row;
@@ -239,8 +237,10 @@ var gameLogic;
                     }
                     // check for promotion
                     if (deltaTo.row === 0 || deltaTo.row === 7) {
-                        if (!promoteToAfterMove) {
-                            promoteToAfterMove = getTurn(turnIndexBeforeMove) + "Q";
+                        var audio = new Audio('sounds/piece_promote.mp3');
+                        audio.play();
+                        if (promoteToAfterMove == '') {
+                            promoteToAfterMove = getTurn(turnIndex) + "Q"; //XXX eventually give choice later on
                         }
                         boardAfterMove[deltaTo.row][deltaTo.col] = promoteToAfterMove;
                     }
@@ -252,11 +252,11 @@ var gameLogic;
             default:
                 throw new Error("Unknown piece type!");
         }
-        var turnIndexAfterMove = 1 - turnIndexBeforeMove;
-        if (isUnderCheckByPositions(boardAfterMove, turnIndexAfterMove)) {
-            isUnderCheckAfterMove[turnIndexAfterMove] = true;
+        turnIndex = 1 - turnIndex;
+        if (isUnderCheckByPositions(boardAfterMove, turnIndex)) {
+            isUnderCheckAfterMove[turnIndex] = true;
         }
-        var winner = getWinner(boardAfterMove, turnIndexAfterMove, isUnderCheckAfterMove, canCastleKingAfterMove, canCastleQueenAfterMove, enpassantPositionAfterMove);
+        var winner = getWinner(boardAfterMove, turnIndex, isUnderCheckAfterMove, canCastleKingAfterMove, canCastleQueenAfterMove, enpassantPositionAfterMove);
         var scores;
         if (winner === 'W') {
             scores = [1, 0];
@@ -264,7 +264,7 @@ var gameLogic;
         else if (winner == 'B') {
             scores = [0, 1];
         }
-        else if (isTie(boardAfterMove, turnIndexAfterMove, isUnderCheckAfterMove, canCastleKingAfterMove, canCastleQueenAfterMove, enpassantPositionAfterMove)) {
+        else if (isTie(boardAfterMove, turnIndex, isUnderCheckAfterMove, canCastleKingAfterMove, canCastleQueenAfterMove, enpassantPositionAfterMove)) {
             scores = [0, 0];
         }
         var firstOperation;
@@ -272,7 +272,7 @@ var gameLogic;
             firstOperation = { endMatch: { endMatchScores: scores } };
         }
         else {
-            firstOperation = { setTurn: { turnIndex: turnIndexAfterMove } };
+            firstOperation = { setTurn: { turnIndex: turnIndex } };
         }
         var move = [firstOperation,
             { set: { key: 'board', value: boardAfterMove } },

@@ -49,7 +49,7 @@
                 <img ng-class="{piece: true,
                                 canSelect: game.canSelect(row, col),
                                 isBlackPiece: game.isBlackPiece(row, col),
-                                isWhitePiece: game.isWhitePiece(row, col)}"
+                                isWhitePiece: !game.isBlackPiece(row, col)}"
                   ng-show="game.shouldShowImage(row, col)"
                   ng-src="{{game.getImageSrc(row, col)}}"
                   id="{{'e2e_test_img_' + game.getPieceKindInId(row, col) + '_' + row + 'x' + col}}">
@@ -59,28 +59,6 @@
         </div>
       </section>
     </div>
-
-  <div class="overlayModal" ng-show="isModalShown('promotionModal')" aria-hidden="true">
-    <div class="modal-backdrop in"></div>
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title" id="myModalLabel">{{ 'PROMOTION_MESSAGE' | translate }}</h4>
-        </div>
-        <div class="modal-body">
-          <div><label><img ng-src="chess_graphics/chess_pieces/{{player}}_Queen.png" alt="queen" /><input type="radio" name="promotions" value="{{player}}Q" checked>{{ 'PROMOTE_QUEEN' | translate }}</label></div>
-          <div><label><img ng-src="chess_graphics/chess_pieces/{{player}}_Rook.png" alt="queen" /><input type="radio" name="promotions" value="{{player}}R">{{ 'PROMOTE_ROOK' | translate }}</label></div>
-          <div><label><img ng-src="chess_graphics/chess_pieces/{{player}}_Knight.png" alt="queen" /><input type="radio" name="promotions" value="{{player}}N">{{ 'PROMOTE_KNIGHT' | translate }}</label></div>
-          <div><label><img ng-src="chess_graphics/chess_pieces/{{player}}_Bishop.png" alt="queen" /><input type="radio" name="promotions" value="{{player}}B">{{ 'PROMOTE_BISHOP' | translate }}</label></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" ng-click="updatePromoteTo()">
-            {{ 'PROMOTE_ACTION' | translate }}!
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
 
 </body>
 </html>
