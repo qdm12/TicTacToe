@@ -43,7 +43,7 @@ var aiService;
                 try {
                     console.log("going to create move: " + JSON.stringify(deltaFrom) + " --> " +
                         JSON.stringify(deltaTo));
-                    possibleMoves.push(gameLogic.createMove(board, deltaFrom, deltaTo, playerIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition, null));
+                    possibleMoves.push(gameLogic.createMove(board, deltaFrom, deltaTo, playerIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition));
                 }
                 catch (e) {
                 }

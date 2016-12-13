@@ -132,14 +132,13 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos,
                            isUnderCheck:[Boolean,Boolean],
                            canCastleKing:[Boolean,Boolean],
                            canCastleQueen:[Boolean,Boolean], 
-                           enpassantPosition:Pos, promoteTo:string): IMove{    
+                           enpassantPosition:Pos): IMove{    
     // initialize all variables
     if (!board) { board = getInitialBoard(); }
     if (!isUnderCheck) { isUnderCheck = [false, false]; }
     if (!canCastleKing) { canCastleKing = [true, true]; }
     if (!canCastleQueen) { canCastleQueen = [true, true]; }
     if (!enpassantPosition) { enpassantPosition = {row: null, col: null}; }
-    if (!promoteTo) { promoteTo = ''; }
     if (deltaFrom.row === deltaTo.row && deltaFrom.col === deltaTo.col){
       throw new Error ("Cannot move to the same position.");
     }
@@ -159,8 +158,7 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos,
         isUnderCheckAfterMove = angular.copy(isUnderCheck),
         canCastleKingAfterMove = angular.copy(canCastleKing),
         canCastleQueenAfterMove = angular.copy(canCastleQueen),
-        enpassantPositionAfterMove = angular.copy(enpassantPosition),
-        promoteToAfterMove = angular.copy(promoteTo);
+        enpassantPositionAfterMove = angular.copy(enpassantPosition);
     if (getTurn(turnIndex) !== board[deltaFrom.row][deltaFrom.col].charAt(0)) {
       throw new Error("Illegal to move this piece!");
     }
@@ -256,11 +254,7 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos,
           if (deltaTo.row === 0 || deltaTo.row === 7) {
             let audio = new Audio('sounds/piece_promote.mp3');
             audio.play();
-            if (promoteToAfterMove == ''){
-              promoteToAfterMove = getTurn(turnIndex) + "Q"; //XXX eventually give choice later on
-            }
-            boardAfterMove[deltaTo.row][deltaTo.col] = promoteToAfterMove;
-            // promoteToAfterMove = '';
+            boardAfterMove[deltaTo.row][deltaTo.col] = getTurn(turnIndex) + "Q"; //XXX eventually give choice later on
           }
         } else {
           throw new Error("Illegal move for Pawn");
@@ -306,7 +300,6 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos,
                       {set: {key: 'canCastleKing', value: canCastleKingAfterMove}},
                       {set: {key: 'canCastleQueen', value: canCastleQueenAfterMove}},
                       {set: {key: 'enpassantPosition', value: enpassantPositionAfterMove}},
-                      {set: {key: 'promoteTo', value: promoteToAfterMove}},
                      ];
     return move;
   }
@@ -909,7 +902,6 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos,
     try {
       let deltaFrom = stateTransition.move[2].set.value;
       let deltaTo = stateTransition.move[3].set.value;
-      let promoteTo = stateTransition.move[8].set.value;
       let board = stateTransition.stateBeforeMove.board;
       let isUnderCheck = stateTransition.stateBeforeMove.isUnderCheck;
       let canCastleKing = stateTransition.stateBeforeMove.canCastleKing;
@@ -922,8 +914,7 @@ export function createMove(board:Board, deltaFrom:Pos, deltaTo:Pos,
                                     isUnderCheck,
                                     canCastleKing,
                                     canCastleQueen,
-                                    enpassantPosition,
-                                    promoteTo);
+                                    enpassantPosition);
       if (!angular.equals(stateTransition.move, expectedMove)) {
         return false;
       }

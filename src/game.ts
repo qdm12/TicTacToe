@@ -28,7 +28,6 @@ module game {
       let enpassantPosition:Pos = null;
       let deltaFrom:any = null;
       let deltaTo:any = null;
-      let promoteTo:any = null;
       let isYourTurn:Boolean = false;
       let rotate:any = null;
       let player:any = null;
@@ -83,7 +82,6 @@ module game {
 	  canCastleKing = params.stateAfterMove.canCastleKing;
 	  canCastleQueen = params.stateAfterMove.canCastleQueen;
 	  enpassantPosition = params.stateAfterMove.enpassantPosition
-	  promoteTo = params.stateAfterMove.promoteTo;
     isYourTurn = turnIndex === params.yourPlayerIndex && // it's my turn
                  turnIndex >= 0; // game is ongoing
 	  // Is it the computer's turn?
@@ -115,10 +113,35 @@ module game {
                                                    isUnderCheck,
                                                    canCastleKing,
                                                    canCastleQueen,
-                                                   enpassantPosition);
+                                                   enpassantPosition);                                                   
     if (possibleMoves.length) {
       let audio = new Audio('sounds/piece_lift.mp3');
-      audio.play();
+      audio.play(); //XXX move to end
+      //Check for attack move
+      for (let i = 0; i < possibleMoves.length; i++) {
+          deltaFrom = possibleMoves[i][0];
+          let availableMoves = possibleMoves[i][1];
+          for (let j = 0; j < availableMoves.length; j++) {
+              deltaTo = availableMoves[j];
+              if(rotate) {
+                deltaTo.row = 7 - deltaTo.row;
+                deltaTo.col = 7 - deltaTo.col;
+              }
+              let toTeam:string = board[deltaTo.row][deltaTo.col].charAt(0);
+              if(toTeam !== getTurn(turnIndex) && toTeam !== ''){
+                  gameService.makeMove(gameLogic.createMove(board,
+                                                            deltaFrom,
+                                                            deltaTo,
+                                                            turnIndex,
+                                                            isUnderCheck,
+                                                            canCastleKing,
+                                                            canCastleQueen,
+                                                            enpassantPosition));
+              return;
+              }
+          }
+      }
+      //No attack move found
       let index1 = Math.floor(Math.random() * possibleMoves.length);
       let pm = possibleMoves[index1];
       let index2 = Math.floor(Math.random() * pm[1].length);
@@ -131,8 +154,7 @@ module game {
                                                 isUnderCheck,
                                                 canCastleKing,
                                                 canCastleQueen,
-                                                enpassantPosition,
-                                                promoteTo));
+                                                enpassantPosition));
       audio = new Audio('sounds/piece_drop.wav');
       audio.play();
     } else {
@@ -262,8 +284,7 @@ module game {
                                       isUnderCheck,
                                       canCastleKing,
                                       canCastleQueen,
-                                      enpassantPosition,
-                                      promoteTo);
+                                      enpassantPosition);
       isYourTurn = false; // to prevent making another move, acts as a kicj
       gameService.makeMove(move);
     } catch (e) {
@@ -273,6 +294,7 @@ module game {
   }
 
   function getDraggingPieceAvailableMoves(row:number, col:number) {
+    let select_Position:Pos = {row:row, col:col};
     let possibleMoves = gameLogic.getPossibleMoves(board,
                                                    turnIndex,
                                                    isUnderCheck,
@@ -280,11 +302,11 @@ module game {
                                                    canCastleQueen,
                                                    enpassantPosition);
     let draggingPieceAvailableMoves:any = [];
-    let index = cellInPossibleMoves(row, col, possibleMoves);
+    let index:number = cellInPossibleMoves(select_Position, possibleMoves);
     if (index !== -1) {
       let availableMoves = possibleMoves[index][1];
       for (let i = 0; i < availableMoves.length; i++) {
-        let availablePos = availableMoves[i];
+        let availablePos:Pos = availableMoves[i];
         if(rotate) {
           availablePos.row = 7 - availablePos.row;
           availablePos.col = 7 - availablePos.col;
@@ -362,6 +384,7 @@ module game {
         col = 7 - col;
       }
       if (board[row][col].charAt(0) === getTurn(turnIndex)) {
+        let select_Position:Pos = {row: row, col: col};
         if (!isUnderCheck) { isUnderCheck = [false, false]; }
         if (!canCastleKing) { canCastleKing = [true, true]; }
         if (!canCastleQueen) { canCastleQueen = [true, true]; }
@@ -372,29 +395,30 @@ module game {
                                                        canCastleKing,
                                                        canCastleQueen,
                                                        enpassantPosition);
-        return cellInPossibleMoves(row, col, possibleMoves) !== -1;
+        return cellInPossibleMoves(select_Position, possibleMoves) !== -1;
       }
       return false;
     }
   };
 
-  function getTurn(turnIndex:any) {
+  function getTurn(turnIndex:number) {
     if (turnIndex === 0){
       return 'W';
     }
     return 'B';
   }
 
-  function cellInPossibleMoves(row:number, col:number, possibleMoves:any):any {
+  function cellInPossibleMoves(select_Position:Pos, possibleMoves:any):number {
     for (let i = 0; i < possibleMoves.length; i++) {
-      if (angular.equals({row: row, col: col}, possibleMoves[i][0])) {
+      if (angular.equals({row: select_Position.row, col: select_Position.col},
+                         possibleMoves[i][0])) {
         return i;
       }
     }
     return -1;
   }
 
-  export let isBlackPiece = function(row:any, col:any) {
+  export let isBlackPiece = function(row:number, col:number):boolean {
     if (rotate) {
       row = 7 - row;
       col = 7 - col;

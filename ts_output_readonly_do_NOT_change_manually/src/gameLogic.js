@@ -107,7 +107,7 @@ var gameLogic;
         }
     }
     // Returns the move that should be performed
-    function createMove(board, deltaFrom, deltaTo, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition, promoteTo) {
+    function createMove(board, deltaFrom, deltaTo, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition) {
         // initialize all variables
         if (!board) {
             board = getInitialBoard();
@@ -124,9 +124,6 @@ var gameLogic;
         if (!enpassantPosition) {
             enpassantPosition = { row: null, col: null };
         }
-        if (!promoteTo) {
-            promoteTo = '';
-        }
         if (deltaFrom.row === deltaTo.row && deltaFrom.col === deltaTo.col) {
             throw new Error("Cannot move to the same position.");
         }
@@ -140,7 +137,7 @@ var gameLogic;
                 isTie(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition)) {
             throw new Error("Can only make a move if the game is not over!");
         }
-        var boardAfterMove = angular.copy(board), isUnderCheckAfterMove = angular.copy(isUnderCheck), canCastleKingAfterMove = angular.copy(canCastleKing), canCastleQueenAfterMove = angular.copy(canCastleQueen), enpassantPositionAfterMove = angular.copy(enpassantPosition), promoteToAfterMove = angular.copy(promoteTo);
+        var boardAfterMove = angular.copy(board), isUnderCheckAfterMove = angular.copy(isUnderCheck), canCastleKingAfterMove = angular.copy(canCastleKing), canCastleQueenAfterMove = angular.copy(canCastleQueen), enpassantPositionAfterMove = angular.copy(enpassantPosition);
         if (getTurn(turnIndex) !== board[deltaFrom.row][deltaFrom.col].charAt(0)) {
             throw new Error("Illegal to move this piece!");
         }
@@ -239,10 +236,7 @@ var gameLogic;
                     if (deltaTo.row === 0 || deltaTo.row === 7) {
                         var audio = new Audio('sounds/piece_promote.mp3');
                         audio.play();
-                        if (promoteToAfterMove == '') {
-                            promoteToAfterMove = getTurn(turnIndex) + "Q"; //XXX eventually give choice later on
-                        }
-                        boardAfterMove[deltaTo.row][deltaTo.col] = promoteToAfterMove;
+                        boardAfterMove[deltaTo.row][deltaTo.col] = getTurn(turnIndex) + "Q"; //XXX eventually give choice later on
                     }
                 }
                 else {
@@ -282,7 +276,6 @@ var gameLogic;
             { set: { key: 'canCastleKing', value: canCastleKingAfterMove } },
             { set: { key: 'canCastleQueen', value: canCastleQueenAfterMove } },
             { set: { key: 'enpassantPosition', value: enpassantPositionAfterMove } },
-            { set: { key: 'promoteTo', value: promoteToAfterMove } },
         ];
         return move;
     }
@@ -861,13 +854,12 @@ var gameLogic;
         try {
             var deltaFrom = stateTransition.move[2].set.value;
             var deltaTo = stateTransition.move[3].set.value;
-            var promoteTo = stateTransition.move[8].set.value;
             var board = stateTransition.stateBeforeMove.board;
             var isUnderCheck = stateTransition.stateBeforeMove.isUnderCheck;
             var canCastleKing = stateTransition.stateBeforeMove.canCastleKing;
             var canCastleQueen = stateTransition.stateBeforeMove.canCastleQueen;
             var enpassantPosition = stateTransition.stateBeforeMove.enpassantPosition;
-            var expectedMove = createMove(board, deltaFrom, deltaTo, stateTransition.turnIndexBeforeMove, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition, promoteTo);
+            var expectedMove = createMove(board, deltaFrom, deltaTo, stateTransition.turnIndexBeforeMove, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
             if (!angular.equals(stateTransition.move, expectedMove)) {
                 return false;
             }

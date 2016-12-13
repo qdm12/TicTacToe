@@ -19,7 +19,6 @@ var game;
     var enpassantPosition = null;
     var deltaFrom = null;
     var deltaTo = null;
-    var promoteTo = null;
     var isYourTurn = false;
     var rotate = null;
     var player = null;
@@ -70,7 +69,6 @@ var game;
         canCastleKing = params.stateAfterMove.canCastleKing;
         canCastleQueen = params.stateAfterMove.canCastleQueen;
         enpassantPosition = params.stateAfterMove.enpassantPosition;
-        promoteTo = params.stateAfterMove.promoteTo;
         isYourTurn = turnIndex === params.yourPlayerIndex &&
             turnIndex >= 0; // game is ongoing
         // Is it the computer's turn?
@@ -98,13 +96,31 @@ var game;
         var possibleMoves = gameLogic.getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
         if (possibleMoves.length) {
             var audio = new Audio('sounds/piece_lift.mp3');
-            audio.play();
+            audio.play(); //XXX move to end
+            //Check for attack move
+            for (var i = 0; i < possibleMoves.length; i++) {
+                deltaFrom = possibleMoves[i][0];
+                var availableMoves = possibleMoves[i][1];
+                for (var j = 0; j < availableMoves.length; j++) {
+                    deltaTo = availableMoves[j];
+                    if (rotate) {
+                        deltaTo.row = 7 - deltaTo.row;
+                        deltaTo.col = 7 - deltaTo.col;
+                    }
+                    var toTeam = board[deltaTo.row][deltaTo.col].charAt(0);
+                    if (toTeam !== getTurn(turnIndex) && toTeam !== '') {
+                        gameService.makeMove(gameLogic.createMove(board, deltaFrom, deltaTo, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition));
+                        return;
+                    }
+                }
+            }
+            //No attack move found
             var index1 = Math.floor(Math.random() * possibleMoves.length);
             var pm = possibleMoves[index1];
             var index2 = Math.floor(Math.random() * pm[1].length);
             deltaFrom = pm[0];
             deltaTo = pm[1][index2];
-            gameService.makeMove(gameLogic.createMove(board, deltaFrom, deltaTo, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition, promoteTo));
+            gameService.makeMove(gameLogic.createMove(board, deltaFrom, deltaTo, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition));
             audio = new Audio('sounds/piece_drop.wav');
             audio.play();
         }
@@ -221,7 +237,7 @@ var game;
     }
     function actuallyMakeMove() {
         try {
-            var move = gameLogic.createMove(board, deltaFrom, deltaTo, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition, promoteTo);
+            var move = gameLogic.createMove(board, deltaFrom, deltaTo, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
             isYourTurn = false; // to prevent making another move, acts as a kicj
             gameService.makeMove(move);
         }
@@ -231,9 +247,10 @@ var game;
         }
     }
     function getDraggingPieceAvailableMoves(row, col) {
+        var select_Position = { row: row, col: col };
         var possibleMoves = gameLogic.getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
         var draggingPieceAvailableMoves = [];
-        var index = cellInPossibleMoves(row, col, possibleMoves);
+        var index = cellInPossibleMoves(select_Position, possibleMoves);
         if (index !== -1) {
             var availableMoves = possibleMoves[index][1];
             for (var i = 0; i < availableMoves.length; i++) {
@@ -308,6 +325,7 @@ var game;
                 col = 7 - col;
             }
             if (board[row][col].charAt(0) === getTurn(turnIndex)) {
+                var select_Position = { row: row, col: col };
                 if (!isUnderCheck) {
                     isUnderCheck = [false, false];
                 }
@@ -321,7 +339,7 @@ var game;
                     enpassantPosition = { row: null, col: null };
                 }
                 var possibleMoves = gameLogic.getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
-                return cellInPossibleMoves(row, col, possibleMoves) !== -1;
+                return cellInPossibleMoves(select_Position, possibleMoves) !== -1;
             }
             return false;
         }
@@ -332,9 +350,9 @@ var game;
         }
         return 'B';
     }
-    function cellInPossibleMoves(row, col, possibleMoves) {
+    function cellInPossibleMoves(select_Position, possibleMoves) {
         for (var i = 0; i < possibleMoves.length; i++) {
-            if (angular.equals({ row: row, col: col }, possibleMoves[i][0])) {
+            if (angular.equals({ row: select_Position.row, col: select_Position.col }, possibleMoves[i][0])) {
                 return i;
             }
         }
