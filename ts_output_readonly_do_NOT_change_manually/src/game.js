@@ -1,11 +1,10 @@
 ;
 var game;
 (function (game) {
-    var gameArea = document.getElementById("gameArea");
+    var gameArea;
     var draggingStartedRowCol = null; // The {row: YY, col: XX} where dragging started.
     var draggingPiece = null;
     var draggingPieceAvailableMoves = null;
-    var animationEnded = false;
     var isComputerTurn = false;
     var board = null;
     var turnIndex = 0;
@@ -18,6 +17,7 @@ var game;
     var isYourTurn = false;
     var rotate = null;
     var player = null;
+    game.animationEndedTimeout = null;
     function init() {
         registerServiceWorker();
         //translate.setTranslations(getTranslations());
@@ -30,7 +30,6 @@ var game;
             updateUI: updateUI,
             gotMessageFromPlatform: null,
         });
-        // See http://www.sitepoint.com/css3-animation-javascript-event-handlers/
         document.addEventListener("animationend", animationEndedCallback, false); // standard
         document.addEventListener("webkitAnimationEnd", animationEndedCallback, false); // WebKit
         document.addEventListener("oanimationend", animationEndedCallback, false); // Opera
@@ -54,11 +53,11 @@ var game;
         return {}; //XXX to fill in
     }
     function updateUI(params) {
-        turnIndex = params.turnIndexAfterMove;
         board = params.stateAfterMove.board;
         if (!board) {
             board = gameLogic.getInitialBoard();
         }
+        turnIndex = params.turnIndexAfterMove;
         deltaFrom = params.stateAfterMove.deltaFrom;
         deltaTo = params.stateAfterMove.deltaTo;
         isUnderCheck = params.stateAfterMove.isUnderCheck;
@@ -70,8 +69,12 @@ var game;
             isYourTurn = false; // to make sure the UI won't send another move.
             /* Waiting 0.5 seconds to let the move animation finish; if we call aiService
               then the animation is paused until the javascript finishes. */
-            $timeout(sendComputerMove, 500);
+            $timeout(maybeSendComputerMove, 1500);
         }
+        // We calculate the AI move only after the animation finishes,
+        // because if we call aiService now
+        // then the animation will be paused until the javascript finishes.
+        game.animationEndedTimeout = $timeout(animationEndedCallback, 1500);
         /* If the play mode is not pass and play then "rotate" the board
          for the player. Therefore the board will always look from the
          point of view of the player in single player mode... */
@@ -81,12 +84,11 @@ var game;
         }
     }
     function animationEndedCallback() {
-        animationEnded = true;
         if (isComputerTurn) {
-            sendComputerMove();
+            maybeSendComputerMove();
         }
     }
-    function sendComputerMove() {
+    function maybeSendComputerMove() {
         var possibleMoves = gameLogic.getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
         if (possibleMoves.length) {
             var audio = new Audio('sounds/piece_lift.mp3');

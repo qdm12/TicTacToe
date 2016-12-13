@@ -10,11 +10,10 @@ interface Translations {
 }
 
 module game {
-    let gameArea:any = document.getElementById("gameArea");
+    let gameArea:any;
     let draggingStartedRowCol:Pos = null; // The {row: YY, col: XX} where dragging started.
     let draggingPiece:any = null;
     let draggingPieceAvailableMoves:any = null;
-    let animationEnded = false;
     let isComputerTurn = false;
     let board:Board = null;
     let turnIndex = 0;
@@ -25,8 +24,9 @@ module game {
     let deltaFrom:any = null;
     let deltaTo:any = null;
     let isYourTurn:Boolean = false;
-    let rotate:any = null;
+    let rotate:boolean = null;
     let player:any = null;
+    export let animationEndedTimeout: ng.IPromise<any> = null;
 
     export function init() {
         registerServiceWorker();
@@ -40,7 +40,6 @@ module game {
             updateUI: updateUI,
             gotMessageFromPlatform: null,
         });
-        // See http://www.sitepoint.com/css3-animation-javascript-event-handlers/
         document.addEventListener("animationend", animationEndedCallback, false); // standard
         document.addEventListener("webkitAnimationEnd", animationEndedCallback, false); // WebKit
         document.addEventListener("oanimationend", animationEndedCallback, false); // Opera
@@ -67,11 +66,11 @@ module game {
     }
 
     function updateUI(params:any) {
-        turnIndex = params.turnIndexAfterMove;
         board = params.stateAfterMove.board;
         if (!board) {
             board = gameLogic.getInitialBoard();
         }
+        turnIndex = params.turnIndexAfterMove;
         deltaFrom = params.stateAfterMove.deltaFrom;
         deltaTo = params.stateAfterMove.deltaTo;
         isUnderCheck = params.stateAfterMove.isUnderCheck;
@@ -83,8 +82,12 @@ module game {
             isYourTurn = false; // to make sure the UI won't send another move.
             /* Waiting 0.5 seconds to let the move animation finish; if we call aiService
               then the animation is paused until the javascript finishes. */
-            $timeout(sendComputerMove, 500);
+            $timeout(maybeSendComputerMove, 1500);
         }
+        // We calculate the AI move only after the animation finishes,
+        // because if we call aiService now
+        // then the animation will be paused until the javascript finishes.
+        animationEndedTimeout = $timeout(animationEndedCallback, 1500);
         /* If the play mode is not pass and play then "rotate" the board
          for the player. Therefore the board will always look from the
          point of view of the player in single player mode... */
@@ -95,13 +98,12 @@ module game {
     }
 
     function animationEndedCallback() {
-        animationEnded = true;
         if (isComputerTurn) {
-            sendComputerMove();
+            maybeSendComputerMove();
         }
 	}
 
-    function sendComputerMove() {
+    function maybeSendComputerMove() {
         let possibleMoves = gameLogic.getPossibleMoves(board,
                                                        turnIndex,
                                                        isUnderCheck,
