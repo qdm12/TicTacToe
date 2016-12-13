@@ -251,19 +251,25 @@ var gameLogic;
             isUnderCheckAfterMove[turnIndex] = true;
         }
         var winner = getWinner(boardAfterMove, turnIndex, isUnderCheckAfterMove, canCastleKingAfterMove, canCastleQueenAfterMove, enpassantPositionAfterMove);
-        var scores;
+        var endMatchScores;
         if (winner === 'W') {
-            scores = [1, 0];
+            endMatchScores = [1, 0];
+            turnIndex = -1;
         }
         else if (winner == 'B') {
-            scores = [0, 1];
+            endMatchScores = [0, 1];
+            turnIndex = -1;
         }
         else if (isTie(boardAfterMove, turnIndex, isUnderCheckAfterMove, canCastleKingAfterMove, canCastleQueenAfterMove, enpassantPositionAfterMove)) {
-            scores = [0, 0];
+            endMatchScores = [0, 0];
+            turnIndex = -1;
+        }
+        else {
+            endMatchScores = null;
         }
         var firstOperation;
-        if (scores != null) {
-            firstOperation = { endMatch: { endMatchScores: scores } };
+        if (endMatchScores != null) {
+            firstOperation = { endMatch: { endMatchScores: endMatchScores } };
         }
         else {
             firstOperation = { setTurn: { turnIndex: turnIndex } };
@@ -280,6 +286,101 @@ var gameLogic;
         return move;
     }
     gameLogic.createMove = createMove;
+    // Returns true if move is ok
+    function isMoveOk(stateTransition) {
+        try {
+            var deltaFrom = stateTransition.move[2].set.value;
+            var deltaTo = stateTransition.move[3].set.value;
+            var board = stateTransition.stateBeforeMove.board;
+            var isUnderCheck = stateTransition.stateBeforeMove.isUnderCheck;
+            var canCastleKing = stateTransition.stateBeforeMove.canCastleKing;
+            var canCastleQueen = stateTransition.stateBeforeMove.canCastleQueen;
+            var enpassantPosition = stateTransition.stateBeforeMove.enpassantPosition;
+            var expectedMove = createMove(board, deltaFrom, deltaTo, stateTransition.turnIndexBeforeMove, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
+            if (!angular.equals(stateTransition.move, expectedMove)) {
+                return false;
+            }
+        }
+        catch (e) {
+            return false;
+        }
+        return true;
+    }
+    gameLogic.isMoveOk = isMoveOk;
+    /* Returns all the possible moves for the given state and turnIndex.
+     * Returns an empty array if the game is over. */
+    function getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition) {
+        if (!board) {
+            return [];
+        }
+        var possibleMoves = [];
+        var localpossibleMoves = [];
+        for (var i = 0; i < 8; i++) {
+            for (var j = 0; j < 8; j++) {
+                var PieceEmpty = (board[i][j] === '');
+                var PieceTeam = board[i][j].charAt(0);
+                if (!PieceEmpty && PieceTeam === getTurn(turnIndex)) {
+                    var startPos = { row: i, col: j };
+                    switch (board[i][j].charAt(1)) {
+                        case 'K':
+                            localpossibleMoves = getKingPossibleMoves(board, turnIndex, startPos, isUnderCheck, canCastleKing, canCastleQueen);
+                            break;
+                        case 'Q':
+                            localpossibleMoves = getQueenPossibleMoves(board, turnIndex, startPos);
+                            break;
+                        case 'R':
+                            localpossibleMoves = getRookPossibleMoves(board, turnIndex, startPos);
+                            break;
+                        case 'B':
+                            localpossibleMoves = getBishopPossibleMoves(board, turnIndex, startPos);
+                            break;
+                        case 'N':
+                            localpossibleMoves = getKnightPossibleMoves(board, turnIndex, startPos);
+                            break;
+                        case 'P':
+                            localpossibleMoves = getPawnPossibleMoves(board, turnIndex, startPos, enpassantPosition);
+                            break;
+                    }
+                    if (localpossibleMoves.length) {
+                        possibleMoves.push([startPos, localpossibleMoves]);
+                    }
+                }
+            }
+        }
+        return possibleMoves;
+    }
+    gameLogic.getPossibleMoves = getPossibleMoves;
+    // Returns a list of positions available for king to move
+    function getKingPossibleMoves(board, turnIndex, startPos, isUnderCheck, canCastleKing, canCastleQueen) {
+        var destinations = [];
+        // standard moves
+        for (var i = startPos.row - 1; i < startPos.row + 2; i++) {
+            for (var j = startPos.col - 1; j < startPos.col + 2; j++) {
+                var curPos = { row: i, col: j };
+                if (isOutOfBound(curPos)) {
+                    continue;
+                }
+                var PieceEmpty = (board[i][j] === '');
+                var PieceTeam = board[i][j].charAt(0);
+                if (PieceEmpty || PieceTeam !== getTurn(turnIndex)) {
+                    if (moveAndCheck(board, turnIndex, startPos, curPos)) {
+                        destinations.push(curPos);
+                    }
+                }
+            }
+        }
+        // casling moves
+        if (!isUnderCheck[turnIndex]) {
+            if (isCastlingKing(board, startPos, { row: startPos.row, col: startPos.col + 2 }, turnIndex, canCastleKing)) {
+                destinations.push({ row: startPos.row, col: startPos.col + 2 });
+            }
+            if (isCastlingQueen(board, startPos, { row: startPos.row, col: startPos.col - 2 }, turnIndex, canCastleQueen)) {
+                destinations.push({ row: startPos.row, col: startPos.col - 2 });
+            }
+        }
+        return destinations;
+    }
+    gameLogic.getKingPossibleMoves = getKingPossibleMoves;
     // Returns true if the conditions of castle to king side satisfied
     function isCastlingKing(board, deltaFrom, deltaTo, turnIndex, canCastleKing) {
         var caslingRow = 0;
@@ -381,37 +482,6 @@ var gameLogic;
         }
         return false;
     }
-    // Returns a list of positions available for king to move
-    function getKingPossibleMoves(board, turnIndex, startPos, isUnderCheck, canCastleKing, canCastleQueen) {
-        var destinations = [];
-        // standard moves
-        for (var i = startPos.row - 1; i < startPos.row + 2; i++) {
-            for (var j = startPos.col - 1; j < startPos.col + 2; j++) {
-                var curPos = { row: i, col: j };
-                if (isOutOfBound(curPos)) {
-                    continue;
-                }
-                var PieceEmpty = (board[i][j] === '');
-                var PieceTeam = board[i][j].charAt(0);
-                if (PieceEmpty || PieceTeam !== getTurn(turnIndex)) {
-                    if (moveAndCheck(board, turnIndex, startPos, curPos)) {
-                        destinations.push(curPos);
-                    }
-                }
-            }
-        }
-        // casling moves
-        if (!isUnderCheck[turnIndex]) {
-            if (isCastlingKing(board, startPos, { row: startPos.row, col: startPos.col + 2 }, turnIndex, canCastleKing)) {
-                destinations.push({ row: startPos.row, col: startPos.col + 2 });
-            }
-            if (isCastlingQueen(board, startPos, { row: startPos.row, col: startPos.col - 2 }, turnIndex, canCastleQueen)) {
-                destinations.push({ row: startPos.row, col: startPos.col - 2 });
-            }
-        }
-        return destinations;
-    }
-    gameLogic.getKingPossibleMoves = getKingPossibleMoves;
     // Returns true if the current player's king is under check
     function isUnderCheckByPositions(board, turnIndex) {
         var kingsPosition = findKingsPosition(board, turnIndex);
@@ -849,69 +919,5 @@ var gameLogic;
         }
         return false;
     }
-    // Returns true if move is ok
-    function isMoveOk(stateTransition) {
-        try {
-            var deltaFrom = stateTransition.move[2].set.value;
-            var deltaTo = stateTransition.move[3].set.value;
-            var board = stateTransition.stateBeforeMove.board;
-            var isUnderCheck = stateTransition.stateBeforeMove.isUnderCheck;
-            var canCastleKing = stateTransition.stateBeforeMove.canCastleKing;
-            var canCastleQueen = stateTransition.stateBeforeMove.canCastleQueen;
-            var enpassantPosition = stateTransition.stateBeforeMove.enpassantPosition;
-            var expectedMove = createMove(board, deltaFrom, deltaTo, stateTransition.turnIndexBeforeMove, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
-            if (!angular.equals(stateTransition.move, expectedMove)) {
-                return false;
-            }
-        }
-        catch (e) {
-            return false;
-        }
-        return true;
-    }
-    gameLogic.isMoveOk = isMoveOk;
-    /* Returns all the possible moves for the given state and turnIndex.
-     * Returns an empty array if the game is over. */
-    function getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition) {
-        if (!board) {
-            return [];
-        }
-        var possibleMoves = [];
-        var localpossibleMoves = [];
-        for (var i = 0; i < 8; i++) {
-            for (var j = 0; j < 8; j++) {
-                var PieceEmpty = (board[i][j] === '');
-                var PieceTeam = board[i][j].charAt(0);
-                if (!PieceEmpty && PieceTeam === getTurn(turnIndex)) {
-                    var startPos = { row: i, col: j };
-                    switch (board[i][j].charAt(1)) {
-                        case 'K':
-                            localpossibleMoves = getKingPossibleMoves(board, turnIndex, startPos, isUnderCheck, canCastleKing, canCastleQueen);
-                            break;
-                        case 'Q':
-                            localpossibleMoves = getQueenPossibleMoves(board, turnIndex, startPos);
-                            break;
-                        case 'R':
-                            localpossibleMoves = getRookPossibleMoves(board, turnIndex, startPos);
-                            break;
-                        case 'B':
-                            localpossibleMoves = getBishopPossibleMoves(board, turnIndex, startPos);
-                            break;
-                        case 'N':
-                            localpossibleMoves = getKnightPossibleMoves(board, turnIndex, startPos);
-                            break;
-                        case 'P':
-                            localpossibleMoves = getPawnPossibleMoves(board, turnIndex, startPos, enpassantPosition);
-                            break;
-                    }
-                    if (localpossibleMoves.length) {
-                        possibleMoves.push([startPos, localpossibleMoves]);
-                    }
-                }
-            }
-        }
-        return possibleMoves;
-    }
-    gameLogic.getPossibleMoves = getPossibleMoves;
 })(gameLogic || (gameLogic = {}));
 //# sourceMappingURL=gameLogic.js.map

@@ -14,7 +14,6 @@ module game {
     let draggingStartedRowCol:Pos = null; // The {row: YY, col: XX} where dragging started.
     let draggingPiece:any = null;
     let draggingPieceAvailableMoves:any = null;
-    let isComputerTurn = false;
     let board:Board = null;
     let turnIndex = 0;
     let isUnderCheck:any = null;
@@ -23,10 +22,9 @@ module game {
     let enpassantPosition:Pos = null;
     let deltaFrom:any = null;
     let deltaTo:any = null;
-    let isYourTurn:Boolean = false;
+    let isYourTurn:boolean = false;
     let rotate:boolean = null;
     let player:any = null;
-    export let animationEndedTimeout: ng.IPromise<any> = null;
 
     export function init() {
         registerServiceWorker();
@@ -40,9 +38,6 @@ module game {
             updateUI: updateUI,
             gotMessageFromPlatform: null,
         });
-        document.addEventListener("animationend", animationEndedCallback, false); // standard
-        document.addEventListener("webkitAnimationEnd", animationEndedCallback, false); // WebKit
-        document.addEventListener("oanimationend", animationEndedCallback, false); // Opera
         dragAndDropService.addDragListener("gameArea", handleDragEvent);
         gameArea = document.getElementById("gameArea");
   }
@@ -84,10 +79,6 @@ module game {
               then the animation is paused until the javascript finishes. */
             $timeout(maybeSendComputerMove, 1500);
         }
-        // We calculate the AI move only after the animation finishes,
-        // because if we call aiService now
-        // then the animation will be paused until the javascript finishes.
-        animationEndedTimeout = $timeout(animationEndedCallback, 1500);
         /* If the play mode is not pass and play then "rotate" the board
          for the player. Therefore the board will always look from the
          point of view of the player in single player mode... */
@@ -96,12 +87,6 @@ module game {
             rotate = true;
         }
     }
-
-    function animationEndedCallback() {
-        if (isComputerTurn) {
-            maybeSendComputerMove();
-        }
-	}
 
     function maybeSendComputerMove() {
         let possibleMoves = gameLogic.getPossibleMoves(board,
@@ -241,43 +226,7 @@ module game {
             draggingPieceAvailableMoves = null;
         }
     }
-
-    function dragDoneHandler(fromPos:Pos, toPos:Pos) {
-        if (window.location.search === '?throwException') {
-          throw new Error("Throwing the error because URL has '?throwException'");
-        }
-        if (!isYourTurn) {
-            return;
-        }
-        deltaFrom = fromPos;
-        deltaTo = toPos;
-        if(rotate){
-            deltaFrom.row = 7 - deltaFrom.row;
-            deltaFrom.col = 7 - deltaFrom.col;
-            deltaTo.row = 7 - deltaTo.row;
-            deltaTo.col = 7 - deltaTo.col;
-        }
-        actuallyMakeMove();
-    }
-
-    function actuallyMakeMove() {
-        try {
-            let move = gameLogic.createMove(board,
-                                            deltaFrom,
-                                            deltaTo,
-                                            turnIndex,
-                                            isUnderCheck,
-                                            canCastleKing,
-                                            canCastleQueen,
-                                            enpassantPosition);
-            isYourTurn = false; // to prevent making another move, acts as a kicj
-            gameService.makeMove(move);
-        } catch (e) {
-            console.log(["Exception thrown when create move in position:", deltaFrom, deltaTo]);
-            return;
-        }
-    }
-
+    
     function getDraggingPieceAvailableMoves(row:number, col:number) {
         let select_Position:Pos = {row:row, col:col};
         let possibleMoves = gameLogic.getPossibleMoves(board,
@@ -303,6 +252,42 @@ module game {
             }
         }
         return draggingPieceAvailableMoves;
+    }
+
+    function dragDoneHandler(fromPos:Pos, toPos:Pos) {
+        if (window.location.search === '?throwException') {
+          throw new Error("Throwing the error because URL has '?throwException'");
+        }
+        if (!isYourTurn) {
+            return;
+        }
+        if(rotate){
+            fromPos.row = 7 - fromPos.row;
+            fromPos.col = 7 - fromPos.col;
+            toPos.row = 7 - toPos.row;
+            toPos.col = 7 - toPos.col;
+        }
+        deltaFrom = fromPos;
+        deltaTo = toPos;
+        actuallyMakeMove();
+    }
+
+    function actuallyMakeMove() {
+        try {
+            let move = gameLogic.createMove(board,
+                                            deltaFrom,
+                                            deltaTo,
+                                            turnIndex,
+                                            isUnderCheck,
+                                            canCastleKing,
+                                            canCastleQueen,
+                                            enpassantPosition);
+            isYourTurn = false; // to prevent making another move, acts as a kicj
+            gameService.makeMove(move);
+        } catch (e) {
+            console.log(["Exception thrown when create move in position:", deltaFrom, deltaTo]);
+            return;
+        }
     }
 
     export let shouldShowImage = function(row:number, col:number) {
@@ -400,14 +385,17 @@ module game {
         }
         return -1;
     }
-
-    export let isBlackPiece = function(row:number, col:number):boolean {
+    
+    function isPiece(row: number, col: number, turnIndex: number, pieceKind: string): boolean {
         if (rotate) {
             row = 7 - row;
             col = 7 - col;
         }
-        let pieceTeam = board[row][col].charAt(0);
-        return pieceTeam === 'B';
+        return board[row][col].charAt(0) === pieceKind;
+    }
+
+    export function isBlackPiece(row:number, col:number):boolean {
+        return isPiece(row, col, 1, 'B');
     };
 }
 

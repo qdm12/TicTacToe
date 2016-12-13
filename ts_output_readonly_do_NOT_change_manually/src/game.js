@@ -5,7 +5,6 @@ var game;
     var draggingStartedRowCol = null; // The {row: YY, col: XX} where dragging started.
     var draggingPiece = null;
     var draggingPieceAvailableMoves = null;
-    var isComputerTurn = false;
     var board = null;
     var turnIndex = 0;
     var isUnderCheck = null;
@@ -17,7 +16,6 @@ var game;
     var isYourTurn = false;
     var rotate = null;
     var player = null;
-    game.animationEndedTimeout = null;
     function init() {
         registerServiceWorker();
         //translate.setTranslations(getTranslations());
@@ -30,9 +28,6 @@ var game;
             updateUI: updateUI,
             gotMessageFromPlatform: null,
         });
-        document.addEventListener("animationend", animationEndedCallback, false); // standard
-        document.addEventListener("webkitAnimationEnd", animationEndedCallback, false); // WebKit
-        document.addEventListener("oanimationend", animationEndedCallback, false); // Opera
         dragAndDropService.addDragListener("gameArea", handleDragEvent);
         gameArea = document.getElementById("gameArea");
     }
@@ -71,21 +66,12 @@ var game;
               then the animation is paused until the javascript finishes. */
             $timeout(maybeSendComputerMove, 1500);
         }
-        // We calculate the AI move only after the animation finishes,
-        // because if we call aiService now
-        // then the animation will be paused until the javascript finishes.
-        game.animationEndedTimeout = $timeout(animationEndedCallback, 1500);
         /* If the play mode is not pass and play then "rotate" the board
          for the player. Therefore the board will always look from the
          point of view of the player in single player mode... */
         rotate = false;
         if (params.playMode === "playBlack") {
             rotate = true;
-        }
-    }
-    function animationEndedCallback() {
-        if (isComputerTurn) {
-            maybeSendComputerMove();
         }
     }
     function maybeSendComputerMove() {
@@ -207,34 +193,6 @@ var game;
             draggingPieceAvailableMoves = null;
         }
     }
-    function dragDoneHandler(fromPos, toPos) {
-        if (window.location.search === '?throwException') {
-            throw new Error("Throwing the error because URL has '?throwException'");
-        }
-        if (!isYourTurn) {
-            return;
-        }
-        deltaFrom = fromPos;
-        deltaTo = toPos;
-        if (rotate) {
-            deltaFrom.row = 7 - deltaFrom.row;
-            deltaFrom.col = 7 - deltaFrom.col;
-            deltaTo.row = 7 - deltaTo.row;
-            deltaTo.col = 7 - deltaTo.col;
-        }
-        actuallyMakeMove();
-    }
-    function actuallyMakeMove() {
-        try {
-            var move = gameLogic.createMove(board, deltaFrom, deltaTo, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
-            isYourTurn = false; // to prevent making another move, acts as a kicj
-            gameService.makeMove(move);
-        }
-        catch (e) {
-            console.log(["Exception thrown when create move in position:", deltaFrom, deltaTo]);
-            return;
-        }
-    }
     function getDraggingPieceAvailableMoves(row, col) {
         var select_Position = { row: row, col: col };
         var possibleMoves = gameLogic.getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
@@ -254,6 +212,34 @@ var game;
             }
         }
         return draggingPieceAvailableMoves;
+    }
+    function dragDoneHandler(fromPos, toPos) {
+        if (window.location.search === '?throwException') {
+            throw new Error("Throwing the error because URL has '?throwException'");
+        }
+        if (!isYourTurn) {
+            return;
+        }
+        if (rotate) {
+            fromPos.row = 7 - fromPos.row;
+            fromPos.col = 7 - fromPos.col;
+            toPos.row = 7 - toPos.row;
+            toPos.col = 7 - toPos.col;
+        }
+        deltaFrom = fromPos;
+        deltaTo = toPos;
+        actuallyMakeMove();
+    }
+    function actuallyMakeMove() {
+        try {
+            var move = gameLogic.createMove(board, deltaFrom, deltaTo, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
+            isYourTurn = false; // to prevent making another move, acts as a kicj
+            gameService.makeMove(move);
+        }
+        catch (e) {
+            console.log(["Exception thrown when create move in position:", deltaFrom, deltaTo]);
+            return;
+        }
     }
     game.shouldShowImage = function (row, col) {
         if (rotate) {
@@ -346,14 +332,18 @@ var game;
         }
         return -1;
     }
-    game.isBlackPiece = function (row, col) {
+    function isPiece(row, col, turnIndex, pieceKind) {
         if (rotate) {
             row = 7 - row;
             col = 7 - col;
         }
-        var pieceTeam = board[row][col].charAt(0);
-        return pieceTeam === 'B';
-    };
+        return board[row][col].charAt(0) === pieceKind;
+    }
+    function isBlackPiece(row, col) {
+        return isPiece(row, col, 1, 'B');
+    }
+    game.isBlackPiece = isBlackPiece;
+    ;
 })(game || (game = {}));
 angular.module('myApp', ['ngTouch', 'ui.bootstrap', 'gameServices'])
     .run(function () {
