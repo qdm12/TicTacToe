@@ -69,18 +69,16 @@ var game;
         canCastleKing = params.stateAfterMove.canCastleKing;
         canCastleQueen = params.stateAfterMove.canCastleQueen;
         enpassantPosition = params.stateAfterMove.enpassantPosition;
-        isYourTurn = turnIndex === params.yourPlayerIndex &&
-            turnIndex >= 0; // game is ongoing
-        // Is it the computer's turn?
+        isYourTurn = (turnIndex === params.yourPlayerIndex && turnIndex >= 0);
         if (isYourTurn && params.playersInfo[params.yourPlayerIndex].playerId === '') {
             isYourTurn = false; // to make sure the UI won't send another move.
             /* Waiting 0.5 seconds to let the move animation finish; if we call aiService
-               then the animation is paused until the javascript finishes. */
+              then the animation is paused until the javascript finishes. */
             $timeout(sendComputerMove, 500);
         }
         /* If the play mode is not pass and play then "rotate" the board
-           for the player. Therefore the board will always look from the
-           point of view of the player in single player mode... */
+         for the player. Therefore the board will always look from the
+         point of view of the player in single player mode... */
         rotate = false;
         if (params.playMode === "playBlack") {
             rotate = true;
@@ -96,13 +94,13 @@ var game;
         var possibleMoves = gameLogic.getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
         if (possibleMoves.length) {
             var audio = new Audio('sounds/piece_lift.mp3');
-            audio.play(); //XXX move to end
+            audio.play();
             //Check for attack move
-            for (var i = 0; i < possibleMoves.length; i++) {
-                deltaFrom = possibleMoves[i][0];
-                var availableMoves = possibleMoves[i][1];
-                for (var j = 0; j < availableMoves.length; j++) {
-                    deltaTo = availableMoves[j];
+            for (var i_1 = 0; i_1 < possibleMoves.length; i_1++) {
+                deltaFrom = possibleMoves[i_1][0];
+                var availableMoves = possibleMoves[i_1][1];
+                for (var j_1 = 0; j_1 < availableMoves.length; j_1++) {
+                    deltaTo = availableMoves[j_1];
                     if (rotate) {
                         deltaTo.row = 7 - deltaTo.row;
                         deltaTo.col = 7 - deltaTo.col;
@@ -115,11 +113,10 @@ var game;
                 }
             }
             //No attack move found
-            var index1 = Math.floor(Math.random() * possibleMoves.length);
-            var pm = possibleMoves[index1];
-            var index2 = Math.floor(Math.random() * pm[1].length);
-            deltaFrom = pm[0];
-            deltaTo = pm[1][index2];
+            var i = Math.floor(Math.random() * possibleMoves.length);
+            var j = Math.floor(Math.random() * possibleMoves[i][1].length);
+            deltaFrom = possibleMoves[i][0];
+            deltaTo = possibleMoves[i][1][j];
             gameService.makeMove(gameLogic.createMove(board, deltaFrom, deltaTo, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition));
             audio = new Audio('sounds/piece_drop.wav');
             audio.play();
@@ -185,7 +182,14 @@ var game;
                 dragDoneHandler(draggingStartedRowCol, { row: row, col: col });
             }
             else {
-                setDraggingPieceCenter(getSquareCenterXY(row, col));
+                var width = gameArea.clientWidth / 8;
+                var height = gameArea.clientHeight / 8;
+                var ToCenter = { x: col * width + width / 2,
+                    y: row * height + height / 2 };
+                var FromCenter = { x: draggingStartedRowCol.col * width + width / 2,
+                    y: draggingStartedRowCol.row * height + height / 2 };
+                draggingPiece.style.left = (ToCenter.x - FromCenter.x + gameArea.clientWidth / 16) + "px";
+                draggingPiece.style.top = (ToCenter.y - FromCenter.y + gameArea.clientWidth / 16) + "px";
             }
         }
         if (type === "touchend" || type === "touchcancel" || type === "touchleave") {
@@ -205,18 +209,6 @@ var game;
             draggingPieceAvailableMoves = null;
         }
     }
-    function setDraggingPieceCenter(Center) {
-        var originalCenter = getSquareCenterXY(draggingStartedRowCol.row, draggingStartedRowCol.col);
-        draggingPiece.style.left = (Center.x - originalCenter.x + gameArea.clientWidth / 16) + "px";
-        draggingPiece.style.top = (Center.y - originalCenter.y + gameArea.clientWidth / 16) + "px";
-    }
-    function getSquareWidthHeight() {
-        return { width: gameArea.clientWidth / 8, height: gameArea.clientHeight / 8 };
-    }
-    function getSquareCenterXY(row, col) {
-        var size = getSquareWidthHeight();
-        return { x: col * size.width + size.width / 2, y: row * size.height + size.height / 2 };
-    }
     function dragDoneHandler(fromPos, toPos) {
         if (window.location.search === '?throwException') {
             throw new Error("Throwing the error because URL has '?throwException'");
@@ -226,7 +218,6 @@ var game;
         }
         deltaFrom = fromPos;
         deltaTo = toPos;
-        // need to rotate the angle if playblack
         if (rotate) {
             deltaFrom.row = 7 - deltaFrom.row;
             deltaFrom.col = 7 - deltaFrom.col;
@@ -252,9 +243,8 @@ var game;
         var draggingPieceAvailableMoves = [];
         var index = cellInPossibleMoves(select_Position, possibleMoves);
         if (index !== -1) {
-            var availableMoves = possibleMoves[index][1];
-            for (var i = 0; i < availableMoves.length; i++) {
-                var availablePos = availableMoves[i];
+            for (var i = 0; i < possibleMoves[index][1].length; i++) {
+                var availablePos = possibleMoves[index][1][i];
                 if (rotate) {
                     availablePos.row = 7 - availablePos.row;
                     availablePos.col = 7 - availablePos.col;
@@ -352,7 +342,7 @@ var game;
     }
     function cellInPossibleMoves(select_Position, possibleMoves) {
         for (var i = 0; i < possibleMoves.length; i++) {
-            if (angular.equals({ row: select_Position.row, col: select_Position.col }, possibleMoves[i][0])) {
+            if (angular.equals(select_Position, possibleMoves[i][0])) {
                 return i;
             }
         }
