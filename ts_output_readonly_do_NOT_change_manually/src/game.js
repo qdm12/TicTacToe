@@ -97,12 +97,16 @@ var game;
     function sendComputerMove() {
         var possibleMoves = gameLogic.getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
         if (possibleMoves.length) {
+            var audio = new Audio('sounds/piece_lift.mp3');
+            audio.play();
             var index1 = Math.floor(Math.random() * possibleMoves.length);
             var pm = possibleMoves[index1];
             var index2 = Math.floor(Math.random() * pm[1].length);
             deltaFrom = pm[0];
             deltaTo = pm[1][index2];
             gameService.makeMove(gameLogic.createMove(board, deltaFrom, deltaTo, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition, promoteTo));
+            audio = new Audio('sounds/piece_drop.wav');
+            audio.play();
         }
         else {
             console.log("There is no possible move");

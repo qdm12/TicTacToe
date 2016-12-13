@@ -43,7 +43,7 @@ module game {
       maxNumberOfPlayers: 2,
       isMoveOk: gameLogic.isMoveOk,
       updateUI: updateUI,
-	    gotMessageFromPlatform: null,
+	  gotMessageFromPlatform: null,
     });
     // See http://www.sitepoint.com/css3-animation-javascript-event-handlers/
     document.addEventListener("animationend", animationEndedCallback, false); // standard
@@ -117,6 +117,8 @@ module game {
                                                    canCastleQueen,
                                                    enpassantPosition);
     if (possibleMoves.length) {
+      let audio = new Audio('sounds/piece_lift.mp3');
+      audio.play();
       let index1 = Math.floor(Math.random() * possibleMoves.length);
       let pm = possibleMoves[index1];
       let index2 = Math.floor(Math.random() * pm[1].length);
@@ -131,6 +133,8 @@ module game {
                                                 canCastleQueen,
                                                 enpassantPosition,
                                                 promoteTo));
+      audio = new Audio('sounds/piece_drop.wav');
+      audio.play();
     } else {
       console.log("There is no possible move");
     }
