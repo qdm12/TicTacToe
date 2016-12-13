@@ -877,6 +877,7 @@ var gameLogic;
             return [];
         }
         var possibleMoves = [];
+        var localpossibleMoves = [];
         for (var i = 0; i < 8; i++) {
             for (var j = 0; j < 8; j++) {
                 var PieceEmpty = (board[i][j] === '');
@@ -885,46 +886,31 @@ var gameLogic;
                     var startPos = { row: i, col: j };
                     switch (board[i][j].charAt(1)) {
                         case 'K':
-                            possibleMoves.push([startPos,
-                                getKingPossibleMoves(board, turnIndex, startPos, isUnderCheck, canCastleKing, canCastleQueen)
-                            ]);
+                            localpossibleMoves = getKingPossibleMoves(board, turnIndex, startPos, isUnderCheck, canCastleKing, canCastleQueen);
                             break;
                         case 'Q':
-                            possibleMoves.push([startPos,
-                                getQueenPossibleMoves(board, turnIndex, startPos)
-                            ]);
+                            localpossibleMoves = getQueenPossibleMoves(board, turnIndex, startPos);
                             break;
                         case 'R':
-                            possibleMoves.push([startPos,
-                                getRookPossibleMoves(board, turnIndex, startPos)
-                            ]);
+                            localpossibleMoves = getRookPossibleMoves(board, turnIndex, startPos);
                             break;
                         case 'B':
-                            possibleMoves.push([startPos,
-                                getBishopPossibleMoves(board, turnIndex, startPos)
-                            ]);
+                            localpossibleMoves = getBishopPossibleMoves(board, turnIndex, startPos);
                             break;
                         case 'N':
-                            possibleMoves.push([startPos,
-                                getKnightPossibleMoves(board, turnIndex, startPos)
-                            ]);
+                            localpossibleMoves = getKnightPossibleMoves(board, turnIndex, startPos);
                             break;
                         case 'P':
-                            possibleMoves.push([startPos,
-                                getPawnPossibleMoves(board, turnIndex, startPos, enpassantPosition)
-                            ]);
+                            localpossibleMoves = getPawnPossibleMoves(board, turnIndex, startPos, enpassantPosition);
                             break;
+                    }
+                    if (localpossibleMoves.length) {
+                        possibleMoves.push([startPos, localpossibleMoves]);
                     }
                 }
             }
         }
-        var nonEmptyPossibleMoves = [];
-        for (var i = 0; i < possibleMoves.length; i++) {
-            if (possibleMoves[i][1].length) {
-                nonEmptyPossibleMoves.push(possibleMoves[i]);
-            }
-        }
-        return nonEmptyPossibleMoves;
+        return possibleMoves;
     }
     gameLogic.getPossibleMoves = getPossibleMoves;
 })(gameLogic || (gameLogic = {}));
