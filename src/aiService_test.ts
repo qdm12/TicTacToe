@@ -1,17 +1,41 @@
 describe("aiService", function() {
-  function createStateFromBoard(board: Board): IState {
-    return {board: board, delta: null};
+  function createState(board: Board,
+                       deltaFrom:Pos,
+                       deltaTo:Pos,
+                       isUnderCheck:[boolean,boolean],
+                       canCastleKing:[boolean,boolean],
+                       canCastleQueen:[boolean,boolean],
+                       enpassantPosition:Pos):IState{
+    return {board: board,
+            delta: {deltaFrom:deltaFrom,
+                    deltaTo:deltaTo,
+                    isUnderCheck:isUnderCheck,
+                    canCastleKing:canCastleKing,
+                    canCastleQueen:canCastleQueen,
+                    enpassantPosition:enpassantPosition}
+           }
   }
 
-  function createComputerMove(board: Board, turnIndex: number, maxDepth: number): IMove {
+  function createComputerMove(turnIndex: number,
+                              endMatchScores:any,
+                              board: Board,
+                              deltaFrom: Pos,
+                              deltaTo: Pos,
+                              isUnderCheck:[boolean, boolean],
+                              canCastleKing:[boolean, boolean],
+                              canCastleQueen:[boolean, boolean],
+                              enpassantPosition:Pos): IMove {
     let move: IMove = {
       turnIndexAfterMove: turnIndex,
-      endMatchScores: null,
-      stateAfterMove: createStateFromBoard(board),
-    };
-    return aiService.createComputerMove(move, {maxDepth: maxDepth});
+      endMatchScores: endMatchScores,
+      stateAfterMove: createState(board, deltaFrom, deltaTo, isUnderCheck,
+                                  canCastleKing, canCastleQueen, enpassantPosition)
+                      }
+    let rotate:boolean = false; //Try if true ?? XXX
+    return aiService.createComputerMove(move, rotate);
   }
 
+  /*
   it("getPossibleMoves returns exactly one cell", function() {
     let board =
         [['O', 'O', 'X'],
@@ -123,5 +147,5 @@ describe("aiService", function() {
          ['', '', '']], 0, 5);
     expect(angular.equals(move.stateAfterMove.delta, {row: 0, col: 0})).toBe(true);
   });
-
+  */
 });
