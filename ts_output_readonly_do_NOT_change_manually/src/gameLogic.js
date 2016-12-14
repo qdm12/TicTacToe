@@ -254,7 +254,6 @@ var gameLogic;
             default:
                 throw new Error("Unknown piece type!");
         }
-        console.log("=================fiftymovecounter: " + fiftymovecounter);
         fiftymovecounter++; //by default, increase the counter
         /*Note: The first move will only execute createMove once.
           However, all the next turns will execute createMove twice because of

@@ -8,7 +8,6 @@ describe("In Chess", function () {
     var W_WIN_SCORES = [1, 0];
     var B_WIN_SCORES = [0, 1];
     var TIE_SCORES = [0, 0];
-    //XXX We need to fix checkmoveok first
     function expectStateTransition(isOk, stateTransition) {
         if (isOk) {
             gameLogic.checkMoveOk(stateTransition);
@@ -50,23 +49,33 @@ describe("In Chess", function () {
         };
         expectStateTransition(isOk, stateTransition);
     }
-    /*
-    it("Initial move", function() {
-      expectStateTransition(OK, {
-        turnIndexBeforeMove: X_TURN,
-        stateBeforeMove: null,
-        move: {
-          turnIndexAfterMove: X_TURN,
-          endMatchScores: NO_ONE_WINS,
-          stateAfterMove: {board:
-            [['', '', ''],
-            ['', '', ''],
-            ['', '', '']], delta: null}
-        },
-        numberOfPlayers: null
-      });
+    it("Initial move", function () {
+        var move = {
+            turnIndexAfterMove: B_TURN,
+            endMatchScores: NO_ONE_WINS,
+            stateAfterMove: {
+                board: [
+                    ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+                    ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+                    ['', '', '', '', '', '', '', ''],
+                    ['', '', '', '', '', '', '', ''],
+                    ['', '', '', '', '', '', '', ''],
+                    ['', '', '', '', '', '', '', ''],
+                    ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+                    ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+                ],
+                delta: null
+            }
+        };
+        var stateTransition = {
+            turnIndexBeforeMove: W_TURN,
+            stateBeforeMove: null,
+            numberOfPlayers: null,
+            move: move
+        };
+        expectStateTransition(OK, stateTransition);
     });
-    
+    /*
     it("Initial move setting turn to O player is illegal", function() {
       expectStateTransition(ILLEGAL, {
         turnIndexBeforeMove: X_TURN,

@@ -9,8 +9,6 @@ describe("In Chess", function() {
   let B_WIN_SCORES = [0, 1];
   let TIE_SCORES = [0, 0];
   
-  //XXX We need to fix checkmoveok first
-
   function expectStateTransition(isOk:boolean, stateTransition:IStateTransition) {
     if (isOk) {
       gameLogic.checkMoveOk(stateTransition);
@@ -61,23 +59,33 @@ describe("In Chess", function() {
     expectStateTransition(isOk, stateTransition);
   }
 
-  /*
   it("Initial move", function() {
-    expectStateTransition(OK, {
-      turnIndexBeforeMove: X_TURN,
-      stateBeforeMove: null,
-      move: {
-        turnIndexAfterMove: X_TURN,
+    let move:IMove = {
+        turnIndexAfterMove: B_TURN,
         endMatchScores: NO_ONE_WINS,
-        stateAfterMove: {board: 
-          [['', '', ''],
-          ['', '', ''],
-          ['', '', '']], delta: null}
-      },
-      numberOfPlayers: null
-    });
+        stateAfterMove: {
+            board:[
+      ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+      ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+      ['',   '',   '',   '',   '',   '',   '',   ''],
+      ['',   '',   '',   '',   '',   '',   '',   ''],
+      ['',   '',   '',   '',   '',   '',   '',   ''],
+      ['',   '',   '',   '',   '',   '',   '',   ''],
+      ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+      ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+      ], 
+            delta: null}        
+    }
+    let stateTransition:IStateTransition = {
+        turnIndexBeforeMove:W_TURN,
+        stateBeforeMove:null,
+        numberOfPlayers:null,
+        move:move
+    }
+    expectStateTransition(OK, stateTransition);
   });
-  
+
+  /*
   it("Initial move setting turn to O player is illegal", function() {
     expectStateTransition(ILLEGAL, {
       turnIndexBeforeMove: X_TURN,
