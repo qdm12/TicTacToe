@@ -308,8 +308,13 @@ var gameLogic;
         var turnIndexBeforeMove = stateTransition.turnIndexBeforeMove;
         var stateBeforeMove = stateTransition.stateBeforeMove;
         var move = stateTransition.move;
-        if (!stateBeforeMove && turnIndexBeforeMove === 0) {
-            return;
+        if (!stateBeforeMove) {
+            if (turnIndexBeforeMove === 0) {
+                return;
+            }
+            else {
+                throw new Error("First move should be done with turnIndexBeforeMove=0");
+            }
         }
         var expectedMove = createMove(stateBeforeMove, turnIndexBeforeMove);
         if (!angular.equals(move, expectedMove)) {

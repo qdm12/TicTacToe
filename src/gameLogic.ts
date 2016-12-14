@@ -345,8 +345,12 @@ module gameLogic {
     let turnIndexBeforeMove = stateTransition.turnIndexBeforeMove;
     let stateBeforeMove: IState = stateTransition.stateBeforeMove;
     let move: IMove = stateTransition.move;
-    if (!stateBeforeMove && turnIndexBeforeMove === 0){ //first checkmoveok
-      return;
+    if (!stateBeforeMove){
+      if(turnIndexBeforeMove === 0){ //first checkmoveok
+        return;
+      }else{
+        throw new Error("First move should be done with turnIndexBeforeMove=0");
+      }
     }
     let expectedMove = createMove(stateBeforeMove, turnIndexBeforeMove);
     if (!angular.equals(move, expectedMove)) {

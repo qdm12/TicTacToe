@@ -75,30 +75,60 @@ describe("In Chess", function () {
         };
         expectStateTransition(OK, stateTransition);
     });
+    it("Initial move setting turn to Black player is illegal", function () {
+        var move = {
+            turnIndexAfterMove: W_TURN,
+            endMatchScores: NO_ONE_WINS,
+            stateAfterMove: {
+                board: [
+                    ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+                    ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+                    ['', '', '', '', '', '', '', ''],
+                    ['', '', '', '', '', '', '', ''],
+                    ['', '', '', '', '', '', '', ''],
+                    ['', '', '', '', '', '', '', ''],
+                    ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+                    ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+                ],
+                delta: null
+            }
+        };
+        var stateTransition = {
+            turnIndexBeforeMove: B_TURN,
+            stateBeforeMove: null,
+            numberOfPlayers: null,
+            move: move
+        };
+        expectStateTransition(OK, stateTransition);
+    });
+    it("placing WP in 5x0 from initial state is legal", function () {
+        expectMove(OK, W_TURN, B_TURN, [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', '', '', '', '', '', '', ''],
+            ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], null, //endMatchScores
+        { row: 6, col: 0 }, //deltaFrom
+        { row: 5, col: 0 }, //deltaTo
+        [false, false], //isUnderCheck
+        [true, true], //canCastleKing
+        [true, true], //canCastleQueen
+        { row: null, col: null }); //enpassantPosition
+    });
     /*
-    it("Initial move setting turn to O player is illegal", function() {
-      expectStateTransition(ILLEGAL, {
-        turnIndexBeforeMove: X_TURN,
-        stateBeforeMove: null,
-        move: {
-          turnIndexAfterMove: O_TURN,
-          endMatchScores: NO_ONE_WINS,
-          stateAfterMove: {board:
-            [['', '', ''],
-            ['', '', ''],
-            ['', '', '']], delta: null}
-        },
-        numberOfPlayers: null
-      });
-    });
-    
-    it("placing X in 0x0 from initial state is legal", function() {
-      expectMove(OK, X_TURN, null, 0, 0,
-        [['X', '', ''],
-         ['', '', ''],
-         ['', '', '']], O_TURN, NO_ONE_WINS);
-    });
-  
     it("placing X in 0x0 from initial state but setting the turn to yourself is illegal", function() {
       expectMove(ILLEGAL, X_TURN, null, 0, 0,
         [['X', '', ''],

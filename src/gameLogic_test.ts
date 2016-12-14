@@ -27,8 +27,10 @@ describe("In Chess", function() {
   }
     
   function expectMove(isOk: boolean, 
-                      turnIndexBeforeMove: number, turnIndexAfterMove: number,
-                      boardBeforeMove: Board, boardAfterMove: Board, 
+                      turnIndexBeforeMove: number, 
+                      turnIndexAfterMove: number,
+                      boardBeforeMove: Board, 
+                      boardAfterMove: Board, 
                       endMatchScores: number[], 
                       deltaFrom: Pos,
                       deltaTo: Pos,
@@ -77,7 +79,7 @@ describe("In Chess", function() {
             delta: null}        
     }
     let stateTransition:IStateTransition = {
-        turnIndexBeforeMove:W_TURN,
+        turnIndexBeforeMove: W_TURN,
         stateBeforeMove:null,
         numberOfPlayers:null,
         move:move
@@ -85,30 +87,65 @@ describe("In Chess", function() {
     expectStateTransition(OK, stateTransition);
   });
 
-  /*
-  it("Initial move setting turn to O player is illegal", function() {
-    expectStateTransition(ILLEGAL, {
-      turnIndexBeforeMove: X_TURN,
-      stateBeforeMove: null,
-      move: {
-        turnIndexAfterMove: O_TURN,
+  
+  it("Initial move setting turn to Black player is illegal", function() {
+    let move:IMove = {
+        turnIndexAfterMove: W_TURN,
         endMatchScores: NO_ONE_WINS,
-        stateAfterMove: {board: 
-          [['', '', ''],
-          ['', '', ''],
-          ['', '', '']], delta: null}
-      },
-      numberOfPlayers: null
-    });
+        stateAfterMove: {
+            board:[
+      ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+      ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+      ['',   '',   '',   '',   '',   '',   '',   ''],
+      ['',   '',   '',   '',   '',   '',   '',   ''],
+      ['',   '',   '',   '',   '',   '',   '',   ''],
+      ['',   '',   '',   '',   '',   '',   '',   ''],
+      ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+      ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+      ], 
+            delta: null}        
+    }
+    let stateTransition:IStateTransition = {
+        turnIndexBeforeMove: B_TURN,
+        stateBeforeMove:null,
+        numberOfPlayers:null,
+        move:move
+    }
+    expectStateTransition(OK, stateTransition);
   });
   
-  it("placing X in 0x0 from initial state is legal", function() {
-    expectMove(OK, X_TURN, null, 0, 0,
-      [['X', '', ''],
-       ['', '', ''],
-       ['', '', '']], O_TURN, NO_ONE_WINS);
+  it("placing WP in 5x0 from initial state is legal", function() {
+    expectMove(OK, W_TURN, B_TURN,
+      [
+      ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+      ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+      ['',   '',   '',   '',   '',   '',   '',   ''],
+      ['',   '',   '',   '',   '',   '',   '',   ''],
+      ['',   '',   '',   '',   '',   '',   '',   ''],
+      ['',   '',   '',   '',   '',   '',   '',   ''],
+      ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+      ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+      ],
+      [
+      ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+      ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+      ['',   '',   '',   '',   '',   '',   '',   ''],
+      ['',   '',   '',   '',   '',   '',   '',   ''],
+      ['',   '',   '',   '',   '',   '',   '',   ''],
+      ['WP',   '',   '',   '',   '',   '',   '',   ''],
+      ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+      ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+      ],
+      null, //endMatchScores
+      {row:6,col:0}, //deltaFrom
+      {row:5,col:0}, //deltaTo
+      [false, false], //isUnderCheck
+      [true, true], //canCastleKing
+      [true, true], //canCastleQueen
+      {row: null, col: null}) //enpassantPosition
   });
-
+  
+  /*
   it("placing X in 0x0 from initial state but setting the turn to yourself is illegal", function() {
     expectMove(ILLEGAL, X_TURN, null, 0, 0,
       [['X', '', ''],
