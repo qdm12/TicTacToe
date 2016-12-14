@@ -340,7 +340,7 @@ var game;
     function isLight(row, col) {
         var rowIsEven = row % 2 === 0;
         var colIsEven = col % 2 === 0;
-        return rowIsEven && colIsEven || !rowIsEven && !colIsEven;
+        return !(rowIsEven && colIsEven || !rowIsEven && !colIsEven);
     }
     function isFirstMove() {
         return !game.currentUpdateUI.move.stateAfterMove;

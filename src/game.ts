@@ -365,7 +365,7 @@ module game {
     function isLight(row:number, col:number) {
         let rowIsEven = row % 2 === 0;
         let colIsEven = col % 2 === 0;
-        return rowIsEven && colIsEven || !rowIsEven && !colIsEven;
+        return !(rowIsEven && colIsEven || !rowIsEven && !colIsEven);
     }
 
   function isFirstMove() {
