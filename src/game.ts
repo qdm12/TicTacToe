@@ -155,6 +155,9 @@ module game {
   
     //window.e2e_test_stateService = stateService;
     function handleDragEvent(type:string, clientX:number, clientY:number) {
+        if(isComputerTurn()){
+            return;
+        }
         // Center point in gameArea
         let x:number = clientX - gameArea.offsetLeft;
         let y:number = clientY - gameArea.offsetTop;
@@ -395,6 +398,9 @@ module game {
 
     export let canSelect = function(row:number, col:number) {
         if(!state.board){
+            return false;
+        }
+        if(isComputerTurn()){
             return false;
         }
         if (isMyTurn()) {

@@ -142,6 +142,9 @@ var game;
     }
     //window.e2e_test_stateService = stateService;
     function handleDragEvent(type, clientX, clientY) {
+        if (isComputerTurn()) {
+            return;
+        }
         // Center point in gameArea
         var x = clientX - gameArea.offsetLeft;
         var y = clientY - gameArea.offsetTop;
@@ -363,6 +366,9 @@ var game;
     }
     game.canSelect = function (row, col) {
         if (!game.state.board) {
+            return false;
+        }
+        if (isComputerTurn()) {
             return false;
         }
         if (isMyTurn()) {
