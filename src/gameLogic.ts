@@ -149,16 +149,11 @@ module gameLogic {
     if (!stateBeforeMove) { //XXX should be initial state, not null
       stateBeforeMove = getInitialState();
     }
-    let board: Board = stateBeforeMove.board;
+    let stateAfterMove: IState = angular.copy(stateBeforeMove);
+    let board:Board = stateBeforeMove.board;
     let deltaFrom:Pos = stateBeforeMove.delta.deltaFrom;
     let deltaTo:Pos = stateBeforeMove.delta.deltaTo;
-    let isUnderCheck:[boolean, boolean] = stateBeforeMove.delta.isUnderCheck;
-    let canCastleKing:[boolean, boolean] = stateBeforeMove.delta.canCastleKing;
-    let canCastleQueen:[boolean, boolean] = stateBeforeMove.delta.canCastleQueen;
     let enpassantPosition:Pos = stateBeforeMove.delta.enpassantPosition;
-    if(!deltaFrom || !deltaTo){
-      throw new Error ("Probably comes from checkmoveok which sends empty deltaFrom and deltaTo for some reason.");  
-    }
     if (deltaFrom.row === deltaTo.row && deltaFrom.col === deltaTo.col){
       throw new Error ("Cannot move to the same position.");
     }
@@ -167,18 +162,13 @@ module gameLogic {
     if (!PieceEmpty && PieceTeam === getTurn(turnIndex)){
       throw new Error("One can only make a move in an empty position or capture opponent's piece!");
     }
-    if (getWinner(board, turnIndex, isUnderCheck, canCastleKing,
-                  canCastleQueen, enpassantPosition)
+    if (getWinner(board, turnIndex, stateBeforeMove.delta.isUnderCheck, stateBeforeMove.delta.canCastleKing,
+                  stateBeforeMove.delta.canCastleQueen, enpassantPosition)
         ||
-        isTie(board, turnIndex, isUnderCheck, canCastleKing,
-              canCastleQueen, enpassantPosition)){
+        isTie(board, turnIndex, stateBeforeMove.delta.isUnderCheck, stateBeforeMove.delta.canCastleKing,
+              stateBeforeMove.delta.canCastleQueen, enpassantPosition)){
       throw new Error("Can only make a move if the game is not over!");
     }
-    let boardAfterMove = angular.copy(board),
-        isUnderCheckAfterMove = angular.copy(isUnderCheck),
-        canCastleKingAfterMove = angular.copy(canCastleKing),
-        canCastleQueenAfterMove = angular.copy(canCastleQueen),
-        enpassantPositionAfterMove = angular.copy(enpassantPosition);
     if (getTurn(turnIndex) !== board[deltaFrom.row][deltaFrom.col].charAt(0)) {
       throw new Error("Illegal to move this piece!");
     }
@@ -186,88 +176,88 @@ module gameLogic {
     // update the board according to the moving piece
     switch(board[deltaFrom.row][deltaFrom.col].charAt(1)) {
       case 'K':
-        if (isCastlingKing(board, deltaFrom, deltaTo, turnIndex, canCastleKing)) {
+        if (isCastlingKing(board, deltaFrom, deltaTo, turnIndex, stateBeforeMove.delta.canCastleKing)) {
             console.log("isCastlingKing.");
-          boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
-          boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
-          boardAfterMove[deltaTo.row][deltaTo.col - 1] = getTurn(turnIndex) + 'R';
-          boardAfterMove[deltaTo.row][7] = '';
-          canCastleKingAfterMove[turnIndex] = false;
-          canCastleQueenAfterMove[turnIndex] = false;
+          stateAfterMove.board[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
+          stateAfterMove.board[deltaFrom.row][deltaFrom.col] = '';
+          stateAfterMove.board[deltaTo.row][deltaTo.col - 1] = getTurn(turnIndex) + 'R';
+          stateAfterMove.board[deltaTo.row][7] = '';
+          stateAfterMove.delta.canCastleKing[turnIndex] = false;
+          stateAfterMove.delta.canCastleQueen[turnIndex] = false;
         }
-        else if (isCastlingQueen(board, deltaFrom, deltaTo, turnIndex, canCastleQueen)) {
-          boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
-          boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
-          boardAfterMove[deltaTo.row][deltaTo.col + 1] = getTurn(turnIndex) + 'R';
-          boardAfterMove[deltaTo.row][0] = '';
-          canCastleKingAfterMove[turnIndex] = false;
-          canCastleQueenAfterMove[turnIndex] = false;
+        else if (isCastlingQueen(board, deltaFrom, deltaTo, turnIndex, stateBeforeMove.delta.canCastleQueen)) {
+          stateAfterMove.board[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
+          stateAfterMove.board[deltaFrom.row][deltaFrom.col] = '';
+          stateAfterMove.board[deltaTo.row][deltaTo.col + 1] = getTurn(turnIndex) + 'R';
+          stateAfterMove.board[deltaTo.row][0] = '';
+          stateAfterMove.delta.canCastleKing[turnIndex] = false;
+          stateAfterMove.delta.canCastleQueen[turnIndex] = false;
         }
         else if(canKingMove(board, deltaFrom, deltaTo, turnIndex)) {
-          boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
-          boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
+          stateAfterMove.board[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
+          stateAfterMove.board[deltaFrom.row][deltaFrom.col] = '';
         } else {
           throw new Error("Illegal move for king.");
         }
         break;
       case 'Q':
         if(canQueenMove(board, deltaFrom, deltaTo, turnIndex)) {
-            boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
-            boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
+            stateAfterMove.board[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
+            stateAfterMove.board[deltaFrom.row][deltaFrom.col] = '';
         } else {
           throw new Error("Illegal move for Queen");
         }
         break;
       case 'R':
         if(canRookMove(board, deltaFrom, deltaTo, turnIndex)) {
-            boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
-            boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
+            stateAfterMove.board[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
+            stateAfterMove.board[deltaFrom.row][deltaFrom.col] = '';
         } else {
           throw new Error("Illegal move for Rook");
         }
         break;
       case 'B':
         if(canBishopMove(board, deltaFrom, deltaTo, turnIndex)) {
-          boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
-          boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
+          stateAfterMove.board[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
+          stateAfterMove.board[deltaFrom.row][deltaFrom.col] = '';
         } else {
           throw new Error("Illegal move for Bishop");
         }
         break;
       case 'N':
         if(canKnightMove(board, deltaFrom, deltaTo, turnIndex)) {
-          boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
-          boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
+          stateAfterMove.board[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
+          stateAfterMove.board[deltaFrom.row][deltaFrom.col] = '';
         } else {
           throw new Error("Illegal move for Knight");
         }
         break;
       case 'P':
         if(canPawnMove(board, deltaFrom, deltaTo, turnIndex, enpassantPosition)) {
-          boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
+          stateAfterMove.board[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
           // capture the opponent pawn with enpassant
           if (enpassantPosition.row &&
               deltaFrom.row === enpassantPosition.row &&
               deltaFrom.col !== deltaTo.col &&
               (Math.abs(deltaFrom.col - enpassantPosition.col) === 1)) {
-            boardAfterMove[enpassantPosition.row][enpassantPosition.col] = '';
+            stateAfterMove.board[enpassantPosition.row][enpassantPosition.col] = '';
           }
-          boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
-          enpassantPositionAfterMove.row = null;
-          enpassantPositionAfterMove.col = null;
+          stateAfterMove.board[deltaFrom.row][deltaFrom.col] = '';
+          stateAfterMove.delta.enpassantPosition.row = null;
+          stateAfterMove.delta.enpassantPosition.col = null;
 
           // check for enpassant
           if (getTurn(turnIndex) === "W" && deltaTo.row === 4){
-            if (boardAfterMove[deltaTo.row][deltaTo.col - 1] === "BP" ||
-                boardAfterMove[deltaTo.row][deltaTo.col + 1] === "BP") {
-              enpassantPositionAfterMove.row = deltaTo.row;
-              enpassantPositionAfterMove.col = deltaTo.col;
+            if (stateAfterMove.board[deltaTo.row][deltaTo.col - 1] === "BP" ||
+                stateAfterMove.board[deltaTo.row][deltaTo.col + 1] === "BP") {
+              stateAfterMove.delta.enpassantPosition.row = deltaTo.row;
+              stateAfterMove.delta.enpassantPosition.col = deltaTo.col;
             }
           }else if (getTurn(turnIndex) === "B" && deltaTo.row === 3) {
-            if (boardAfterMove[deltaTo.row][deltaTo.col - 1] === "WP" ||
-                boardAfterMove[deltaTo.row][deltaTo.col + 1] === "WP") {
-              enpassantPositionAfterMove.row = deltaTo.row;
-              enpassantPositionAfterMove.col = deltaTo.col;
+            if (stateAfterMove.board[deltaTo.row][deltaTo.col - 1] === "WP" ||
+                stateAfterMove.board[deltaTo.row][deltaTo.col + 1] === "WP") {
+              stateAfterMove.delta.enpassantPosition.row = deltaTo.row;
+              stateAfterMove.delta.enpassantPosition.col = deltaTo.col;
             }
           }
 
@@ -275,7 +265,7 @@ module gameLogic {
           if (deltaTo.row === 0 || deltaTo.row === 7) {
             let audio = new Audio('sounds/piece_promote.mp3');
             audio.play();
-            boardAfterMove[deltaTo.row][deltaTo.col] = getTurn(turnIndex) + "Q"; //XXX eventually give choice later on
+            stateAfterMove.board[deltaTo.row][deltaTo.col] = getTurn(turnIndex) + "Q"; //XXX eventually give choice later on
           }
           fiftymovecounter = 0; //if a pawn move is done, reset the counter
         } else {
@@ -292,19 +282,19 @@ module gameLogic {
       twice per turn. On top of that, a chess "move" = 2 turns so 
       50 moves are reached when fiftymovecounter = 2*50*2 - 1 = 199.
     */
-    if(getOpponent(turnIndex) === board[deltaTo.row][deltaTo.col].charAt(0)){
+    if(getOpponent(turnIndex) === stateBeforeMove.board[deltaTo.row][deltaTo.col].charAt(0)){
         fiftymovecounter = 0; //If this was an attack move, reset the counter
     }
     turnIndex = 1 - turnIndex;
-    if (isUnderCheckByPositions(boardAfterMove, turnIndex)) {
-      isUnderCheckAfterMove[turnIndex] = true;
+    if (isUnderCheckByPositions(stateAfterMove.board, turnIndex)) {
+      stateAfterMove.delta.isUnderCheck[turnIndex] = true;
     }
-    let winner = getWinner(boardAfterMove,
+    let winner = getWinner(stateAfterMove.board,
                            turnIndex,
-                           isUnderCheckAfterMove,
-                           canCastleKingAfterMove,
-                           canCastleQueenAfterMove,
-                           enpassantPositionAfterMove);
+                           stateAfterMove.delta.isUnderCheck,
+                           stateAfterMove.delta.canCastleKing,
+                           stateAfterMove.delta.canCastleQueen,
+                           stateAfterMove.delta.enpassantPosition);
     let endMatchScores: number[];
     if (winner === 'W'){
       endMatchScores = [1,0];
@@ -312,12 +302,12 @@ module gameLogic {
     } else if (winner == 'B'){
       endMatchScores = [0,1];
       turnIndex = -1;
-    } else if (isTie(boardAfterMove,
+    } else if (isTie(stateAfterMove.board,
                      turnIndex,
-                     isUnderCheckAfterMove,
-                     canCastleKingAfterMove,
-                     canCastleQueenAfterMove,
-                     enpassantPositionAfterMove)
+                     stateAfterMove.delta.isUnderCheck,
+                     stateAfterMove.delta.canCastleKing,
+                     stateAfterMove.delta.canCastleQueen,
+                     stateAfterMove.delta.enpassantPosition)
                 ||
                 fiftymovecounter === 199){
       endMatchScores = [0,0];
@@ -325,13 +315,6 @@ module gameLogic {
     }else{
         endMatchScores = null;
     }
-    let delta: BoardDelta = {deltaFrom: deltaFrom,
-                            deltaTo: deltaTo,
-                            isUnderCheck: isUnderCheckAfterMove,
-                            canCastleKing: canCastleKingAfterMove,
-                            canCastleQueen: canCastleQueenAfterMove,
-                            enpassantPosition:enpassantPositionAfterMove}
-    let stateAfterMove: IState = {delta: delta, board: boardAfterMove}
     return {endMatchScores: endMatchScores, turnIndexAfterMove: turnIndex, stateAfterMove: stateAfterMove};
   }
   

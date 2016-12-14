@@ -39,9 +39,6 @@ describe("In Chess", function() {
                       canCastleQueen: [boolean, boolean],
                       enpassantPosition:Pos): void {
     let stateBeforeMove:IState = null;
-    if(boardBeforeMove){
-        stateBeforeMove = {board: boardBeforeMove, delta: null};
-    }
     let stateTransition: IStateTransition = {
       turnIndexBeforeMove: turnIndexBeforeMove,
       stateBeforeMove: stateBeforeMove,
@@ -111,7 +108,7 @@ describe("In Chess", function() {
         numberOfPlayers:null,
         move:move
     }
-    expectStateTransition(OK, stateTransition);
+    expectStateTransition(ILLEGAL, stateTransition);
   });
   
   it("placing WP in 5x0 from initial state is legal", function() {

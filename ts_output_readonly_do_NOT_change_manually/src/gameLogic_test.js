@@ -28,9 +28,6 @@ describe("In Chess", function () {
     }
     function expectMove(isOk, turnIndexBeforeMove, turnIndexAfterMove, boardBeforeMove, boardAfterMove, endMatchScores, deltaFrom, deltaTo, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition) {
         var stateBeforeMove = null;
-        if (boardBeforeMove) {
-            stateBeforeMove = { board: boardBeforeMove, delta: null };
-        }
         var stateTransition = {
             turnIndexBeforeMove: turnIndexBeforeMove,
             stateBeforeMove: stateBeforeMove,
@@ -99,7 +96,7 @@ describe("In Chess", function () {
             numberOfPlayers: null,
             move: move
         };
-        expectStateTransition(OK, stateTransition);
+        expectStateTransition(ILLEGAL, stateTransition);
     });
     it("placing WP in 5x0 from initial state is legal", function () {
         expectMove(OK, W_TURN, B_TURN, [
