@@ -14,6 +14,7 @@ var gameLogic;
     }
     gameLogic.getInitialBoard = getInitialBoard;
     function getInitialState() {
+        console.log("DEBUG: getInitialState");
         var delta = { deltaFrom: null, deltaTo: null,
             isUnderCheck: [false, false],
             canCastleKing: [true, true],
@@ -24,6 +25,7 @@ var gameLogic;
     gameLogic.getInitialState = getInitialState;
     // Returns true if the game ended in a tie because there are no available moves for any pieces
     function isTie(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition) {
+        console.log("DEBUG: isTie");
         if (isUnderCheck[turnIndex]) {
             return false;
         }
@@ -70,6 +72,7 @@ var gameLogic;
     }
     // Returns the winner (either 'W' or 'B') or '' if there is no winner
     function getWinner(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition) {
+        console.log("DEBUG: getWinner");
         if (!isUnderCheck[turnIndex]) {
             return '';
         }
@@ -117,6 +120,7 @@ var gameLogic;
     }
     // Returns the move that should be performed when player givin a state
     function createMove(stateBeforeMove, turnIndex) {
+        console.log("DEBUG: createMove");
         if (!stateBeforeMove) {
             stateBeforeMove = getInitialState();
         }
@@ -252,6 +256,7 @@ var gameLogic;
             default:
                 throw new Error("Unknown piece type!");
         }
+        console.log("DEBUG: createMove 2");
         turnIndex = 1 - turnIndex;
         if (isUnderCheckByPositions(boardAfterMove, turnIndex)) {
             isUnderCheckAfterMove[turnIndex] = true;
@@ -280,10 +285,12 @@ var gameLogic;
             canCastleQueen: canCastleQueenAfterMove,
             enpassantPosition: enpassantPositionAfterMove };
         var stateAfterMove = { delta: delta, board: boardAfterMove };
+        console.log("DEBUG: createMove 3");
         return { endMatchScores: endMatchScores, turnIndexAfterMove: turnIndex, stateAfterMove: stateAfterMove };
     }
     gameLogic.createMove = createMove;
     function createInitialMove() {
+        console.log("DEBUG: createInitialMove");
         return { endMatchScores: null, turnIndexAfterMove: 0,
             stateAfterMove: getInitialState() };
     }
@@ -291,19 +298,27 @@ var gameLogic;
     function checkMoveOk(stateTransition) {
         // We can assume that turnIndexBeforeMove and stateBeforeMove are legal, and we need
         // to verify that the move is OK.
+        console.log("DEBUG: checkmoveOk");
         var turnIndexBeforeMove = stateTransition.turnIndexBeforeMove;
         var stateBeforeMove = stateTransition.stateBeforeMove;
         var move = stateTransition.move;
+        if (!stateBeforeMove) {
+            //turnBasedServices is checking with a null state (error!) XXX
+            return;
+        }
         if (!stateBeforeMove && turnIndexBeforeMove === 0 &&
             angular.equals(createInitialMove(), move)) {
             return;
         }
-        //XXX ERROR because deltaFrom and deltaTo in stateBeforeMove are null
-        /*let expectedMove = createMove(stateBeforeMove, turnIndexBeforeMove);
+        if (!stateBeforeMove.delta.deltaFrom || !stateBeforeMove.delta.deltaTo) {
+            //angular is checking is does not work here
+            return;
+        }
+        var expectedMove = createMove(stateBeforeMove, turnIndexBeforeMove);
         if (!angular.equals(move, expectedMove)) {
-          throw new Error("Expected move=" + angular.toJson(expectedMove, true) +
-              ", but got stateTransition=" + angular.toJson(stateTransition, true))
-        }*/
+            throw new Error("Expected move=" + angular.toJson(expectedMove, true) +
+                ", but got stateTransition=" + angular.toJson(stateTransition, true));
+        }
     }
     gameLogic.checkMoveOk = checkMoveOk;
     function forSimpleTestHtml() {
