@@ -118,6 +118,8 @@ module game {
                                                                   canCastleKing,
                                                                   canCastleQueen,
                                                                   enpassantPosition));
+                        audio = new Audio('sounds/piece_drop.wav');
+                        audio.play();
                         return;
                     }
                 }

@@ -14,7 +14,7 @@ var game;
     var deltaFrom = null;
     var deltaTo = null;
     var isYourTurn = false;
-    var rotate = null;
+    var rotate = true;
     var player = null;
     function init() {
         registerServiceWorker();
