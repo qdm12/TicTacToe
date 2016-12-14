@@ -187,6 +187,7 @@ module gameLogic {
     switch(board[deltaFrom.row][deltaFrom.col].charAt(1)) {
       case 'K':
         if (isCastlingKing(board, deltaFrom, deltaTo, turnIndex, canCastleKing)) {
+            console.log("isCastlingKing.");
           boardAfterMove[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
           boardAfterMove[deltaFrom.row][deltaFrom.col] = '';
           boardAfterMove[deltaTo.row][deltaTo.col - 1] = getTurn(turnIndex) + 'R';
@@ -531,7 +532,7 @@ module gameLogic {
     }
     let PieceEmpty = (board[deltaTo.row][deltaTo.col] === '');
     let PieceTeam = board[deltaTo.row][deltaTo.col].charAt(0);
-    if (!PieceEmpty && PieceTeam !== getTurn(turnIndex)) {
+    if (!PieceEmpty && PieceTeam === getTurn(turnIndex)) {
       return false;
     }
     for (let i = deltaFrom.row - 1; i < deltaFrom.row + 2; i++) {
