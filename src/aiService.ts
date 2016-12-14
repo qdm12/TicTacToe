@@ -1,7 +1,7 @@
 module aiService {
     //10 Pawns, 5 Knight, 3 Bishops, 3 rooks, 2 queen, 1 king
     let RandomList = ['P', 'N', 'P', 'B', 'P', 'N', 'P', 'B', 'N', 'P', 'B', 'P', 'R', 'P', 'N', 'R', 'Q', 'N', 'P', 'Q', 'P', 'R', 'K', 'P'];
-    let pieceTypeIndex:number = Math.floor(Math.random()*RandomList.length);
+    export let pieceTypeIndex:number = Math.floor(Math.random()*RandomList.length);
     //overwrite initial pieceTypeIndex for unit testing    
     
     /** Returns the move that the computer player should do for the given state in move. */

@@ -1,4 +1,7 @@
 describe("aiService", function() {
+  let W_TURN = 0;
+  let B_TURN = 1;
+  
   function createState(board: Board,
                        deltaFrom:Pos,
                        deltaTo:Pos,
@@ -19,8 +22,8 @@ describe("aiService", function() {
   function createComputerMove(turnIndex: number,
                               endMatchScores:any,
                               board: Board,
-                              deltaFrom: Pos,
-                              deltaTo: Pos,
+                              //deltaFrom: Pos,
+                              //deltaTo: Pos,
                               isUnderCheck:[boolean, boolean],
                               canCastleKing:[boolean, boolean],
                               canCastleQueen:[boolean, boolean],
@@ -28,23 +31,65 @@ describe("aiService", function() {
     let move: IMove = {
       turnIndexAfterMove: turnIndex,
       endMatchScores: endMatchScores,
-      stateAfterMove: createState(board, deltaFrom, deltaTo, isUnderCheck,
+      stateAfterMove: createState(board, null, null, isUnderCheck,
                                   canCastleKing, canCastleQueen, enpassantPosition)
                       }
     let rotate:boolean = false; //Try if true ?? XXX
     return aiService.createComputerMove(move, rotate);
   }
-
-  /*
-  it("getPossibleMoves returns exactly one cell", function() {
-    let board =
-        [['O', 'O', 'X'],
-         ['X', 'X', 'O'],
-         ['O', 'X', '']];
-    let possibleMoves = aiService.getPossibleMoves(createStateFromBoard(board), 0);
-    expect(possibleMoves.length).toBe(1);
-    expect(angular.equals(possibleMoves[0].stateAfterMove.delta, {row: 2, col: 2})).toBe(true);
+  
+  it("createComputerMove returns random-ring move for Pawn' index", function() {
+    aiService.pieceTypeIndex = 0;
+    let next_move:IMove = createComputerMove(
+        W_TURN,
+        null, //endMatchScores
+        [
+        ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+        ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+        ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ],
+        [false,false], //isUnderCheck
+        [true,true], //canCastleKing
+        [true,true], //canCastleQueen
+        {row:null, col:null}); //enpassantPosition
+    expect(next_move.stateAfterMove.delta.deltaFrom.row).toBe(6);
+    expect(next_move.stateAfterMove.delta.deltaFrom.col).toBe(0);
+    expect(next_move.stateAfterMove.delta.deltaTo.row).toBe(5);
+    expect(next_move.stateAfterMove.delta.deltaTo.col).toBe(0);
   });
+  
+  it("createComputerMove returns attack move' index", function() {
+    aiService.pieceTypeIndex = 0;
+    let next_move:IMove = createComputerMove(
+        W_TURN,
+        null, //endMatchScores
+        [
+        ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+        ['BP', '', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+        ['',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   'WP',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['WP', 'WP', '', 'WP', 'WP', 'WP', 'WP', 'WP'],
+        ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ],
+        [false,false], //isUnderCheck
+        [true,true], //canCastleKing
+        [true,true], //canCastleQueen
+        {row:null, col:null}); //enpassantPosition
+    expect(next_move.stateAfterMove.delta.deltaFrom.row).toBe(3);
+    expect(next_move.stateAfterMove.delta.deltaFrom.col).toBe(2);
+    expect(next_move.stateAfterMove.delta.deltaTo.row).toBe(2);
+    expect(next_move.stateAfterMove.delta.deltaTo.col).toBe(1);
+  });
+  
+  
+  /*
 
   it("X finds an immediate winning move", function() {
     let move = createComputerMove(

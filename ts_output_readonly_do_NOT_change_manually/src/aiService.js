@@ -2,7 +2,7 @@ var aiService;
 (function (aiService) {
     //10 Pawns, 5 Knight, 3 Bishops, 3 rooks, 2 queen, 1 king
     var RandomList = ['P', 'N', 'P', 'B', 'P', 'N', 'P', 'B', 'N', 'P', 'B', 'P', 'R', 'P', 'N', 'R', 'Q', 'N', 'P', 'Q', 'P', 'R', 'K', 'P'];
-    var pieceTypeIndex = Math.floor(Math.random() * RandomList.length);
+    aiService.pieceTypeIndex = Math.floor(Math.random() * RandomList.length);
     //overwrite initial pieceTypeIndex for unit testing    
     /** Returns the move that the computer player should do for the given state in move. */
     function createComputerMove(move, rotate) {
@@ -87,29 +87,29 @@ var aiService;
         while (possible_origin_indexes.length === 0) {
             for (var i = 0; i < possible_moves.length; i++) {
                 deltaFrom = possible_moves[i][0];
-                if (board[deltaFrom.row][deltaFrom.col].charAt(1) === RandomList[pieceTypeIndex]) {
+                if (board[deltaFrom.row][deltaFrom.col].charAt(1) === RandomList[aiService.pieceTypeIndex]) {
                     possible_origin_indexes.push(i);
                 }
             }
             if (possible_origin_indexes.length === 0) {
-                pieceTypeIndex++;
-                if (pieceTypeIndex === RandomList.length) {
-                    pieceTypeIndex = 0;
+                aiService.pieceTypeIndex++;
+                if (aiService.pieceTypeIndex === RandomList.length) {
+                    aiService.pieceTypeIndex = 0;
                 }
             }
         }
         //We have found at least one origin for the type RandomList[pieceTypeIndex]
-        var origin_index = pieceTypeIndex % possible_origin_indexes.length; //"Random"
+        var origin_index = aiService.pieceTypeIndex % possible_origin_indexes.length; //"Random"
         var pm_index = possible_origin_indexes[origin_index];
         deltaFrom = possible_moves[pm_index][0];
         possible_destinations = possible_moves[pm_index][1];
-        var pd_index = pieceTypeIndex % possible_destinations.length; //"Random"
+        var pd_index = aiService.pieceTypeIndex % possible_destinations.length; //"Random"
         deltaTo = possible_destinations[pd_index];
         move.stateAfterMove.delta.deltaFrom = deltaFrom;
         move.stateAfterMove.delta.deltaTo = deltaTo;
-        pieceTypeIndex++; //changes the piece Type for next AI move
-        if (pieceTypeIndex === RandomList.length) {
-            pieceTypeIndex = 0; //reset the index when it reaches its max
+        aiService.pieceTypeIndex++; //changes the piece Type for next AI move
+        if (aiService.pieceTypeIndex === RandomList.length) {
+            aiService.pieceTypeIndex = 0; //reset the index when it reaches its max
         }
         return gameLogic.createMove(move.stateAfterMove, turnIndex);
     }
