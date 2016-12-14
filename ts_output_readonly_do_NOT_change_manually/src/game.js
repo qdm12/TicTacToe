@@ -134,6 +134,8 @@ var game;
     function maybeSendComputerMove() {
         if (!isComputerTurn())
             return;
+        var audio = new Audio('sounds/piece_lift.mp3');
+        audio.play();
         var move = aiService.findComputerMove(game.currentUpdateUI.move, rotate);
         log.info("Computer move: ", move);
         makeMove(move);
@@ -190,8 +192,6 @@ var game;
                 return;
             }
             if (type === "touchend") {
-                var audio = new Audio('sounds/piece_drop.wav');
-                audio.play();
                 dragDoneHandler(draggingStartedRowCol, { row: row, col: col });
             }
             else {
@@ -272,6 +272,8 @@ var game;
             return;
         }
         game.didMakeMove = true;
+        var audio = new Audio('sounds/piece_drop.wav');
+        audio.play();
         if (!game.proposals) {
             moveService.makeMove(move);
         }

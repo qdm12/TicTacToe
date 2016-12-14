@@ -1,7 +1,6 @@
 var aiService;
 (function (aiService) {
     var pieceTypeIndex = 0;
-    var secondary_counter = 0;
     /** Returns the move that the computer player should do for the given state in move. */
     function findComputerMove(move, rotate) {
         var next_move;
@@ -9,8 +8,6 @@ var aiService;
         if (next_move === null) {
             next_move = findRingMove(move); //find a "random" move
         }
-        var audio = new Audio('sounds/piece_drop.wav');
-        audio.play();
         return next_move;
     }
     aiService.findComputerMove = findComputerMove;
@@ -26,8 +23,6 @@ var aiService;
             console.log("AI: findAttackMove: There is no possible move");
             return null;
         }
-        var audio = new Audio('sounds/piece_lift.mp3');
-        audio.play();
         //Searches for attack move
         var deltaFrom;
         var deltaTo;
@@ -41,15 +36,9 @@ var aiService;
                     for (var j = 0; j < possible_destinations.length; j++) {
                         deltaTo = possible_destinations[j];
                         if (isEnnemyCell(turnIndex, board, deltaTo, rotate)) {
-                            var stateBeforeMove = void 0;
-                            stateBeforeMove.board = board;
-                            stateBeforeMove.delta.deltaFrom = deltaFrom;
-                            stateBeforeMove.delta.deltaTo = deltaTo;
-                            stateBeforeMove.delta.isUnderCheck = isUnderCheck;
-                            stateBeforeMove.delta.canCastleKing = canCastleKing;
-                            stateBeforeMove.delta.canCastleQueen = canCastleQueen;
-                            stateBeforeMove.delta.enpassantPosition = enpassantPosition;
-                            return gameLogic.createMove(stateBeforeMove, turnIndex);
+                            move.stateAfterMove.delta.deltaFrom = deltaFrom;
+                            move.stateAfterMove.delta.deltaTo = deltaTo;
+                            return gameLogic.createMove(move.stateAfterMove, turnIndex);
                         }
                     }
                 }
@@ -71,11 +60,9 @@ var aiService;
         }
         var team = board[deltaTo.row][deltaTo.col].charAt(0);
         if (team === 'W') {
-            return 1; //XXX check that
-        }
-        else {
             return 0;
         }
+        return 1; //Black team
     }
     function findRingMove(move) {
         var board = move.stateAfterMove.board;
@@ -91,39 +78,27 @@ var aiService;
         }
         var deltaFrom;
         var deltaTo;
-        var PriorityList = ['P', 'N', 'B', 'R', 'Q', 'K'];
+        //10 Pawns, 5 Knight, 3 Bishops, 3 rooks, 2 queen, 1 king
+        var PriorityList = ['P', 'N', 'P', 'B', 'P', 'N', 'P', 'B', 'N', 'P', 'B', 'P', 'R', 'P', 'N', 'R', 'Q', 'N', 'P', 'Q', 'P', 'R', 'K', 'P'];
         var possible_destinations;
         while (true) {
-            switch (PriorityList[pieceTypeIndex]) {
-                case 'P': secondary_counter = secondary_counter + 1;
-                case 'N': secondary_counter = secondary_counter + 2;
-                case 'B': secondary_counter = secondary_counter + 4;
-                case 'R': secondary_counter = secondary_counter + 5;
-                case 'Q': secondary_counter = secondary_counter + 7;
-                case 'K': secondary_counter = secondary_counter + 14;
-            }
             for (var i = 0; i < possible_moves.length; i++) {
                 deltaFrom = possible_moves[i][0];
                 if (board[deltaFrom.row][deltaFrom.col].charAt(1) === PriorityList[pieceTypeIndex]) {
                     possible_destinations = possible_moves[i][1];
-                    deltaTo = possible_destinations[secondary_counter % possible_destinations.length];
-                    var stateBeforeMove = void 0;
-                    stateBeforeMove.board = board;
-                    stateBeforeMove.delta.deltaFrom = deltaFrom;
-                    stateBeforeMove.delta.deltaTo = deltaTo;
-                    stateBeforeMove.delta.isUnderCheck = isUnderCheck; //change to stateBeforeMove = stateAfterMove
-                    stateBeforeMove.delta.canCastleKing = canCastleKing;
-                    stateBeforeMove.delta.canCastleQueen = canCastleQueen;
-                    stateBeforeMove.delta.enpassantPosition = enpassantPosition;
-                    return gameLogic.createMove(stateBeforeMove, turnIndex);
+                    deltaTo = possible_destinations[pieceTypeIndex % possible_destinations.length];
+                    move.stateAfterMove.delta.deltaFrom = deltaFrom;
+                    move.stateAfterMove.delta.deltaTo = deltaTo;
+                    pieceTypeIndex++;
+                    if (pieceTypeIndex === PriorityList.length) {
+                        pieceTypeIndex = 0;
+                    }
+                    return gameLogic.createMove(move.stateAfterMove, turnIndex);
                 }
             }
-            if (secondary_counter === 14) {
-                secondary_counter = 0;
-                pieceTypeIndex++;
-                if (pieceTypeIndex === PriorityList.length) {
-                    pieceTypeIndex = 0;
-                }
+            pieceTypeIndex++;
+            if (pieceTypeIndex === PriorityList.length) {
+                pieceTypeIndex = 0;
             }
         }
     }

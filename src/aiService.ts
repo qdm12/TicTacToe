@@ -1,6 +1,5 @@
 module aiService {
     let pieceTypeIndex:number = 0;
-    let secondary_counter:number = 0;
     
     /** Returns the move that the computer player should do for the given state in move. */
     export function findComputerMove(move:IMove, rotate:boolean):IMove {
@@ -9,8 +8,6 @@ module aiService {
         if(next_move === null){ //No attack move found
             next_move = findRingMove(move); //find a "random" move
         }
-        let audio = new Audio('sounds/piece_drop.wav');
-        audio.play();
         return next_move;
     }
     
@@ -31,8 +28,6 @@ module aiService {
             console.log("AI: findAttackMove: There is no possible move");
             return null;
         }
-        let audio = new Audio('sounds/piece_lift.mp3');
-        audio.play();
         //Searches for attack move
         let deltaFrom:Pos;
         let deltaTo:Pos;
@@ -46,15 +41,9 @@ module aiService {
                     for (let j = 0; j < possible_destinations.length; j++) {
                         deltaTo = possible_destinations[j];
                         if(isEnnemyCell(turnIndex,board,deltaTo,rotate)){
-                            let stateBeforeMove:IState;
-                            stateBeforeMove.board = board;
-                            stateBeforeMove.delta.deltaFrom = deltaFrom;
-                            stateBeforeMove.delta.deltaTo = deltaTo;
-                            stateBeforeMove.delta.isUnderCheck = isUnderCheck;
-                            stateBeforeMove.delta.canCastleKing = canCastleKing;
-                            stateBeforeMove.delta.canCastleQueen = canCastleQueen;
-                            stateBeforeMove.delta.enpassantPosition = enpassantPosition;
-                            return gameLogic.createMove(stateBeforeMove, turnIndex);
+                            move.stateAfterMove.delta.deltaFrom = deltaFrom;
+                            move.stateAfterMove.delta.deltaTo = deltaTo;
+                            return gameLogic.createMove(move.stateAfterMove, turnIndex);
                         }
                     }
                 }
@@ -77,11 +66,10 @@ module aiService {
             deltaTo.col = 7 - deltaTo.col;
         }
         let team:string = board[deltaTo.row][deltaTo.col].charAt(0);
-        if(team === 'W'){
-            return 1; //XXX check that
-        }else{
+        if(team === 'W'){ //White team
             return 0;
         }
+        return 1; //Black team
     }
     
     function findRingMove(move:IMove):IMove{
@@ -103,39 +91,27 @@ module aiService {
         }
         let deltaFrom:Pos;
         let deltaTo:Pos;
-        let PriorityList = ['P', 'N', 'B', 'R', 'Q', 'K'];
+        //10 Pawns, 5 Knight, 3 Bishops, 3 rooks, 2 queen, 1 king
+        let PriorityList = ['P', 'N', 'P', 'B', 'P', 'N', 'P', 'B', 'N', 'P', 'B', 'P', 'R', 'P', 'N', 'R', 'Q', 'N', 'P', 'Q', 'P', 'R', 'K', 'P'];
         let possible_destinations:any;
         while(true){
-            switch(PriorityList[pieceTypeIndex]){ //This makes the piece kind "random"
-                case 'P':secondary_counter = secondary_counter + 1;
-                case 'N':secondary_counter = secondary_counter + 2;
-                case 'B':secondary_counter = secondary_counter + 4;
-                case 'R':secondary_counter = secondary_counter + 5;
-                case 'Q':secondary_counter = secondary_counter + 7;
-                case 'K':secondary_counter = secondary_counter + 14;
-            }
             for(let i = 0; i < possible_moves.length; i++){
                 deltaFrom = possible_moves[i][0];
                 if(board[deltaFrom.row][deltaFrom.col].charAt(1) === PriorityList[pieceTypeIndex]){
                     possible_destinations = possible_moves[i][1];
-                    deltaTo = possible_destinations[secondary_counter % possible_destinations.length];
-                    let stateBeforeMove:IState;
-                    stateBeforeMove.board = board;
-                    stateBeforeMove.delta.deltaFrom = deltaFrom;
-                    stateBeforeMove.delta.deltaTo = deltaTo;
-                    stateBeforeMove.delta.isUnderCheck = isUnderCheck; //change to stateBeforeMove = stateAfterMove
-                    stateBeforeMove.delta.canCastleKing = canCastleKing;
-                    stateBeforeMove.delta.canCastleQueen = canCastleQueen;
-                    stateBeforeMove.delta.enpassantPosition = enpassantPosition;
-                    return gameLogic.createMove(stateBeforeMove, turnIndex);
+                    deltaTo = possible_destinations[pieceTypeIndex % possible_destinations.length];
+                    move.stateAfterMove.delta.deltaFrom = deltaFrom;
+                    move.stateAfterMove.delta.deltaTo = deltaTo;
+                    pieceTypeIndex++;
+                    if(pieceTypeIndex === PriorityList.length){
+                        pieceTypeIndex = 0;
+                    }
+                    return gameLogic.createMove(move.stateAfterMove, turnIndex);
                 }
             }
-            if(secondary_counter === 14){ //14 because 14 possible destinations max
-                secondary_counter = 0;
-                pieceTypeIndex++;
-                if(pieceTypeIndex === PriorityList.length){
-                    pieceTypeIndex = 0;
-                }         
+            pieceTypeIndex++;
+            if(pieceTypeIndex === PriorityList.length){
+                pieceTypeIndex = 0;
             }
         }
     }

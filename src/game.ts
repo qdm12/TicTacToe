@@ -146,6 +146,8 @@ module game {
 
   function maybeSendComputerMove() {
     if (!isComputerTurn()) return;
+    let audio = new Audio('sounds/piece_lift.mp3');
+    audio.play();
     let move:IMove = aiService.findComputerMove(currentUpdateUI.move, rotate);
     log.info("Computer move: ", move);
     makeMove(move);
@@ -204,8 +206,6 @@ module game {
                 return;
             }
             if (type === "touchend") {
-                let audio = new Audio('sounds/piece_drop.wav');
-                audio.play();
                 dragDoneHandler(draggingStartedRowCol, {row: row, col: col});
             } else { // Drag continue
                 let width = gameArea.clientWidth/8;
@@ -293,6 +293,8 @@ module game {
       return;
     }
     didMakeMove = true;
+    let audio = new Audio('sounds/piece_drop.wav');
+    audio.play();
     if (!proposals) {
       moveService.makeMove(move);
     } else {
