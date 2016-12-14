@@ -10,39 +10,43 @@ interface Translations {
 }
 
 module game {
-    let gameArea:any;
-    let draggingStartedRowCol:Pos = null; // The {row: YY, col: XX} where dragging started.
-    let draggingPiece:any = null;
-    let draggingPieceAvailableMoves:any = null;
-    let board:Board = null;
-    let turnIndex = 0;
-    let isUnderCheck:any = null;
-    let canCastleKing:any = null;
-    let canCastleQueen:any = null;
-    let enpassantPosition:Pos = null;
-    let deltaFrom:any = null;
-    let deltaTo:any = null;
-    let isYourTurn:boolean = false;
-    let rotate:boolean = null;
-    let player:any = null;
-
-    export function init() {
-        registerServiceWorker();
-	    //translate.setTranslations(getTranslations());
-        //translate.setLanguage('en');
-        resizeGameAreaService.setWidthToHeight(1);
-        gameService.setGame({
-            minNumberOfPlayers: 2,
-            maxNumberOfPlayers: 2,
-            isMoveOk: gameLogic.isMoveOk,
-            updateUI: updateUI,
-            gotMessageFromPlatform: null,
-        });
-        dragAndDropService.addDragListener("gameArea", handleDragEvent);
-        gameArea = document.getElementById("gameArea");
-  }
+  // Global variables are cleared when getting updateUI.
+  // I export all variables to make it easy to debug in the browser by
+  // simply typing in the console, e.g.,
+  // game.currentUpdateUI
+  export let currentUpdateUI: IUpdateUI = null;
+  export let didMakeMove: boolean = false; // You can only make one move per updateUI
+  export let animationEndedTimeout: ng.IPromise<any> = null;
+  export let state: IState = null;
+  // For community games.
+  export let proposals: number[][] = null;
+  export let yourPlayerInfo: IPlayerInfo = null;
   
- 
+  let rotate:boolean = false;
+  let gameArea:any;
+  let draggingStartedRowCol:any = null; // The {row: YY, col: XX} where dragging started.
+  let draggingPiece:any = null;
+  let draggingPieceAvailableMoves:any = null;
+  let nextZIndex = 1;
+  
+
+  export function init() {
+    registerServiceWorker();
+    translate.setTranslations(getTranslations());
+    translate.setLanguage('en');
+    resizeGameAreaService.setWidthToHeight(1);
+    moveService.setGame({
+      minNumberOfPlayers: 2,
+      maxNumberOfPlayers: 2,
+      checkMoveOk: gameLogic.checkMoveOk,
+      updateUI: updateUI,
+      communityUI: communityUI,
+      getStateForOgImage: null,
+    });
+    dragAndDropService.addDragListener("gameArea", handleDragEvent);
+    gameArea = document.getElementById("gameArea");
+  }
+
     function registerServiceWorker() {
     // I prefer to use appCache over serviceWorker (because iOS doesn't support serviceWorker, so we have to use appCache) I've added this code for a future where all browsers support serviceWorker (so we can deprecate appCache!)
         if (!window.applicationCache && 'serviceWorker' in navigator) {
@@ -55,95 +59,98 @@ module game {
             });
         }
     }
-  
+
     function getTranslations(): Translations {
         return {}; //XXX to fill in
     }
 
-    function updateUI(params:any) {
-        board = params.stateAfterMove.board;
-        if (!board) {
-            board = gameLogic.getInitialBoard();
-        }
-        turnIndex = params.turnIndexAfterMove;
-        deltaFrom = params.stateAfterMove.deltaFrom;
-        deltaTo = params.stateAfterMove.deltaTo;
-        isUnderCheck = params.stateAfterMove.isUnderCheck;
-        canCastleKing = params.stateAfterMove.canCastleKing;
-        canCastleQueen = params.stateAfterMove.canCastleQueen;
-        enpassantPosition = params.stateAfterMove.enpassantPosition
-        isYourTurn = (turnIndex === params.yourPlayerIndex && turnIndex >= 0);
-        if (isYourTurn && params.playersInfo[params.yourPlayerIndex].playerId === '') {
-            isYourTurn = false; // to make sure the UI won't send another move.
-            /* Waiting 0.5 seconds to let the move animation finish; if we call aiService
-              then the animation is paused until the javascript finishes. */
-            $timeout(maybeSendComputerMove, 1500);
-        }
-        /* If the play mode is not pass and play then "rotate" the board
-         for the player. Therefore the board will always look from the
-         point of view of the player in single player mode... */
-        rotate = false;
-        if (params.playMode === "playBlack") {
-            rotate = true;
-        }
+  export function communityUI(communityUI: ICommunityUI) { //HELP
+    log.info("Game got communityUI:", communityUI);
+    // If only proposals changed, then do NOT call updateUI. Then update proposals.
+    let nextUpdateUI: IUpdateUI = {
+        playersInfo: [],
+        playMode: communityUI.yourPlayerIndex,
+        move: communityUI.move,
+        numberOfPlayers: communityUI.numberOfPlayers,
+        stateBeforeMove: communityUI.stateBeforeMove,
+        turnIndexBeforeMove: communityUI.turnIndexBeforeMove,
+        yourPlayerIndex: communityUI.yourPlayerIndex,
+      };
+    if (angular.equals(yourPlayerInfo, communityUI.yourPlayerInfo) &&
+        currentUpdateUI && angular.equals(currentUpdateUI, nextUpdateUI)) {
+      // We're not calling updateUI to avoid disrupting the player if he's in the middle of a move.
+    } else {
+      // Things changed, so call updateUI.
+      updateUI(nextUpdateUI);
     }
-
-    function maybeSendComputerMove() {
-        let possibleMoves = gameLogic.getPossibleMoves(board,
-                                                       turnIndex,
-                                                       isUnderCheck,
-                                                       canCastleKing,
-                                                       canCastleQueen,
-                                                       enpassantPosition);                                                   
-        if (possibleMoves.length) {
-            let audio = new Audio('sounds/piece_lift.mp3');
-            audio.play();
-            //Check for attack move
-            for (let i = 0; i < possibleMoves.length; i++) {
-                deltaFrom = possibleMoves[i][0];
-                let availableMoves = possibleMoves[i][1];
-                for (let j = 0; j < availableMoves.length; j++) {
-                    deltaTo = availableMoves[j];
-                    if(rotate) {
-                        deltaTo.row = 7 - deltaTo.row;
-                        deltaTo.col = 7 - deltaTo.col;
-                    }
-                    let toTeam:string = board[deltaTo.row][deltaTo.col].charAt(0);           
-                    if(toTeam !== getTurn(turnIndex) && toTeam !== ''){
-                        gameService.makeMove(gameLogic.createMove(board,
-                                                                  deltaFrom,
-                                                                  deltaTo,
-                                                                  turnIndex,
-                                                                  isUnderCheck,
-                                                                  canCastleKing,
-                                                                  canCastleQueen,
-                                                                  enpassantPosition));
-                        audio = new Audio('sounds/piece_drop.wav');
-                        audio.play();
-                        return;
-                    }
-                }
-            }
-            //No attack move found
-            let i = Math.floor(Math.random() * possibleMoves.length);
-            let j = Math.floor(Math.random() * possibleMoves[i][1].length);
-            deltaFrom = possibleMoves[i][0];
-            deltaTo = possibleMoves[i][1][j];
-            gameService.makeMove(gameLogic.createMove(board,
-                                                      deltaFrom,
-                                                      deltaTo,
-                                                      turnIndex,
-                                                      isUnderCheck,
-                                                      canCastleKing,
-                                                      canCastleQueen,
-                                                      enpassantPosition));
-            audio = new Audio('sounds/piece_drop.wav');
-            audio.play();
-        } else {
-            console.log("There is no possible move");
-        }
+    // This must be after calling updateUI, because we nullify things there (like playerIdToProposal&proposals&etc)
+    yourPlayerInfo = communityUI.yourPlayerInfo;
+    let playerIdToProposal = communityUI.playerIdToProposal; 
+    didMakeMove = !!playerIdToProposal[communityUI.yourPlayerInfo.playerId];
+    proposals = [];
+    for (let i = 0; i < 8; i++) {
+      proposals[i] = [];
+      for (let j = 0; j < 8; j++) {
+        proposals[i][j] = 0;
+      }
     }
+    for (let playerId in playerIdToProposal) {
+      let proposal = playerIdToProposal[playerId];
+      let delta = proposal.data;
+      proposals[delta.deltaTo.row][delta.deltaTo.col]++; //XXX that might be wrong
+    }
+  }
+  export function isProposal(row: number, col: number) {
+    return proposals && proposals[row][col] > 0;
+  } 
+  export function isProposal1(row: number, col: number) {
+    return proposals && proposals[row][col] == 1;
+  } 
+  export function isProposal2(row: number, col: number) {
+    return proposals && proposals[row][col] == 2;
+  }
+  
+  export function updateUI(params: IUpdateUI): void {
+    log.info("Game got updateUI:", params);
+    didMakeMove = false; // Only one move per updateUI
+    currentUpdateUI = params;
+    clearAnimationTimeout();
+    state = params.move.stateAfterMove;
+    if (isFirstMove()) {
+      state = gameLogic.getInitialState();
+    }
+    // We calculate the AI move only after the animation finishes,
+    // because if we call aiService now
+    // then the animation will be paused until the javascript finishes.
+    animationEndedTimeout = $timeout(animationEndedCallback, 1500);
+    /* If the play mode is not pass and play then "rotate" the board
+     for the player. Therefore the board will always look from the
+     point of view of the player in single player mode... */
+    rotate = false;
+    if(params.playMode === "passAndPlay"){ //was playBlack
+        rotate = true;
+    }
+  }
 
+  function animationEndedCallback() {
+    log.info("Animation ended");
+    maybeSendComputerMove();
+  }
+
+  function clearAnimationTimeout() {
+    if (animationEndedTimeout) {
+      $timeout.cancel(animationEndedTimeout);
+      animationEndedTimeout = null;
+    }
+  }
+
+  function maybeSendComputerMove() {
+    if (!isComputerTurn()) return;
+    let move:IMove = aiService.findComputerMove(currentUpdateUI.move, rotate);
+    log.info("Computer move: ", move);
+    makeMove(move);
+  }
+  
     //window.e2e_test_stateService = stateService;
     function handleDragEvent(type:string, clientX:number, clientY:number) {
         // Center point in gameArea
@@ -165,9 +172,9 @@ module game {
             }
             if (type === "touchstart" && !draggingStartedRowCol) {
                 // drag started
-                let PieceEmpty = (board[r_row][r_col] === '');
-                let PieceTeam = board[r_row][r_col].charAt(0);
-                if (!PieceEmpty && PieceTeam === getTurn(turnIndex)) {
+                let PieceEmpty = (state.board[r_row][r_col] === '');
+                let PieceTeam = state.board[r_row][r_col].charAt(0);
+                if (!PieceEmpty && PieceTeam === getTurn(yourPlayerIndex())) {
                     //valid drag
                     let audio = new Audio('sounds/piece_lift.mp3');
                     audio.play();
@@ -231,12 +238,12 @@ module game {
     
     function getDraggingPieceAvailableMoves(row:number, col:number) {
         let select_Position:Pos = {row:row, col:col};
-        let possibleMoves = gameLogic.getPossibleMoves(board,
-                                                    turnIndex,
-                                                    isUnderCheck,
-                                                    canCastleKing,
-                                                    canCastleQueen,
-                                                    enpassantPosition);
+        let possibleMoves = gameLogic.getPossibleMoves(state.board,
+                                                       yourPlayerIndex(),
+                                                       state.delta.isUnderCheck,
+                                                       state.delta.canCastleKing,
+                                                       state.delta.canCastleQueen,
+                                                       state.delta.enpassantPosition);
         let draggingPieceAvailableMoves:any = [];
         let index:number = cellInPossibleMoves(select_Position, possibleMoves);
         if (index !== -1) {
@@ -260,7 +267,7 @@ module game {
         if (window.location.search === '?throwException') {
           throw new Error("Throwing the error because URL has '?throwException'");
         }
-        if (!isYourTurn) {
+        if (!isMyTurn()) { //XXX check that
             return;
         }
         if(rotate){
@@ -269,35 +276,46 @@ module game {
             toPos.row = 7 - toPos.row;
             toPos.col = 7 - toPos.col;
         }
-        deltaFrom = fromPos;
-        deltaTo = toPos;
-        actuallyMakeMove();
-    }
-
-    function actuallyMakeMove() {
+        state.delta.deltaFrom = fromPos;
+        state.delta.deltaTo = toPos;
+        let nextMove: IMove = null;
         try {
-            let move = gameLogic.createMove(board,
-                                            deltaFrom,
-                                            deltaTo,
-                                            turnIndex,
-                                            isUnderCheck,
-                                            canCastleKing,
-                                            canCastleQueen,
-                                            enpassantPosition);
-            isYourTurn = false; // to prevent making another move, acts as a kicj
-            gameService.makeMove(move);
+            nextMove = gameLogic.createMove(state, yourPlayerIndex());
         } catch (e) {
-            console.log(["Exception thrown when create move in position:", deltaFrom, deltaTo]);
-            return;
+          log.info("Error occured when creating new move");
+          return;
         }
+        makeMove(nextMove);
     }
-
+  
+  function makeMove(move: IMove) {
+    if (didMakeMove) { // Only one move per updateUI
+      return;
+    }
+    didMakeMove = true;
+    if (!proposals) {
+      moveService.makeMove(move);
+    } else {
+      let delta = move.stateAfterMove.delta;
+      let myProposal:IProposal = {
+        data: delta,
+        chatDescription: '' + (delta.deltaTo.row + 1) + 'x' + (delta.deltaTo.col + 1),
+        playerInfo: yourPlayerInfo,
+      };
+      // Decide whether we make a move or not (if we have 2 other proposals supporting the same thing).
+      if (proposals[delta.deltaTo.row][delta.deltaTo.col] < 2) { //XXX That might be wrong HELP
+        move = null;
+      }
+      moveService.communityMove(myProposal, move);
+    }
+  }
+  
     export let shouldShowImage = function(row:number, col:number) {
         if (rotate) {
             row = 7 - row;
             col = 7 - col;
         }
-        return board[row][col] !== "";
+        return state.board[row][col] !== "" || isProposal(row, col); //HELP
     };
 
     export let getImageSrc = function(row:number, col:number) {
@@ -305,7 +323,7 @@ module game {
             row = 7 - row;
             col = 7 - col;
         }
-        switch(board[row][col]) {
+        switch(state.board[row][col]) {
             case 'WK': return 'chess_graphics/chess_pieces/W_King.png';
             case 'WQ': return 'chess_graphics/chess_pieces/W_Queen.png';
             case 'WR': return 'chess_graphics/chess_pieces/W_Rook.png';
@@ -321,57 +339,85 @@ module game {
             default: return '';
         }
     };
-
+  
     export let getPieceKindInId = function(row:number, col:number):string {
-        if (board) {
+        if (state.board) {
             if (rotate) {
                 row = 7 - row;
                 col = 7 - col;
             }
-            return board[row][col];
+            return state.board[row][col];
         }
     };
-
+    
     export let getBackgroundFill = function(row:number, col:number):string {
         if (isLight(row, col)){
             return 'rgb(133, 87, 35)';
         }
         return 'rgb(185, 156, 107)';
     };
-
+    
     function isLight(row:number, col:number) {
         let rowIsEven = row % 2 === 0;
         let colIsEven = col % 2 === 0;
         return rowIsEven && colIsEven || !rowIsEven && !colIsEven;
     }
 
+  function isFirstMove() {
+    return !currentUpdateUI.move.stateAfterMove;
+  }
+
+  function yourPlayerIndex() {
+    return currentUpdateUI.yourPlayerIndex;
+  }
+
+  function isComputer() {
+    let playerInfo = currentUpdateUI.playersInfo[currentUpdateUI.yourPlayerIndex];
+    // In community games, playersInfo is [].
+    return playerInfo && playerInfo.playerId === '';
+  }
+
+  function isComputerTurn() {
+    return isMyTurn() && isComputer();
+  }
+
+  function isHumanTurn() {
+    return isMyTurn() && !isComputer();
+  }
+
+  function isMyTurn() {
+    return !didMakeMove && // you can only make one move per updateUI.
+      currentUpdateUI.move.turnIndexAfterMove >= 0 && // game is ongoing
+      currentUpdateUI.yourPlayerIndex === currentUpdateUI.move.turnIndexAfterMove; // it's my turn
+  }
+
     export let canSelect = function(row:number, col:number) {
-        if (!board) {
+        if(!state.board){
             return false;
         }
-        if (isYourTurn) {
+        if (isMyTurn()) {
             if (rotate) {
                 row = 7 - row;
                 col = 7 - col;
             }
-            if (board[row][col].charAt(0) === getTurn(turnIndex)) {
+            if (state.board[row][col].charAt(0) === getTurn(yourPlayerIndex())) {
                 let select_Position:Pos = {row: row, col: col};
-                if (!isUnderCheck) { isUnderCheck = [false, false]; }
-                if (!canCastleKing) { canCastleKing = [true, true]; }
-                if (!canCastleQueen) { canCastleQueen = [true, true]; }
-                if (!enpassantPosition) { enpassantPosition = {row: null, col: null}; }
-                let possibleMoves = gameLogic.getPossibleMoves(board,
-                                                            turnIndex,
-                                                            isUnderCheck,
-                                                            canCastleKing,
-                                                            canCastleQueen,
-                                                            enpassantPosition);
+                //if (!isUnderCheck) { isUnderCheck = [false, false]; }
+                //if (!canCastleKing) { canCastleKing = [true, true]; } ///XXXXXX
+                //if (!canCastleQueen) { canCastleQueen = [true, true]; }
+                //if (!enpassantPosition) { enpassantPosition = {row: null, col: null}; }
+                let possibleMoves = gameLogic.getPossibleMoves(state.board,
+                                                               yourPlayerIndex(),
+                                                               state.delta.isUnderCheck,
+                                                               state.delta.canCastleKing,
+                                                               state.delta.canCastleQueen,
+                                                               state.delta.enpassantPosition);
                 return cellInPossibleMoves(select_Position, possibleMoves) !== -1;
             }
             return false;
         }
     };
-
+  
     function getTurn(turnIndex:number) {
         if (turnIndex === 0){
             return 'W';
@@ -387,27 +433,22 @@ module game {
         }
         return -1;
     }
-    
     function isPiece(row: number, col: number, turnIndex: number, pieceKind: string): boolean {
         if (rotate) {
             row = 7 - row;
             col = 7 - col;
         }
-        return board[row][col].charAt(0) === pieceKind;
+        return state.board[row][col].charAt(0) === pieceKind ||
+                (isProposal(row, col) && currentUpdateUI.move.turnIndexAfterMove == turnIndex);
     }
-
-    export function isBlackPiece(row:number, col:number):boolean {
-        return isPiece(row, col, 1, 'B');
-    };
+  
+  export function isBlackPiece(row: number, col: number): boolean {
+    return isPiece(row, col, 1, 'B');
+  }
 }
 
 angular.module('myApp', ['ngTouch', 'ui.bootstrap', 'gameServices'])
   .run(function () {
-  $rootScope['game'] = game;
-  translate.setLanguage('en', {
-      CHESS_GAME: "Chess",
-      RULES_OF_CHESS: "Rules of Chess",
-      CLOSE: "Close",
+    $rootScope['game'] = game;
+    game.init();
   });
-  game.init();
-});

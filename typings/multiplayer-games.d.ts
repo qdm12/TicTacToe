@@ -3,68 +3,18 @@ declare var $location: angular.ILocationService;
 declare var $timeout: angular.ITimeoutService;
 declare var $interval: angular.IIntervalService;
 
-
-// OLD CODE:
-interface ISet {
-  key: string;
-  value: any;
-  visibleToPlayerIndexes?: number[];
-}
-interface ISetVisibility {
-  key: string;
-  visibleToPlayerIndexes?: number[];
-}
-interface ISetRandomInteger {
-  key: string;
-  from: number;
-  to: number;
-}
-interface IDelete {
-  key: string;
-}
-interface IShuffle {
-  keys: string[];
-}
-interface ISetTurn {
-  turnIndex: number;
-}
-interface IEndMatch {
+// IState should be defined by the game, e.g., TicTacToe defines it as:
+// interface IState { board: Board; delta: BoardDelta; }
+// When the match ends, set turnIndexAfterMove -1 and endMatchScores to an array of scores.
+// When the match is ongoing, set turnIndexAfterMove to a valid index and endMatchScores to null.
+interface IMove {
   endMatchScores: number[];
+  turnIndexAfterMove: number;
+  stateAfterMove: IState;
 }
-interface IOperation {
-  set?: ISet;
-  setVisibility?: ISetVisibility;
-  setRandomInteger?: ISetRandomInteger;
-  delete?: string;
-  shuffle?: string[];
-  setTurn?: number;
-  endMatch?: number[];
-}
-// END OF OLD CODE
-
-
-
-
-
-
-
-
-
-declare type IMove = IOperation[];
-//NEW:
-//interface IMove {
-//  endMatchScores: number[];
-//  turnIndexAfterMove: number;
-//  stateAfterMove: IState;
-//}
-
-
-
 interface IStateTransition {
   turnIndexBeforeMove : number;
-  turnIndexAfterMove: number; //NEW: removed
   stateBeforeMove: IState;
-  stateAfterMove: IState; //NEW: removed
   numberOfPlayers: number;
   move: IMove;
 }
@@ -73,29 +23,53 @@ interface IPlayerInfo {
   displayName: string;
   playerId: string;
 }
-declare type PlayMode = string | number;
-interface IUpdateUI extends IStateTransition {
-  playersInfo: IPlayerInfo[];
+interface ICommonUI extends IStateTransition {
+  // -2 is a viewer; otherwise it's the player index (0/1).
   yourPlayerIndex: number;
-  playMode: PlayMode;
-  //moveNumber: number; //NEW: removed
-  //randomSeed: string; //NEW: removed
-  //endMatchScores?: number[]; //NEW: removed
+}
+// Proposals are used in community games: each player may submit a proposal, and the game will eventual selected
+// the winning proposal and convert it to a move.
+interface ICommunityUI extends ICommonUI {
+  // You need to know your playerId to make sure you only make one proposal,
+  // i.e., if (playerIdToProposal[yourPlayerId]) then you can't make another proposal.
+  yourPlayerInfo: IPlayerInfo; 
+  // Mapping playerId to his proposal.
+  playerIdToProposal: IProposals; 
+}
+interface IProposal {
+  playerInfo: IPlayerInfo; // the player making the proposal.
+  chatDescription: string; // string representation of the proposal that will be shown in the community game chat.
+  data: IProposalData; // IProposalData must be defined by the game.
+}
+interface IProposals {
+  [playerId: string]: IProposal;
+}
+declare type PlayMode = string | number; // 'passAndPlay', 'playAgainstTheComputer', or a number (0/1).
+interface IUpdateUI extends ICommonUI {
+  playersInfo: IPlayerInfo[];
+  playMode: PlayMode; 
 }
 interface IGame {
   minNumberOfPlayers: number;
   maxNumberOfPlayers: number;
-  isMoveOk(stateTransition: IStateTransition): Boolean; 
-  //NEW: checkMoveOk(stateTransition: IStateTransition): void; 
+  checkMoveOk(stateTransition: IStateTransition): void;
   updateUI(update: IUpdateUI): void;
-  gotMessageFromPlatform(message: any): void;
+  communityUI(communityUI: ICommunityUI): void;
+  getStateForOgImage(): string;
 }
-interface IGameService {
+interface IMoveService {
   setGame(game: IGame): void;
   makeMove(move: IMove): void;
+
+  // For community games. move may be null.
+  // I recommend that a proposal will be selected when it's chosen by 3 players.
+  // When a proposal is selected, that proposal will be converted to a move
+  // (and then move will be non-null).
+  // Do not allow making a community move if a player already submitted his proposal, i.e.,
+  // you can submit at most one proposal.
+  communityMove(proposal: IProposal, move: IMove): void;
 }
-declare var gameService: IGameService;
-//NEW: declare var moveService: IMoveService;
+declare var moveService: IMoveService;
 
 interface IAlphaBetaLimits {
   millisecondsLimit? : number;
@@ -105,9 +79,9 @@ interface IAlphaBetaService {
   alphaBetaDecision(
     move: IMove,
     playerIndex: number,
-    getNextStates: (move: IMove, playerIndex: number) => IMove[],
+    getNextStates: (state: IMove, playerIndex: number) => IMove[],
     getStateScoreForIndex0: (move: IMove, playerIndex: number) => number,
-    // If you want to see debugging output in the console, then surf to game.html?debug
+    // If you want to see debugging output in the console, then surf to index.html?debug
     getDebugStateToString: (move: IMove) => string,
     alphaBetaLimits: IAlphaBetaLimits): IMove;
 }
@@ -119,19 +93,14 @@ interface StringDictionary {
 interface ITranslateService {
   (translationId: string, interpolateParams?: StringDictionary): string;
   getLanguage(): string;
-  setLanguage(language: string, codeToL10N: StringDictionary): void;
-//NEW:
-//  setTranslations(idToLanguageToL10n: Translations): void;
-//  setLanguage(language: string): void;
-
+  setTranslations(idToLanguageToL10n: Translations): void;
+  setLanguage(language: string): void;
 }
 declare var translate: ITranslateService;
 
 interface IResizeGameAreaService {
-  setWidthToHeight(widthToHeightRatio: number): void;
-//NEW:
-//  setWidthToHeight(widthToHeightRatio: number,
-//    dimensionsChanged?: (gameAreaWidth: number, gameAreaHeight: number)=>void
+  setWidthToHeight(widthToHeightRatio: number,
+    dimensionsChanged?: (gameAreaWidth: number, gameAreaHeight: number)=>void): void;
 }
 declare var resizeGameAreaService: IResizeGameAreaService;
 
@@ -141,6 +110,7 @@ interface ILog {
   warn(... args: any[]):void;
   error(... args: any[]):void;
   log(... args: any[]):void;
+  alwaysLog(... args: any[]):void;
 }
 declare var log:ILog;
 
