@@ -1,16 +1,17 @@
-describe("In TicTacToe", function() {
+describe("In Chess", function() {
   let OK = true;
   let ILLEGAL = false;
-  let X_TURN = 0;
-  let O_TURN = 1;
+  let W_TURN = 0;
+  let B_TURN = 1;
   let NO_ONE_TURN = -1;
   let NO_ONE_WINS: number[] = null;
-  let X_WIN_SCORES = [1, 0];
-  let O_WIN_SCORES = [0, 1];
+  let W_WIN_SCORES = [1, 0];
+  let B_WIN_SCORES = [0, 1];
   let TIE_SCORES = [0, 0];
+  
+  //XXX We need to fix checkmoveok first
 
-  function expectStateTransition(
-        isOk: boolean, stateTransition: IStateTransition) {
+  function expectStateTransition(isOk:boolean, stateTransition:IStateTransition) {
     if (isOk) {
       gameLogic.checkMoveOk(stateTransition);
     } else {
@@ -27,28 +28,40 @@ describe("In TicTacToe", function() {
     }   
   }
     
-  function expectMove(
-      isOk: boolean,
-      turnIndexBeforeMove: number,
-      boardBeforeMove: Board,
-      row: number,
-      col: number,
-      boardAfterMove: Board,
-      turnIndexAfterMove: number,
-      endMatchScores: number[]): void {
+  function expectMove(isOk: boolean, 
+                      turnIndexBeforeMove: number, turnIndexAfterMove: number,
+                      boardBeforeMove: Board, boardAfterMove: Board, 
+                      endMatchScores: number[], 
+                      deltaFrom: Pos,
+                      deltaTo: Pos,
+                      isUnderCheck: [boolean, boolean],
+                      canCastleKing: [boolean, boolean],
+                      canCastleQueen: [boolean, boolean],
+                      enpassantPosition:Pos): void {
+    let stateBeforeMove:IState = null;
+    if(boardBeforeMove){
+        stateBeforeMove = {board: boardBeforeMove, delta: null};
+    }
     let stateTransition: IStateTransition = {
       turnIndexBeforeMove: turnIndexBeforeMove,
-      stateBeforeMove: boardBeforeMove ? {board: boardBeforeMove, delta: null} : null,
-      move: {
-        turnIndexAfterMove: turnIndexAfterMove,
-        endMatchScores: endMatchScores,
-        stateAfterMove: {board: boardAfterMove, delta: {row: row, col: col}}
-      },
-      numberOfPlayers: null
-    };
+      stateBeforeMove: stateBeforeMove,
+      numberOfPlayers: null,
+      move: {endMatchScores: endMatchScores,
+             turnIndexAfterMove: turnIndexAfterMove,
+             stateAfterMove: {board: boardAfterMove,
+                              delta: {deltaFrom:deltaFrom,
+                                      deltaTo:deltaTo,
+                                      isUnderCheck:isUnderCheck,
+                                      canCastleKing:canCastleKing,
+                                      canCastleQueen:canCastleQueen,
+                                      enpassantPosition:enpassantPosition}
+                              }
+             }
+      };
     expectStateTransition(isOk, stateTransition);
   }
 
+  /*
   it("Initial move", function() {
     expectStateTransition(OK, {
       turnIndexBeforeMove: X_TURN,
@@ -196,4 +209,5 @@ describe("In TicTacToe", function() {
        ['', '', ''],
        ['', '', '']], O_TURN, NO_ONE_WINS);
   });
+  */
 });

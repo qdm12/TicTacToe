@@ -148,8 +148,6 @@ module gameLogic {
     if (!stateBeforeMove) { //XXX should be initial state, not null
       stateBeforeMove = getInitialState();
     }
-    console.log("Doing createmove...");
-    console.log(stateBeforeMove); //HELP error with deltaFrom and deltaTo being NULL from checkmove
     let board: Board = stateBeforeMove.board;
     let deltaFrom:Pos = stateBeforeMove.delta.deltaFrom;
     let deltaTo:Pos = stateBeforeMove.delta.deltaTo;
@@ -157,6 +155,9 @@ module gameLogic {
     let canCastleKing:[boolean, boolean] = stateBeforeMove.delta.canCastleKing;
     let canCastleQueen:[boolean, boolean] = stateBeforeMove.delta.canCastleQueen;
     let enpassantPosition:Pos = stateBeforeMove.delta.enpassantPosition;
+    if(!deltaFrom || !deltaTo){
+      throw new Error ("Probably comes from checkmoveok which sends empty deltaFrom and deltaTo for some reason.");  
+    }
     if (deltaFrom.row === deltaTo.row && deltaFrom.col === deltaTo.col){
       throw new Error ("Cannot move to the same position.");
     }
