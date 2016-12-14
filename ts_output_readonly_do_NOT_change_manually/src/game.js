@@ -111,7 +111,7 @@ var game;
         // We calculate the AI move only after the animation finishes,
         // because if we call aiService now
         // then the animation will be paused until the javascript finishes.
-        game.animationEndedTimeout = $timeout(animationEndedCallback, 1500);
+        game.animationEndedTimeout = $timeout(animationEndedCallback, 1100);
         /* If the play mode is not pass and play then "rotate" the board
          for the player. Therefore the board will always look from the
          point of view of the player in single player mode... */
@@ -136,9 +136,9 @@ var game;
             return;
         var audio = new Audio('sounds/piece_lift.mp3');
         audio.play();
-        var move = aiService.findComputerMove(game.currentUpdateUI.move, rotate);
-        log.info("Computer move: ", move);
-        makeMove(move);
+        var nextMove = aiService.createComputerMove(game.currentUpdateUI.move, rotate);
+        log.info("Computer move: ", nextMove);
+        makeMove(nextMove);
     }
     //window.e2e_test_stateService = stateService;
     function handleDragEvent(type, clientX, clientY) {
