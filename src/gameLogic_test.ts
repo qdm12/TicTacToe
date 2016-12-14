@@ -26,19 +26,33 @@ describe("In Chess", function() {
     }   
   }
     
-  function expectMove(isOk: boolean, 
+  function expectMove(isOk: boolean,
+                      endMatchScores: number[], 
+                      deltaFrom: Pos,
+                      deltaTo: Pos,
                       turnIndexBeforeMove: number, 
                       turnIndexAfterMove: number,
                       boardBeforeMove: Board, 
                       boardAfterMove: Board, 
-                      endMatchScores: number[], 
-                      deltaFrom: Pos,
-                      deltaTo: Pos,
-                      isUnderCheck: [boolean, boolean],
-                      canCastleKing: [boolean, boolean],
-                      canCastleQueen: [boolean, boolean],
-                      enpassantPosition:Pos): void {
-    let stateBeforeMove:IState = null;
+                      isUnderCheckBeforeMove:[boolean,boolean],
+                      isUnderCheckAfterMove:[boolean,boolean],
+                      canCastleKingBeforeMove: [boolean, boolean],
+                      canCastleKingAfterMove: [boolean, boolean],
+                      canCastleQueenBeforeMove: [boolean, boolean],
+                      canCastleQueenAfterMove: [boolean, boolean],
+                      enpassantPositionBeforeMove:Pos,
+                      enpassantPositionAfterMove:Pos):void{
+    let stateBeforeMove:IState = {
+        board:boardBeforeMove,
+        delta:{
+            deltaFrom:deltaFrom,
+            deltaTo:deltaTo,
+            isUnderCheck:isUnderCheckBeforeMove,
+            canCastleKing:canCastleKingBeforeMove,
+            canCastleQueen:canCastleQueenBeforeMove,
+            enpassantPosition:enpassantPositionBeforeMove
+        }
+    };
     let stateTransition: IStateTransition = {
       turnIndexBeforeMove: turnIndexBeforeMove,
       stateBeforeMove: stateBeforeMove,
@@ -48,20 +62,20 @@ describe("In Chess", function() {
              stateAfterMove: {board: boardAfterMove,
                               delta: {deltaFrom:deltaFrom,
                                       deltaTo:deltaTo,
-                                      isUnderCheck:isUnderCheck,
-                                      canCastleKing:canCastleKing,
-                                      canCastleQueen:canCastleQueen,
-                                      enpassantPosition:enpassantPosition}
+                                      isUnderCheck:isUnderCheckAfterMove,
+                                      canCastleKing:canCastleKingAfterMove,
+                                      canCastleQueen:canCastleQueenAfterMove,
+                                      enpassantPosition:enpassantPositionAfterMove}
                               }
              }
-      };
+    };
     expectStateTransition(isOk, stateTransition);
   }
 
   it("Initial move", function() {
     let move:IMove = {
-        turnIndexAfterMove: B_TURN,
         endMatchScores: NO_ONE_WINS,
+        turnIndexAfterMove: B_TURN,
         stateAfterMove: {
             board:[
       ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
@@ -69,8 +83,8 @@ describe("In Chess", function() {
       ['',   '',   '',   '',   '',   '',   '',   ''],
       ['',   '',   '',   '',   '',   '',   '',   ''],
       ['',   '',   '',   '',   '',   '',   '',   ''],
-      ['',   '',   '',   '',   '',   '',   '',   ''],
-      ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+      ['WP',   '',   '',   '',   '',   '',   '',   ''],
+      ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
       ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
       ], 
             delta: null}        
@@ -112,34 +126,43 @@ describe("In Chess", function() {
   });
   
   it("placing WP in 5x0 from initial state is legal", function() {
-    expectMove(OK, W_TURN, B_TURN,
-      [
-      ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
-      ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
-      ['',   '',   '',   '',   '',   '',   '',   ''],
-      ['',   '',   '',   '',   '',   '',   '',   ''],
-      ['',   '',   '',   '',   '',   '',   '',   ''],
-      ['',   '',   '',   '',   '',   '',   '',   ''],
-      ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
-      ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
-      ],
-      [
-      ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
-      ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
-      ['',   '',   '',   '',   '',   '',   '',   ''],
-      ['',   '',   '',   '',   '',   '',   '',   ''],
-      ['',   '',   '',   '',   '',   '',   '',   ''],
-      ['WP',   '',   '',   '',   '',   '',   '',   ''],
-      ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
-      ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
-      ],
-      null, //endMatchScores
-      {row:6,col:0}, //deltaFrom
-      {row:5,col:0}, //deltaTo
-      [false, false], //isUnderCheck
-      [true, true], //canCastleKing
-      [true, true], //canCastleQueen
-      {row: null, col: null}) //enpassantPosition
+    expectMove(
+        OK,
+        null, //endMatchScores
+        {row:6,col:0}, //deltaFrom
+        {row:5,col:0}, //deltaTo
+        W_TURN, //turnIndexBeforeMove
+        B_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+        ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+        ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+        ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ],
+        //boardAfterMove
+        [
+        ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+        ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['WP',   '',   '',   '',   '',   '',   '',   ''],
+        ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+        ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ],
+        [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        {row: null, col: null}, //enpassantPositionBeforeMove
+        {row: null, col: null}); //enpassantPositionAfterMove
   });
   
   /*

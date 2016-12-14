@@ -26,8 +26,18 @@ describe("In Chess", function () {
             }
         }
     }
-    function expectMove(isOk, turnIndexBeforeMove, turnIndexAfterMove, boardBeforeMove, boardAfterMove, endMatchScores, deltaFrom, deltaTo, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition) {
-        var stateBeforeMove = null;
+    function expectMove(isOk, endMatchScores, deltaFrom, deltaTo, turnIndexBeforeMove, turnIndexAfterMove, boardBeforeMove, boardAfterMove, isUnderCheckBeforeMove, isUnderCheckAfterMove, canCastleKingBeforeMove, canCastleKingAfterMove, canCastleQueenBeforeMove, canCastleQueenAfterMove, enpassantPositionBeforeMove, enpassantPositionAfterMove) {
+        var stateBeforeMove = {
+            board: boardBeforeMove,
+            delta: {
+                deltaFrom: deltaFrom,
+                deltaTo: deltaTo,
+                isUnderCheck: isUnderCheckBeforeMove,
+                canCastleKing: canCastleKingBeforeMove,
+                canCastleQueen: canCastleQueenBeforeMove,
+                enpassantPosition: enpassantPositionBeforeMove
+            }
+        };
         var stateTransition = {
             turnIndexBeforeMove: turnIndexBeforeMove,
             stateBeforeMove: stateBeforeMove,
@@ -37,10 +47,10 @@ describe("In Chess", function () {
                 stateAfterMove: { board: boardAfterMove,
                     delta: { deltaFrom: deltaFrom,
                         deltaTo: deltaTo,
-                        isUnderCheck: isUnderCheck,
-                        canCastleKing: canCastleKing,
-                        canCastleQueen: canCastleQueen,
-                        enpassantPosition: enpassantPosition }
+                        isUnderCheck: isUnderCheckAfterMove,
+                        canCastleKing: canCastleKingAfterMove,
+                        canCastleQueen: canCastleQueenAfterMove,
+                        enpassantPosition: enpassantPositionAfterMove }
                 }
             }
         };
@@ -48,8 +58,8 @@ describe("In Chess", function () {
     }
     it("Initial move", function () {
         var move = {
-            turnIndexAfterMove: B_TURN,
             endMatchScores: NO_ONE_WINS,
+            turnIndexAfterMove: B_TURN,
             stateAfterMove: {
                 board: [
                     ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
@@ -57,8 +67,8 @@ describe("In Chess", function () {
                     ['', '', '', '', '', '', '', ''],
                     ['', '', '', '', '', '', '', ''],
                     ['', '', '', '', '', '', '', ''],
-                    ['', '', '', '', '', '', '', ''],
-                    ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+                    ['WP', '', '', '', '', '', '', ''],
+                    ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
                     ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
                 ],
                 delta: null
@@ -99,7 +109,13 @@ describe("In Chess", function () {
         expectStateTransition(ILLEGAL, stateTransition);
     });
     it("placing WP in 5x0 from initial state is legal", function () {
-        expectMove(OK, W_TURN, B_TURN, [
+        expectMove(OK, null, //endMatchScores
+        { row: 6, col: 0 }, //deltaFrom
+        { row: 5, col: 0 }, //deltaTo
+        W_TURN, //turnIndexBeforeMove
+        B_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
             ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
             ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
             ['', '', '', '', '', '', '', ''],
@@ -108,7 +124,9 @@ describe("In Chess", function () {
             ['', '', '', '', '', '', '', ''],
             ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
             ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
-        ], [
+        ], 
+        //boardAfterMove
+        [
             ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
             ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
             ['', '', '', '', '', '', '', ''],
@@ -117,13 +135,14 @@ describe("In Chess", function () {
             ['WP', '', '', '', '', '', '', ''],
             ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
             ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
-        ], null, //endMatchScores
-        { row: 6, col: 0 }, //deltaFrom
-        { row: 5, col: 0 }, //deltaTo
-        [false, false], //isUnderCheck
-        [true, true], //canCastleKing
-        [true, true], //canCastleQueen
-        { row: null, col: null }); //enpassantPosition
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
     });
     /*
     it("placing X in 0x0 from initial state but setting the turn to yourself is illegal", function() {
