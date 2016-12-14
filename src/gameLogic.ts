@@ -15,6 +15,7 @@ interface IState {
 }
 
 module gameLogic {
+  let fiftymovecounter:number = 0;
   export function getInitialBoard():Board {
     return [
       ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
@@ -29,7 +30,6 @@ module gameLogic {
   }
 
   export function getInitialState(): IState {
-    console.log("DEBUG: getInitialState");
     let delta:BoardDelta = {deltaFrom: null, deltaTo: null, 
                             isUnderCheck: [false, false],
                             canCastleKing: [true, true],
@@ -44,7 +44,6 @@ module gameLogic {
                  canCastleKing:[boolean,boolean],
                  canCastleQueen:[boolean,boolean], 
                  enpassantPosition:Pos):boolean{
-    console.log("DEBUG: isTie");
     if (isUnderCheck[turnIndex]) {
       return false;
     }
@@ -98,7 +97,6 @@ module gameLogic {
                  canCastleKing:[boolean,boolean],
                  canCastleQueen:[boolean,boolean],
                  enpassantPosition:Pos): string {
-    console.log("DEBUG: getWinner");
     if (!isUnderCheck[turnIndex]) {
       return '';
     }
@@ -148,7 +146,6 @@ module gameLogic {
 
   // Returns the move that should be performed when player givin a state
   export function createMove(stateBeforeMove: IState, turnIndex: number): IMove {
-    console.log("DEBUG: createMove");
     if (!stateBeforeMove) { //XXX should be initial state, not null
       stateBeforeMove = getInitialState();
     }
@@ -279,6 +276,7 @@ module gameLogic {
             audio.play();
             boardAfterMove[deltaTo.row][deltaTo.col] = getTurn(turnIndex) + "Q"; //XXX eventually give choice later on
           }
+          fiftymovecounter = 0; //if a pawn move is done, reset the counter
         } else {
           throw new Error("Illegal move for Pawn");
         }
@@ -286,7 +284,17 @@ module gameLogic {
       default:
         throw new Error("Unknown piece type!");
     }
-    console.log("DEBUG: createMove 2");
+    console.log("=================fiftymovecounter: "+fiftymovecounter);
+    fiftymovecounter++; //by default, increase the counter
+    /*Note: The first move will only execute createMove once.
+      However, all the next turns will execute createMove twice because of 
+      the checkmoveok function. Hence, fiftymovecounter is also incremented 
+      twice per turn. On top of that, a chess "move" = 2 turns so 
+      50 moves are reached when fiftymovecounter = 2*50*2 - 1 = 199.
+    */
+    if(getOpponent(turnIndex) === board[deltaTo.row][deltaTo.col].charAt(0)){
+        fiftymovecounter = 0; //If this was an attack move, reset the counter
+    }
     turnIndex = 1 - turnIndex;
     if (isUnderCheckByPositions(boardAfterMove, turnIndex)) {
       isUnderCheckAfterMove[turnIndex] = true;
@@ -309,7 +317,9 @@ module gameLogic {
                      isUnderCheckAfterMove,
                      canCastleKingAfterMove,
                      canCastleQueenAfterMove,
-                     enpassantPositionAfterMove)) {
+                     enpassantPositionAfterMove)
+                ||
+                fiftymovecounter === 199){
       endMatchScores = [0,0];
       turnIndex = -1;
     }else{
@@ -322,34 +332,22 @@ module gameLogic {
                             canCastleQueen: canCastleQueenAfterMove,
                             enpassantPosition:enpassantPositionAfterMove}
     let stateAfterMove: IState = {delta: delta, board: boardAfterMove}
-    console.log("DEBUG: createMove 3");
     return {endMatchScores: endMatchScores, turnIndexAfterMove: turnIndex, stateAfterMove: stateAfterMove};
   }
   
   export function createInitialMove(): IMove {
-    console.log("DEBUG: createInitialMove");
-    return {endMatchScores: null, turnIndexAfterMove: 0, 
+    return {endMatchScores: null, turnIndexAfterMove: 1, 
         stateAfterMove: getInitialState()};  
   }
 
   export function checkMoveOk(stateTransition: IStateTransition): void {
     // We can assume that turnIndexBeforeMove and stateBeforeMove are legal, and we need
     // to verify that the move is OK.
-    console.log("DEBUG: checkmoveOk");
     let turnIndexBeforeMove = stateTransition.turnIndexBeforeMove;
     let stateBeforeMove: IState = stateTransition.stateBeforeMove;
     let move: IMove = stateTransition.move;
-    if(!stateBeforeMove){
-        //turnBasedServices is checking with a null state (error!) XXX
-        return;
-    }
-    if (!stateBeforeMove && turnIndexBeforeMove === 0 && //XXX not !StateBeforeMove
-        angular.equals(createInitialMove(), move)) {
+    if (!stateBeforeMove && turnIndexBeforeMove === 0){ //first checkmoveok
       return;
-    }
-    if(!stateBeforeMove.delta.deltaFrom || !stateBeforeMove.delta.deltaTo){
-        //angular is checking is does not work here
-        return;
     }
     let expectedMove = createMove(stateBeforeMove, turnIndexBeforeMove);
     if (!angular.equals(move, expectedMove)) {

@@ -97,7 +97,7 @@ module game {
     for (let playerId in playerIdToProposal) {
       let proposal = playerIdToProposal[playerId];
       let delta = proposal.data;
-      proposals[delta.deltaTo.row][delta.deltaTo.col]++; //XXX that might be wrong
+      proposals[delta.deltaFrom.row][delta.deltaFrom.col]++; //XXX that might be wrong
     }
   }
   export function isProposal(row: number, col: number) {

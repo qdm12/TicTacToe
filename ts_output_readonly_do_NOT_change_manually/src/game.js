@@ -83,7 +83,7 @@ var game;
         for (var playerId in playerIdToProposal) {
             var proposal = playerIdToProposal[playerId];
             var delta = proposal.data;
-            game.proposals[delta.deltaTo.row][delta.deltaTo.col]++; //XXX that might be wrong
+            game.proposals[delta.deltaFrom.row][delta.deltaFrom.col]++; //XXX that might be wrong
         }
     }
     game.communityUI = communityUI;
