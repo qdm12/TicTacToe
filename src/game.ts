@@ -248,15 +248,15 @@ module game {
         return draggingPieceAvailableMoves;
     }
 
-    function dragDoneHandler(fromPos:Pos, toPos:Pos) {
+    function dragDoneHandler(deltaFrom:Pos, deltaTo:Pos) {
         if (window.location.search === '?throwException') {
           throw new Error("Throwing the error because URL has '?throwException'");
         }
         if (!isMyTurn()){
             return;
         }
-        state.delta.deltaFrom = fromPos;
-        state.delta.deltaTo = toPos;
+        state.delta.deltaFrom = deltaFrom;
+        state.delta.deltaTo = deltaTo;
         let nextMove: IMove = null;
         try {
             nextMove = gameLogic.createMove(state, yourPlayerIndex());

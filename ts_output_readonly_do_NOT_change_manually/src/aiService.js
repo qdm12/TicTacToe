@@ -39,7 +39,6 @@ var aiService;
                     possible_destinations = possible_moves[i][1];
                     for (var j = 0; j < possible_destinations.length; j++) {
                         deltaTo = possible_destinations[j];
-                        //console.log(move.stateAfterMove.board);
                         if (isEnnemyCell(turnIndex, board, deltaTo)) {
                             move.stateAfterMove.delta.deltaFrom = deltaFrom;
                             move.stateAfterMove.delta.deltaTo = deltaTo;
@@ -83,13 +82,12 @@ var aiService;
             for (var i = 0; i < possible_moves.length; i++) {
                 deltaFrom = possible_moves[i][0];
                 if (board[deltaFrom.row][deltaFrom.col].charAt(1) === RandomList[aiService.pieceTypeIndex]) {
-                    //console.log(deltaFrom.row+", "+deltaFrom.col);
                     possible_origin_indexes.push(i);
                 }
             }
             if (possible_origin_indexes.length === 0) {
                 aiService.pieceTypeIndex++;
-                if (aiService.pieceTypeIndex === RandomList.length) {
+                if (aiService.pieceTypeIndex === aiService.RListSize) {
                     aiService.pieceTypeIndex = 0;
                 }
             }
@@ -104,7 +102,7 @@ var aiService;
         move.stateAfterMove.delta.deltaFrom = deltaFrom;
         move.stateAfterMove.delta.deltaTo = deltaTo;
         aiService.pieceTypeIndex++; //changes the piece Type for next AI move
-        if (aiService.pieceTypeIndex === RandomList.length) {
+        if (aiService.pieceTypeIndex === aiService.RListSize) {
             aiService.pieceTypeIndex = 0; //reset the index when it reaches its max
         }
         return gameLogic.createMove(move.stateAfterMove, turnIndex);

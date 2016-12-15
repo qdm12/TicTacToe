@@ -227,15 +227,15 @@ var game;
         }
         return draggingPieceAvailableMoves;
     }
-    function dragDoneHandler(fromPos, toPos) {
+    function dragDoneHandler(deltaFrom, deltaTo) {
         if (window.location.search === '?throwException') {
             throw new Error("Throwing the error because URL has '?throwException'");
         }
         if (!isMyTurn()) {
             return;
         }
-        game.state.delta.deltaFrom = fromPos;
-        game.state.delta.deltaTo = toPos;
+        game.state.delta.deltaFrom = deltaFrom;
+        game.state.delta.deltaTo = deltaTo;
         var nextMove = null;
         try {
             nextMove = gameLogic.createMove(game.state, yourPlayerIndex());

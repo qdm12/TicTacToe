@@ -16,30 +16,31 @@ interface IState {
 
 module gameLogic {
   let fiftymovecounter:number = 0;
-  export function getInitialBoard():Board {
-    return [
-      ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
-      ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
-      ['',   '',   '',   '',   '',   '',   '',   ''],
-      ['',   '',   '',   '',   '',   '',   '',   ''],
-      ['',   '',   '',   '',   '',   '',   '',   ''],
-      ['',   '',   '',   '',   '',   '',   '',   ''],
-      ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
-      ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
-      ];
-  }
 
   export function getInitialState(): IState {
-    let delta:BoardDelta = {deltaFrom: null, deltaTo: null, 
+    let delta:BoardDelta = {deltaFrom: null,
+                            deltaTo: null, 
                             isUnderCheck: [false, false],
                             canCastleKing: [true, true],
                             canCastleQueen: [true, true],
                             enpassantPosition: {row: null, col: null}};
-    return {board: getInitialBoard(), delta: delta};
+    return {board: [
+                   ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+                   ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+                   ['',   '',   '',   '',   '',   '',   '',   ''],
+                   ['',   '',   '',   '',   '',   '',   '',   ''],
+                   ['',   '',   '',   '',   '',   '',   '',   ''],
+                   ['',   '',   '',   '',   '',   '',   '',   ''],
+                   ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+                   ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+                   ],
+            delta: delta
+           };
   }
 
   // Returns true if the game ended in a tie because there are no available moves for any pieces
-  function isTie(board:Board, turnIndex:number,
+  function isTie(board:Board, 
+                 turnIndex:number,
                  isUnderCheck:[boolean,boolean],
                  canCastleKing:[boolean,boolean],
                  canCastleQueen:[boolean,boolean], 
@@ -92,11 +93,11 @@ module gameLogic {
 
   // Returns the winner (either 'W' or 'B') or '' if there is no winner
   function getWinner(board: Board, 
-                 turnIndex:number,
-                 isUnderCheck:[boolean,boolean],
-                 canCastleKing:[boolean,boolean],
-                 canCastleQueen:[boolean,boolean],
-                 enpassantPosition:Pos): string {
+                     turnIndex:number,
+                     isUnderCheck:[boolean,boolean],
+                     canCastleKing:[boolean,boolean],
+                     canCastleQueen:[boolean,boolean],
+                     enpassantPosition:Pos): string {
     if (!isUnderCheck[turnIndex]) {
       return '';
     }
@@ -146,9 +147,6 @@ module gameLogic {
 
   // Returns the move that should be performed when player givin a state
   export function createMove(stateBeforeMove: IState, turnIndex: number): IMove {
-    if (!stateBeforeMove) { //XXX should be initial state, not null
-      stateBeforeMove = getInitialState();
-    }
     let stateAfterMove: IState = angular.copy(stateBeforeMove);
     let board:Board = stateBeforeMove.board;
     let deltaFrom:Pos = stateBeforeMove.delta.deltaFrom;
@@ -315,11 +313,6 @@ module gameLogic {
         endMatchScores = null;
     }
     return {endMatchScores: endMatchScores, turnIndexAfterMove: turnIndex, stateAfterMove: stateAfterMove};
-  }
-  
-  export function createInitialMove(): IMove {
-    return {endMatchScores: null, turnIndexAfterMove: 1, 
-        stateAfterMove: getInitialState()};  
   }
 
   export function checkMoveOk(stateTransition: IStateTransition): void {
@@ -533,15 +526,15 @@ module gameLogic {
   // Returns true if the king has any place to move
   function canKingMoveAnywhere(board:Board, turnIndex:number, startPos:any, isUnderCheck:[boolean,boolean], canCastleKing:[boolean,boolean], canCastleQueen:[boolean,boolean]) {
     // standard moves
-    for (let i = startPos.row - 1; i < startPos.row + 2; i++) {
-      for (let j = startPos.col - 1; j < startPos.col + 2; j++) {
+    for (let i = startPos.row - 1; i <= startPos.row + 1; i++) {
+      for (let j = startPos.col - 1; j <= startPos.col + 1; j++) {
         let curPos = {row: i, col: j};
         if (isOutOfBound(curPos)){
           continue;
         }
         let PieceEmpty = (board[i][j] === '');
         let PieceTeam = board[i][j].charAt(0);
-        if (!PieceEmpty && PieceTeam !== getTurn(turnIndex)) {
+        if (PieceEmpty || PieceTeam !== getTurn(turnIndex)) {
           if (moveAndCheck(board, turnIndex, startPos, curPos)) {
             return true;
           }
@@ -618,6 +611,7 @@ module gameLogic {
         }
       }
     }
+    return false;
   }
 
   // Returns the position of the current player's king
@@ -630,7 +624,7 @@ module gameLogic {
         }
       }
     }
-    throw new Error("Your king is missing and the game should end!");
+    throw new Error("A king is missing and the game should had already ended!");
   }
 
   // Returns true if queen can move from deltaFrom to deltaTo

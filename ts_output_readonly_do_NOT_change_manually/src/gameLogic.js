@@ -1,26 +1,25 @@
 var gameLogic;
 (function (gameLogic) {
     var fiftymovecounter = 0;
-    function getInitialBoard() {
-        return [
-            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
-            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
-            ['', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', ''],
-            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
-            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
-        ];
-    }
-    gameLogic.getInitialBoard = getInitialBoard;
     function getInitialState() {
-        var delta = { deltaFrom: null, deltaTo: null,
+        var delta = { deltaFrom: null,
+            deltaTo: null,
             isUnderCheck: [false, false],
             canCastleKing: [true, true],
             canCastleQueen: [true, true],
             enpassantPosition: { row: null, col: null } };
-        return { board: getInitialBoard(), delta: delta };
+        return { board: [
+                ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+                ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+                ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+            ],
+            delta: delta
+        };
     }
     gameLogic.getInitialState = getInitialState;
     // Returns true if the game ended in a tie because there are no available moves for any pieces
@@ -118,9 +117,6 @@ var gameLogic;
     }
     // Returns the move that should be performed when player givin a state
     function createMove(stateBeforeMove, turnIndex) {
-        if (!stateBeforeMove) {
-            stateBeforeMove = getInitialState();
-        }
         var stateAfterMove = angular.copy(stateBeforeMove);
         var board = stateBeforeMove.board;
         var deltaFrom = stateBeforeMove.delta.deltaFrom;
@@ -146,7 +142,6 @@ var gameLogic;
         switch (board[deltaFrom.row][deltaFrom.col].charAt(1)) {
             case 'K':
                 if (isCastlingKing(board, deltaFrom, deltaTo, turnIndex, stateBeforeMove.delta.canCastleKing)) {
-                    console.log("isCastlingKing.");
                     stateAfterMove.board[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
                     stateAfterMove.board[deltaFrom.row][deltaFrom.col] = '';
                     stateAfterMove.board[deltaTo.row][deltaTo.col - 1] = getTurn(turnIndex) + 'R';
@@ -285,11 +280,6 @@ var gameLogic;
         return { endMatchScores: endMatchScores, turnIndexAfterMove: turnIndex, stateAfterMove: stateAfterMove };
     }
     gameLogic.createMove = createMove;
-    function createInitialMove() {
-        return { endMatchScores: null, turnIndexAfterMove: 1,
-            stateAfterMove: getInitialState() };
-    }
-    gameLogic.createInitialMove = createInitialMove;
     function checkMoveOk(stateTransition) {
         // We can assume that turnIndexBeforeMove and stateBeforeMove are legal, and we need
         // to verify that the move is OK.
@@ -472,15 +462,15 @@ var gameLogic;
     // Returns true if the king has any place to move
     function canKingMoveAnywhere(board, turnIndex, startPos, isUnderCheck, canCastleKing, canCastleQueen) {
         // standard moves
-        for (var i = startPos.row - 1; i < startPos.row + 2; i++) {
-            for (var j = startPos.col - 1; j < startPos.col + 2; j++) {
+        for (var i = startPos.row - 1; i <= startPos.row + 1; i++) {
+            for (var j = startPos.col - 1; j <= startPos.col + 1; j++) {
                 var curPos = { row: i, col: j };
                 if (isOutOfBound(curPos)) {
                     continue;
                 }
                 var PieceEmpty = (board[i][j] === '');
                 var PieceTeam = board[i][j].charAt(0);
-                if (!PieceEmpty && PieceTeam !== getTurn(turnIndex)) {
+                if (PieceEmpty || PieceTeam !== getTurn(turnIndex)) {
                     if (moveAndCheck(board, turnIndex, startPos, curPos)) {
                         return true;
                     }
@@ -547,6 +537,7 @@ var gameLogic;
                 }
             }
         }
+        return false;
     }
     // Returns the position of the current player's king
     function findKingsPosition(board, turnIndex) {
@@ -558,7 +549,7 @@ var gameLogic;
                 }
             }
         }
-        throw new Error("Your king is missing and the game should end!");
+        throw new Error("A king is missing and the game should had already ended!");
     }
     // Returns true if queen can move from deltaFrom to deltaTo
     function canQueenMove(board, deltaFrom, deltaTo, turnIndex) {

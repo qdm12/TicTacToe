@@ -108,7 +108,189 @@ describe("In Chess", function () {
         };
         expectStateTransition(ILLEGAL, stateTransition);
     });
-    it("placing WP in 5x0 from initial state is legal", function () {
+    // FUNDAMENTALS CHECKING
+    it("Playing when it is not my turn is illegal", function () {
+        expectMove(ILLEGAL, null, //endMatchScores
+        { row: 1, col: 0 }, //deltaFrom
+        { row: 2, col: 0 }, //deltaTo
+        W_TURN, //turnIndexBeforeMove
+        B_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['BP', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("Not moving is illegal", function () {
+        expectMove(ILLEGAL, null, //endMatchScores
+        { row: 1, col: 0 }, //deltaFrom
+        { row: 1, col: 0 }, //deltaTo
+        W_TURN, //turnIndexBeforeMove
+        B_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("Moving and cloning is illegal", function () {
+        expectMove(ILLEGAL, null, //endMatchScores
+        { row: 6, col: 0 }, //deltaFrom
+        { row: 5, col: 0 }, //deltaTo
+        W_TURN, //turnIndexBeforeMove
+        B_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("Moving to a friendly piece is illegal", function () {
+        expectMove(ILLEGAL, null, //endMatchScores
+        { row: 0, col: 0 }, //deltaFrom
+        { row: 1, col: 0 }, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BR', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("Illegal piece type is illegal", function () {
+        expectMove(ILLEGAL, null, //endMatchScores
+        { row: 6, col: 1 }, //deltaFrom
+        { row: 5, col: 1 }, //deltaTo
+        W_TURN, //turnIndexBeforeMove
+        B_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WX', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    //PAWN MOVEMENTS  
+    it("Pawn: Moving WP from 6x0 to 5x0 is legal", function () {
         expectMove(OK, null, //endMatchScores
         { row: 6, col: 0 }, //deltaFrom
         { row: 5, col: 0 }, //deltaTo
@@ -144,6 +326,744 @@ describe("In Chess", function () {
         { row: null, col: null }, //enpassantPositionBeforeMove
         { row: null, col: null }); //enpassantPositionAfterMove
     });
+    it("Pawn: Moving WP from 6x0 to 4x0 is legal", function () {
+        expectMove(OK, null, //endMatchScores
+        { row: 6, col: 0 }, //deltaFrom
+        { row: 4, col: 0 }, //deltaTo
+        W_TURN, //turnIndexBeforeMove
+        B_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("Pawn: Attacking with WP from 6x0 to 5x1 is legal", function () {
+        expectMove(OK, null, //endMatchScores
+        { row: 6, col: 0 }, //deltaFrom
+        { row: 5, col: 1 }, //deltaTo
+        W_TURN, //turnIndexBeforeMove
+        B_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', '', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', 'BP', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', '', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', 'WP', '', '', '', '', '', ''],
+            ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("Pawn: Attacking en passant with WP from 4x0 to 3x1 is legal", function () {
+        expectMove(OK, null, //endMatchScores
+        { row: 4, col: 0 }, //deltaFrom
+        { row: 3, col: 1 }, //deltaTo
+        W_TURN, //turnIndexBeforeMove
+        B_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', '', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'BP', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', '', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', 'WP', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: 4, col: 1 }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("Pawn: Moving to an en passant attack position (black) is legal", function () {
+        expectMove(OK, null, //endMatchScores
+        { row: 2, col: 1 }, //deltaFrom
+        { row: 3, col: 1 }, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', '', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', 'BP', '', '', '', '', '', ''],
+            ['WP', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', '', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'BP', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: 3, col: 1 }); //enpassantPositionAfterMove
+    });
+    it("Pawn: Moving to an en passant attack position (white) is legal", function () {
+        expectMove(OK, null, //endMatchScores
+        { row: 5, col: 0 }, //deltaFrom
+        { row: 4, col: 0 }, //deltaTo
+        W_TURN, //turnIndexBeforeMove
+        B_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', '', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', 'BP', '', '', '', '', '', ''],
+            ['WP', '', '', '', '', '', '', ''],
+            ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', '', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'BP', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: 4, col: 0 }); //enpassantPositionAfterMove
+    });
+    it("Pawn: Promoting pawn to Queen is legal", function () {
+        expectMove(OK, null, //endMatchScores
+        { row: 6, col: 0 }, //deltaFrom
+        { row: 7, col: 1 }, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['BP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'BQ', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("Pawn: Moving WP from 5x0 to 3x0 is illegal", function () {
+        expectMove(ILLEGAL, null, //endMatchScores
+        { row: 5, col: 0 }, //deltaFrom
+        { row: 3, col: 0 }, //deltaTo
+        W_TURN, //turnIndexBeforeMove
+        B_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', '', '', '', '', '', '', ''],
+            ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    //KNIGHT MOVEMENTS
+    it("Knight: Moving above a piece is legal", function () {
+        expectMove(OK, null, //endMatchScores
+        { row: 0, col: 1 }, //deltaFrom
+        { row: 2, col: 0 }, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', '', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['BN', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("Knight: Attacking an ennemy piece is legal", function () {
+        expectMove(OK, null, //endMatchScores
+        { row: 0, col: 1 }, //deltaFrom
+        { row: 2, col: 2 }, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', 'WP', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', '', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', '', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', 'BN', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', '', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("Knight: Moving in a straight line is illegal", function () {
+        expectMove(ILLEGAL, null, //endMatchScores
+        { row: 0, col: 1 }, //deltaFrom
+        { row: 4, col: 1 }, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', '', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', 'BN', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    //KING MOVEMENTS
+    it("King: Move of king is legal", function () {
+        expectMove(OK, null, //endMatchScores
+        { row: 2, col: 4 }, //deltaFrom
+        { row: 3, col: 4 }, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', '', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', 'BK', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', '', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', 'BK', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    //UNDERCHECK MOVEMENTS  
+    it("King is missing from game is illegal", function () {
+        expectMove(ILLEGAL, null, //endMatchScores
+        { row: 1, col: 0 }, //deltaFrom
+        { row: 2, col: 0 }, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        NO_ONE_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', '', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', '', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [true, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("Undercheck but Queen can save the King is legal", function () {
+        expectMove(OK, null, //endMatchScores
+        { row: 1, col: 3 }, //deltaFrom
+        { row: 2, col: 3 }, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', 'WK', '', '', ''],
+            ['', '', '', 'WQ', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', '', '', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', '', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', 'BP', '', '', '', ''],
+            ['', '', '', '', 'WK', '', '', ''],
+            ['', '', '', 'WQ', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', '', '', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [true, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("Undercheck but Rook can save the King is legal", function () {
+        expectMove(OK, null, //endMatchScores
+        { row: 1, col: 3 }, //deltaFrom
+        { row: 2, col: 3 }, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', 'WK', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', 'WR', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['', 'WN', 'WB', 'WQ', '', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', '', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', 'BP', '', '', '', ''],
+            ['', '', '', '', 'WK', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', 'WR', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['', 'WN', 'WB', 'WQ', '', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [true, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("Undercheck but Bishop can save the King is legal", function () {
+        expectMove(OK, null, //endMatchScores
+        { row: 1, col: 3 }, //deltaFrom
+        { row: 2, col: 3 }, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', 'WK', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WB', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', '', 'WQ', '', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', '', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', 'BP', '', '', '', ''],
+            ['', '', '', '', 'WK', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WB', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', '', 'WQ', '', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [true, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("Undercheck but Knight can save the King is legal", function () {
+        expectMove(OK, null, //endMatchScores
+        { row: 1, col: 3 }, //deltaFrom
+        { row: 2, col: 3 }, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', 'WK', '', '', ''],
+            ['', '', 'WN', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', '', 'WB', 'WQ', '', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', '', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', 'BP', '', '', '', ''],
+            ['', '', '', '', 'WK', '', '', ''],
+            ['', '', 'WN', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', '', 'WB', 'WQ', '', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [true, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("Undercheck but Pawn can save the King is legal", function () {
+        expectMove(OK, null, //endMatchScores
+        { row: 1, col: 3 }, //deltaFrom
+        { row: 2, col: 3 }, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', 'WP', '', 'WK', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', '', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', '', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+            ['BP', 'BP', 'BP', '', 'BP', 'BP', 'BP', 'BP'],
+            ['', '', '', 'BP', '', '', '', ''],
+            ['', '', 'WP', '', 'WK', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', '', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', '', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [true, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    it("isTie checking where King can move", function () {
+        expectMove(OK, null, //endMatchScores
+        { row: 0, col: 0 }, //deltaFrom
+        { row: 1, col: 0 }, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+            ['BK', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], 
+        //boardAfterMove
+        [
+            ['', '', '', '', '', '', '', ''],
+            ['BK', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ], [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        { row: null, col: null }, //enpassantPositionBeforeMove
+        { row: null, col: null }); //enpassantPositionAfterMove
+    });
+    /*
+    it("placing WR in 5x0 from initial state is illegal", function() {
+      expectMove(
+          ILLEGAL,
+          null, //endMatchScores
+          {row:7,col:0}, //deltaFrom
+          {row:5,col:0}, //deltaTo
+          W_TURN, //turnIndexBeforeMove
+          B_TURN, //turnIndexAfterMove
+          //boardBeforeMove
+          [
+          ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+          ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+          ['',   '',   '',   '',   '',   '',   '',   ''],
+          ['',   '',   '',   '',   '',   '',   '',   ''],
+          ['',   '',   '',   '',   '',   '',   '',   ''],
+          ['',   '',   '',   '',   '',   '',   '',   ''],
+          ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+          ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+          ],
+          //boardAfterMove
+          [
+          ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+          ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+          ['',   '',   '',   '',   '',   '',   '',   ''],
+          ['',   '',   '',   '',   '',   '',   '',   ''],
+          ['',   '',   '',   '',   '',   '',   '',   ''],
+          ['WR',   '',   '',   '',   '',   '',   '',   ''],
+          ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+          ['', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+          ],
+          [false, false], //isUnderCheckBeforeMove
+          [false, false], //isUnderCheckAfterMove
+          [true, true], //canCastleKingBeforeMove
+          [true, true], //canCastleKingAfterMove
+          [true, true], //canCastleQueenBeforeMove
+          [true, true], //canCastleQueenAfterMove
+          {row: null, col: null}, //enpassantPositionBeforeMove
+          {row: null, col: null}); //enpassantPositionAfterMove
+    });
+    
+    it("placing WR in 5x0 from initial state is legal", function() {
+      expectMove(
+          OK,
+          null, //endMatchScores
+          {row:7,col:0}, //deltaFrom
+          {row:5,col:0}, //deltaTo
+          W_TURN, //turnIndexBeforeMove
+          B_TURN, //turnIndexAfterMove
+          //boardBeforeMove
+          [
+          ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+          ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+          ['',   '',   '',   '',   '',   '',   '',   ''],
+          ['',   '',   '',   '',   '',   '',   '',   ''],
+          ['',   'WP',   '',   '',   '',   '',   '',   ''],
+          ['',   '',   '',   '',   '',   '',   '',   ''],
+          ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+          ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+          ],
+          //boardAfterMove
+          [
+          ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+          ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+          ['',   '',   '',   '',   '',   '',   '',   ''],
+          ['',   '',   '',   '',   '',   '',   '',   ''],
+          ['',   'WP',   '',   '',   '',   '',   '',   ''],
+          ['WR',   '',   '',   '',   '',   '',   '',   ''],
+          ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+          ['', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+          ],
+          [false, false], //isUnderCheckBeforeMove
+          [false, false], //isUnderCheckAfterMove
+          [true, true], //canCastleKingBeforeMove
+          [true, true], //canCastleKingAfterMove
+          [true, true], //canCastleQueenBeforeMove
+          [true, true], //canCastleQueenAfterMove
+          {row: null, col: null}, //enpassantPositionBeforeMove
+          {row: null, col: null}); //enpassantPositionAfterMove
+    });
+    
+  
+    
+    
+    
+  
+    */
     /*
     it("placing X in 0x0 from initial state but setting the turn to yourself is illegal", function() {
       expectMove(ILLEGAL, X_TURN, null, 0, 0,
