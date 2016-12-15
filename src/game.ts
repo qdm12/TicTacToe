@@ -125,8 +125,8 @@ module game {
     // because if we call aiService now
     // then the animation will be paused until the javascript finishes.
     dragAnimationEndedTimeout = $timeout(maybeRotateBoard, 300);
-    maybePlayAIliftTimeout = $timeout(maybePlayAIlift, 1200);
-    maybeSendComputerMoveTimeout = $timeout(maybeSendComputerMove, 2500);
+    maybePlayAIliftTimeout = $timeout(maybePlayAIlift, 1500);
+    maybeSendComputerMoveTimeout = $timeout(maybeSendComputerMove, 2200);
   }
 
   function clearTimeouts() {
@@ -316,6 +316,9 @@ module game {
     didMakeMove = true;
     let audio = new Audio('sounds/piece_drop.wav');
     audio.play();
+    if(gameOver(move.endMatchScores)){
+        return;
+    }
     if (!proposals) {
       moveService.makeMove(move);
     } else {
@@ -331,6 +334,22 @@ module game {
       }
       moveService.communityMove(myProposal, move);
     }
+  }
+  
+  function gameOver(endMatchScores:number[]):boolean{
+    let message:string = "Game over ! ";
+    if(angular.equals(endMatchScores, [0,0])){
+        message += "Game ended in a Tie";
+    }else if(angular.equals(endMatchScores, [1,0])){
+        message += "White team has won";
+    }else if(angular.equals(endMatchScores, [0,1])){
+        message += "Black team has won";
+    }
+    if(endMatchScores){ //to change for community use
+        alert(message);
+        return true;
+    }
+    return false;
   }
   
     export let shouldShowImage = function(row:number, col:number) {
