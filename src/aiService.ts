@@ -29,8 +29,7 @@ module aiService {
                                                         canCastleQueen,
                                                         enpassantPosition);         
         if(!possible_moves.length){
-            console.log("AI: findAttackMove: There is no possible move");
-            return null;
+            throw new Error("AI: There is no possible move anymore.");
         }
         //Searches for attack move
         let deltaFrom:Pos;
@@ -47,6 +46,8 @@ module aiService {
                         if(isEnnemyCell(turnIndex,board,deltaTo,rotate)){
                             move.stateAfterMove.delta.deltaFrom = deltaFrom;
                             move.stateAfterMove.delta.deltaTo = deltaTo;
+                            console.log("deltaFrom: "+deltaFrom.row+", "+deltaFrom.col);
+                            console.log("deltaTo: "+deltaTo.row+", "+deltaTo.col);
                             return gameLogic.createMove(move.stateAfterMove, turnIndex);
                         }
                     }
@@ -58,10 +59,7 @@ module aiService {
     
     function isEnnemyCell(turnIndex:number, board:Board, deltaTo:Pos, rotate:boolean):boolean{
         let teamIndex:number = findCellTeamIndex(board, deltaTo, rotate);
-        if(teamIndex === 1 - turnIndex){
-            return true;
-        }
-        return false;
+        return teamIndex === 1 - turnIndex;
     }
     
     function findCellTeamIndex(board:Board, deltaTo:Pos, rotate:boolean):number{
@@ -72,8 +70,11 @@ module aiService {
         let team:string = board[deltaTo.row][deltaTo.col].charAt(0);
         if(team === 'W'){ //White team
             return 0;
+        }else if(team === 'B'){
+            return 1; //Black team
+        }else{
+            return -1; //Empty cell
         }
-        return 1; //Black team
     }
     
     function findRingMove(move:IMove):IMove{
@@ -89,10 +90,6 @@ module aiService {
                                                         canCastleKing,
                                                         canCastleQueen,
                                                         enpassantPosition);         
-        if(!possible_moves.length){
-            console.log("AI: findRingMove: There is no possible move");
-            return null;
-        }
         let deltaFrom:Pos;
         let deltaTo:Pos;
         let possible_destinations:any;
