@@ -108,6 +108,7 @@ var game;
         game.state = params.move.stateAfterMove;
         if (isFirstMove()) {
             game.state = gameLogic.getInitialState();
+            game.currentUpdateUI.move.stateAfterMove = game.state;
         }
         // We calculate the AI move only after the animation finishes,
         // because if we call aiService now

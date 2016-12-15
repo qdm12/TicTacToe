@@ -119,7 +119,8 @@ module game {
     state = params.move.stateAfterMove;
     if (isFirstMove()) {
       state = gameLogic.getInitialState();
-    }    
+      currentUpdateUI.move.stateAfterMove = state;
+    }
     // We calculate the AI move only after the animation finishes,
     // because if we call aiService now
     // then the animation will be paused until the javascript finishes.
