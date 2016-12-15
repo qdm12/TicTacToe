@@ -7,7 +7,9 @@ var game;
     // game.currentUpdateUI
     game.currentUpdateUI = null;
     game.didMakeMove = false; // You can only make one move per updateUI
-    game.animationEndedTimeout = null;
+    var dragAnimationEndedTimeout = null;
+    var maybePlayAIliftTimeout = null;
+    var maybeSendComputerMoveTimeout = null;
     game.state = null;
     // For community games.
     game.proposals = null;
@@ -16,7 +18,7 @@ var game;
     var draggingStartedRowCol = null; // The {row: YY, col: XX} where dragging started.
     var draggingPiece = null;
     var draggingPieceAvailableMoves = null;
-    var nextZIndex = 1;
+    var rotated = false;
     function init() {
         registerServiceWorker();
         translate.setTranslations(getTranslations());
@@ -102,7 +104,7 @@ var game;
         log.info("Game got updateUI:", params);
         game.didMakeMove = false; // Only one move per updateUI
         game.currentUpdateUI = params;
-        clearAnimationTimeout();
+        clearTimeouts();
         game.state = params.move.stateAfterMove;
         if (isFirstMove()) {
             game.state = gameLogic.getInitialState();
@@ -110,29 +112,62 @@ var game;
         // We calculate the AI move only after the animation finishes,
         // because if we call aiService now
         // then the animation will be paused until the javascript finishes.
-        game.animationEndedTimeout = $timeout(animationEndedCallback, 1100);
+        dragAnimationEndedTimeout = $timeout(maybeRotateBoard, 300);
+        maybePlayAIliftTimeout = $timeout(maybePlayAIlift, 1200);
+        maybeSendComputerMoveTimeout = $timeout(maybeSendComputerMove, 2500);
     }
     game.updateUI = updateUI;
-    function animationEndedCallback() {
-        log.info("Animation ended");
-        maybeSendComputerMove();
-    }
-    function clearAnimationTimeout() {
-        if (game.animationEndedTimeout) {
-            $timeout.cancel(game.animationEndedTimeout);
-            game.animationEndedTimeout = null;
+    function clearTimeouts() {
+        if (dragAnimationEndedTimeout) {
+            $timeout.cancel(dragAnimationEndedTimeout);
+            dragAnimationEndedTimeout = null;
+        }
+        if (maybePlayAIliftTimeout) {
+            $timeout.cancel(maybePlayAIliftTimeout);
+            maybePlayAIliftTimeout = null;
+        }
+        if (maybeSendComputerMoveTimeout) {
+            $timeout.cancel(maybeSendComputerMoveTimeout);
+            maybeSendComputerMoveTimeout = null;
         }
     }
-    function maybeSendComputerMove() {
+    function maybeRotateBoard() {
+        if (!isFirstMove() && game.currentUpdateUI.playersInfo[0].playerId !== '' && game.currentUpdateUI.playersInfo[1].playerId !== '') {
+            var transform = void 0;
+            rotated = !rotated;
+            gameArea.classList.toggle('rotate180');
+            if (yourPlayerIndex()) {
+                transform = 'rotate(180deg)';
+            }
+            else {
+                transform = 'rotate(0deg) translate(-50%, -50%)';
+            }
+            var piece = void 0;
+            for (var i = 0; i < 8; i++) {
+                for (var j = 0; j < 8; j++) {
+                    piece = document.getElementById("e2e_test_img_" + game.getPieceKindInId(i, j) + '_' + +i + "x" + j);
+                    piece.style['transform'] = transform;
+                    piece.style['-moz-transform'] = transform;
+                    piece.style['-webkit-transform'] = transform;
+                    piece.style['-o-transform'] = transform;
+                    piece.style['-ms-transform'] = transform;
+                }
+            }
+        }
+    }
+    function maybePlayAIlift() {
         if (!isComputerTurn())
             return;
         var audio = new Audio('sounds/piece_lift.mp3');
         audio.play();
+    }
+    function maybeSendComputerMove() {
+        if (!isComputerTurn())
+            return;
         var nextMove = aiService.createComputerMove(game.currentUpdateUI.move);
         log.info("Computer move: ", nextMove);
         makeMove(nextMove);
     }
-    //window.e2e_test_stateService = stateService;
     function handleDragEvent(type, clientX, clientY) {
         if (isComputerTurn()) {
             return;
@@ -147,8 +182,12 @@ var game;
         }
         else {
             // Inside gameArea. Let's find the containing square's row and col
-            var col = Math.floor(8 * x / gameArea.clientWidth);
             var row = Math.floor(8 * y / gameArea.clientHeight);
+            var col = Math.floor(8 * x / gameArea.clientWidth);
+            if (rotated) {
+                row = 7 - row;
+                col = 7 - col;
+            }
             if (type === "touchstart" && !draggingStartedRowCol) {
                 // drag started
                 var PieceEmpty = (game.state.board[row][col] === '');

@@ -16,7 +16,9 @@ module game {
   // game.currentUpdateUI
   export let currentUpdateUI: IUpdateUI = null;
   export let didMakeMove: boolean = false; // You can only make one move per updateUI
-  export let animationEndedTimeout: ng.IPromise<any> = null;
+  let dragAnimationEndedTimeout: ng.IPromise<any> = null;
+  let maybePlayAIliftTimeout: ng.IPromise<any> = null;
+  let maybeSendComputerMoveTimeout: ng.IPromise<any> = null;
   export let state: IState = null;
   // For community games.
   export let proposals: number[][] = null;
@@ -26,7 +28,7 @@ module game {
   let draggingStartedRowCol:any = null; // The {row: YY, col: XX} where dragging started.
   let draggingPiece:any = null;
   let draggingPieceAvailableMoves:any = null;
-  let nextZIndex = 1;
+  let rotated:boolean = false;
   
 
   export function init() {
@@ -113,39 +115,74 @@ module game {
     log.info("Game got updateUI:", params);
     didMakeMove = false; // Only one move per updateUI
     currentUpdateUI = params;
-    clearAnimationTimeout();
+    clearTimeouts();
     state = params.move.stateAfterMove;
     if (isFirstMove()) {
       state = gameLogic.getInitialState();
-    }
+    }    
     // We calculate the AI move only after the animation finishes,
     // because if we call aiService now
     // then the animation will be paused until the javascript finishes.
-    animationEndedTimeout = $timeout(animationEndedCallback, 1100);
+    dragAnimationEndedTimeout = $timeout(maybeRotateBoard, 300);
+    maybePlayAIliftTimeout = $timeout(maybePlayAIlift, 1200);
+    maybeSendComputerMoveTimeout = $timeout(maybeSendComputerMove, 2500);
   }
 
-  function animationEndedCallback() {
-    log.info("Animation ended");
-    maybeSendComputerMove();
-  }
-
-  function clearAnimationTimeout() {
-    if (animationEndedTimeout) {
-      $timeout.cancel(animationEndedTimeout);
-      animationEndedTimeout = null;
+  function clearTimeouts() {
+    if (dragAnimationEndedTimeout) {
+      $timeout.cancel(dragAnimationEndedTimeout);
+      dragAnimationEndedTimeout = null;
+    }
+    if (maybePlayAIliftTimeout) {
+      $timeout.cancel(maybePlayAIliftTimeout);
+      maybePlayAIliftTimeout = null;
+    }
+    if (maybeSendComputerMoveTimeout) {
+      $timeout.cancel(maybeSendComputerMoveTimeout);
+      maybeSendComputerMoveTimeout = null;
     }
   }
 
+  function maybeRotateBoard(){
+    if(!isFirstMove() && currentUpdateUI.playersInfo[0].playerId !== '' && currentUpdateUI.playersInfo[1].playerId !== ''){
+        let transform:string;
+        rotated = !rotated;
+        gameArea.classList.toggle('rotate180');
+        if(yourPlayerIndex()){ //black team, index 1
+            transform = 'rotate(180deg)';
+        }else{ //white team
+            transform = 'rotate(0deg) translate(-50%, -50%)';            
+        }
+        let piece:any;
+        for(let i = 0; i < 8; i++){
+            for(let j = 0; j < 8; j++){
+                piece = document.getElementById("e2e_test_img_" + getPieceKindInId(i, j) + '_' + + i + "x" + j);
+                piece.style['transform'] = transform;
+                piece.style['-moz-transform'] = transform;
+                piece.style['-webkit-transform'] = transform;
+                piece.style['-o-transform'] = transform;
+                piece.style['-ms-transform'] = transform;
+            }
+        }
+    }
+  }
+
+  function maybePlayAIlift(){
+      if (!isComputerTurn()) return;
+      let audio = new Audio('sounds/piece_lift.mp3');
+      audio.play();
+  }
+    
   function maybeSendComputerMove() {
     if (!isComputerTurn()) return;
-    let audio = new Audio('sounds/piece_lift.mp3');
-    audio.play();
     let nextMove:IMove = aiService.createComputerMove(currentUpdateUI.move);
     log.info("Computer move: ", nextMove);
     makeMove(nextMove);
   }
   
-    //window.e2e_test_stateService = stateService;
+
+  
+  
     function handleDragEvent(type:string, clientX:number, clientY:number) {
         if(isComputerTurn()){
             return;
@@ -159,8 +196,12 @@ module game {
             }
         } else {
             // Inside gameArea. Let's find the containing square's row and col
-            let col:number = Math.floor(8 * x / gameArea.clientWidth);
             let row:number = Math.floor(8 * y / gameArea.clientHeight);
+            let col:number = Math.floor(8 * x / gameArea.clientWidth);
+            if(rotated){
+                row = 7 - row;
+                col = 7 - col;
+            }
             if (type === "touchstart" && !draggingStartedRowCol) {
                 // drag started
                 let PieceEmpty = (state.board[row][col] === '');

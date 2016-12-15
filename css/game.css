@@ -53,18 +53,44 @@ body {
   border-bottom: 5px solid #000;
   border-left: 5px solid #000;
   border-right: 5px solid #000;
+  -moz-transition: 1.4s ease-in-out;
+  -webkit-transition: 1.4s ease-in-out;
+  transition: 1.4s ease-in-out;
 }
+
+.rotate180{
+  -ms-transform-origin: 50% 50%;
+  -webkit-transform-origin: 50% 50%;
+  -moz-transform-origin: 50% 50%;
+  transform-origin: 50% 50%;
+  transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+}
+
 
 .piece {
   position: absolute;
   width: 40%;
   top: 50%;
   left: 50%;
-  transition: all 0.5s ease;
+  transition: all 0.8s ease;
   transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -ms-transform-origin: 28% 26%; /* IE 9 */
+  -webkit-transform-origin: 28% 26%; /* Chrome, Safari, Opera */
+  transform-origin: 28% 26%;
+  
 }
 
+
 img.isBlackPiece.canSelect {
+  animation: black-blink 2s infinite;
   animation: black-blink 2s infinite;
   -webkit-animation: black-blink 2s infinite;
 }
@@ -91,6 +117,14 @@ img.isWhitePiece.canSelect {
     padding: 0%;
   }
 }
+@-moz-keyframes white-blink {
+  50% {
+    filter: brightness(1.1);
+    -webkit-filter: brightness(1.1);
+    -webkit-box-shadow:0 0 18px #ffb515;
+    padding: 0%;
+  }
+}
 
 @keyframes black-blink {
   50% {
@@ -105,3 +139,14 @@ img.isWhitePiece.canSelect {
     -webkit-filter: brightness(1.1);
     -webkit-box-shadow:0 0 18px #4C0000;
 }
+@-moz-keyframes black-blink {
+  50% {
+    filter: brightness(1.1);
+    -webkit-filter: brightness(1.1);
+    -webkit-box-shadow:0 0 18px #4C0000;
+}
+
+
+@-moz-keyframes spin { 100% { -moz-transform: rotate(180deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(180deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(180deg); transform:rotate(180deg); } }
