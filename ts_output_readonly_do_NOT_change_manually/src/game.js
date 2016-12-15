@@ -106,14 +106,14 @@ var game;
         game.currentUpdateUI = params;
         clearTimeouts();
         game.state = params.move.stateAfterMove;
+        console.log("isFirstMove():" + isFirstMove());
         if (isFirstMove()) {
             game.state = gameLogic.getInitialState();
             game.currentUpdateUI.move.stateAfterMove = game.state;
         }
-        // We calculate the AI move only after the animation finishes,
-        // because if we call aiService now
-        // then the animation will be paused until the javascript finishes.
-        dragAnimationEndedTimeout = $timeout(maybeRotateBoard, 300);
+        else {
+            dragAnimationEndedTimeout = $timeout(maybeRotateBoard, 300);
+        }
         maybePlayAIliftTimeout = $timeout(maybePlayAIlift, 1500);
         maybeSendComputerMoveTimeout = $timeout(maybeSendComputerMove, 2200);
     }
@@ -133,7 +133,8 @@ var game;
         }
     }
     function maybeRotateBoard() {
-        if (!isFirstMove() && game.currentUpdateUI.playersInfo[0].playerId !== '' && game.currentUpdateUI.playersInfo[1].playerId !== '') {
+        console.log("isFirstMove():" + isFirstMove());
+        if (game.currentUpdateUI.playersInfo[0].playerId !== '' && game.currentUpdateUI.playersInfo[1].playerId !== '') {
             var transform = void 0;
             rotated = !rotated;
             gameArea.classList.toggle('rotate180');
