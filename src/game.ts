@@ -22,7 +22,6 @@ module game {
   export let proposals: number[][] = null;
   export let yourPlayerInfo: IPlayerInfo = null;
   
-  let rotate:boolean = false;
   let gameArea:any;
   let draggingStartedRowCol:any = null; // The {row: YY, col: XX} where dragging started.
   let draggingPiece:any = null;
@@ -123,13 +122,6 @@ module game {
     // because if we call aiService now
     // then the animation will be paused until the javascript finishes.
     animationEndedTimeout = $timeout(animationEndedCallback, 1100);
-    /* If the play mode is not pass and play then "rotate" the board
-     for the player. Therefore the board will always look from the
-     point of view of the player in single player mode... */
-    rotate = false;
-    if(params.playMode === "passAndPlay"){ //was playBlack
-        rotate = true;
-    }
   }
 
   function animationEndedCallback() {
@@ -148,7 +140,7 @@ module game {
     if (!isComputerTurn()) return;
     let audio = new Audio('sounds/piece_lift.mp3');
     audio.play();
-    let nextMove:IMove = aiService.createComputerMove(currentUpdateUI.move, rotate);
+    let nextMove:IMove = aiService.createComputerMove(currentUpdateUI.move);
     log.info("Computer move: ", nextMove);
     makeMove(nextMove);
   }
@@ -169,16 +161,10 @@ module game {
             // Inside gameArea. Let's find the containing square's row and col
             let col:number = Math.floor(8 * x / gameArea.clientWidth);
             let row:number = Math.floor(8 * y / gameArea.clientHeight);
-            let r_row:number = row;
-            let r_col:number = col;
-            if (rotate) {
-                r_row = 7 - r_row;
-                r_col = 7 - r_col;
-            }
             if (type === "touchstart" && !draggingStartedRowCol) {
                 // drag started
-                let PieceEmpty = (state.board[r_row][r_col] === '');
-                let PieceTeam = state.board[r_row][r_col].charAt(0);
+                let PieceEmpty = (state.board[row][col] === '');
+                let PieceTeam = state.board[row][col].charAt(0);
                 if (!PieceEmpty && PieceTeam === getTurn(yourPlayerIndex())) {
                     //valid drag
                     let audio = new Audio('sounds/piece_lift.mp3');
@@ -196,7 +182,7 @@ module game {
                         draggingPiece.style.width = '60%';
                     }
 
-                    draggingPieceAvailableMoves = getDraggingPieceAvailableMoves(r_row, r_col);
+                    draggingPieceAvailableMoves = getDraggingPieceAvailableMoves(row, col);
                     for (let i = 0; i < draggingPieceAvailableMoves.length; i++) {
                         draggingPieceAvailableMoves[i].style['stroke-width'] = '10';
                         draggingPieceAvailableMoves[i].style.stroke = 'rgba(255, 128, 0, 1)';
@@ -252,10 +238,6 @@ module game {
         if (index !== -1) {
             for (let i = 0; i < possibleMoves[index][1].length; i++) {
                 let availablePos:Pos = possibleMoves[index][1][i];
-                if(rotate) {
-                    availablePos.row = 7 - availablePos.row;
-                    availablePos.col = 7 - availablePos.col;
-                }
                 draggingPieceAvailableMoves.push(document.getElementById(
                                                 "MyBackground" +
                                                 availablePos.row + 
@@ -270,14 +252,8 @@ module game {
         if (window.location.search === '?throwException') {
           throw new Error("Throwing the error because URL has '?throwException'");
         }
-        if (!isMyTurn()) { //XXX check that
+        if (!isMyTurn()){
             return;
-        }
-        if(rotate){
-            fromPos.row = 7 - fromPos.row;
-            fromPos.col = 7 - fromPos.col;
-            toPos.row = 7 - toPos.row;
-            toPos.col = 7 - toPos.col;
         }
         state.delta.deltaFrom = fromPos;
         state.delta.deltaTo = toPos;
@@ -316,18 +292,10 @@ module game {
   }
   
     export let shouldShowImage = function(row:number, col:number) {
-        if (rotate) {
-            row = 7 - row;
-            col = 7 - col;
-        }
         return state.board[row][col] !== "" || isProposal(row, col); //HELP
     };
 
     export let getImageSrc = function(row:number, col:number) {
-        if (rotate) {
-            row = 7 - row;
-            col = 7 - col;
-        }
         switch(state.board[row][col]) {
             case 'WK': return 'chess_graphics/chess_pieces/W_King.png';
             case 'WQ': return 'chess_graphics/chess_pieces/W_Queen.png';
@@ -347,10 +315,6 @@ module game {
   
     export let getPieceKindInId = function(row:number, col:number):string {
         if (state.board) {
-            if (rotate) {
-                row = 7 - row;
-                col = 7 - col;
-            }
             return state.board[row][col];
         }
     };
@@ -399,21 +363,11 @@ module game {
     export let canSelect = function(row:number, col:number) {
         if(!state.board){
             return false;
-        }
-        if(isComputerTurn()){
+        }else if(isComputerTurn()){
             return false;
-        }
-        if (isMyTurn()) {
-            if (rotate) {
-                row = 7 - row;
-                col = 7 - col;
-            }
+        }else if (isMyTurn()) {
             if (state.board[row][col].charAt(0) === getTurn(yourPlayerIndex())) {
                 let select_Position:Pos = {row: row, col: col};
-                //if (!isUnderCheck) { isUnderCheck = [false, false]; }
-                //if (!canCastleKing) { canCastleKing = [true, true]; } ///XXXXXX
-                //if (!canCastleQueen) { canCastleQueen = [true, true]; }
-                //if (!enpassantPosition) { enpassantPosition = {row: null, col: null}; }
                 let possibleMoves = gameLogic.getPossibleMoves(state.board,
                                                                yourPlayerIndex(),
                                                                state.delta.isUnderCheck,
@@ -442,10 +396,6 @@ module game {
         return -1;
     }
     function isPiece(row: number, col: number, turnIndex: number, pieceKind: string): boolean {
-        if (rotate) {
-            row = 7 - row;
-            col = 7 - col;
-        }
         return state.board[row][col].charAt(0) === pieceKind ||
                 (isProposal(row, col) && currentUpdateUI.move.turnIndexAfterMove == turnIndex);
     }

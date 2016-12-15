@@ -1,13 +1,14 @@
 module aiService {
     //10 Pawns, 5 Knight, 3 Bishops, 3 rooks, 2 queen, 1 king
     let RandomList = ['P', 'N', 'P', 'B', 'P', 'N', 'P', 'B', 'N', 'P', 'B', 'P', 'R', 'P', 'N', 'R', 'Q', 'N', 'P', 'Q', 'P', 'R', 'K', 'P'];
+    export let RListSize:number = RandomList.length;
     export let pieceTypeIndex:number = Math.floor(Math.random()*RandomList.length);
     //overwrite initial pieceTypeIndex for unit testing    
     
     /** Returns the move that the computer player should do for the given state in move. */
-    export function createComputerMove(move:IMove, rotate:boolean):IMove {
+    export function createComputerMove(move:IMove):IMove {
         let next_move:IMove;
-        next_move = findAttackMove(move, rotate);
+        next_move = findAttackMove(move);
         if(next_move === null){ //No attack move found
             next_move = findRingMove(move); //find a "random" move
         }
@@ -15,7 +16,7 @@ module aiService {
         return next_move;
     }
     
-    function findAttackMove(move:IMove, rotate:boolean):IMove{
+    function findAttackMove(move:IMove):IMove{
         let board:Board = move.stateAfterMove.board;
         let turnIndex:number = move.turnIndexAfterMove;
         let isUnderCheck:[boolean,boolean] = move.stateAfterMove.delta.isUnderCheck;
@@ -43,11 +44,9 @@ module aiService {
                     possible_destinations = possible_moves[i][1];
                     for (let j = 0; j < possible_destinations.length; j++) {
                         deltaTo = possible_destinations[j];
-                        if(isEnnemyCell(turnIndex,board,deltaTo,rotate)){
+                        if(isEnnemyCell(turnIndex,board,deltaTo)){
                             move.stateAfterMove.delta.deltaFrom = deltaFrom;
                             move.stateAfterMove.delta.deltaTo = deltaTo;
-                            console.log("deltaFrom: "+deltaFrom.row+", "+deltaFrom.col);
-                            console.log("deltaTo: "+deltaTo.row+", "+deltaTo.col);
                             return gameLogic.createMove(move.stateAfterMove, turnIndex);
                         }
                     }
@@ -57,16 +56,12 @@ module aiService {
         return null; //No attack move found
     }
     
-    function isEnnemyCell(turnIndex:number, board:Board, deltaTo:Pos, rotate:boolean):boolean{
-        let teamIndex:number = findCellTeamIndex(board, deltaTo, rotate);
+    function isEnnemyCell(turnIndex:number, board:Board, deltaTo:Pos):boolean{
+        let teamIndex:number = findCellTeamIndex(board, deltaTo);
         return teamIndex === 1 - turnIndex;
     }
     
-    function findCellTeamIndex(board:Board, deltaTo:Pos, rotate:boolean):number{
-        if(rotate) {
-            deltaTo.row = 7 - deltaTo.row;
-            deltaTo.col = 7 - deltaTo.col;
-        }
+    function findCellTeamIndex(board:Board, deltaTo:Pos):number{
         let team:string = board[deltaTo.row][deltaTo.col].charAt(0);
         if(team === 'W'){ //White team
             return 0;
@@ -103,7 +98,7 @@ module aiService {
             }
             if(possible_origin_indexes.length === 0){ //no origins for this piece Type
                 pieceTypeIndex++;
-                if(pieceTypeIndex === RandomList.length){
+                if(pieceTypeIndex === RListSize){
                     pieceTypeIndex = 0;
                 }
             }
@@ -118,7 +113,7 @@ module aiService {
         move.stateAfterMove.delta.deltaFrom = deltaFrom;
         move.stateAfterMove.delta.deltaTo = deltaTo;
         pieceTypeIndex++; //changes the piece Type for next AI move
-        if(pieceTypeIndex === RandomList.length){
+        if(pieceTypeIndex === RListSize){
             pieceTypeIndex = 0; //reset the index when it reaches its max
         }
         return gameLogic.createMove(move.stateAfterMove, turnIndex);

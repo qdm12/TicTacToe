@@ -12,7 +12,6 @@ var game;
     // For community games.
     game.proposals = null;
     game.yourPlayerInfo = null;
-    var rotate = false;
     var gameArea;
     var draggingStartedRowCol = null; // The {row: YY, col: XX} where dragging started.
     var draggingPiece = null;
@@ -112,13 +111,6 @@ var game;
         // because if we call aiService now
         // then the animation will be paused until the javascript finishes.
         game.animationEndedTimeout = $timeout(animationEndedCallback, 1100);
-        /* If the play mode is not pass and play then "rotate" the board
-         for the player. Therefore the board will always look from the
-         point of view of the player in single player mode... */
-        rotate = false;
-        if (params.playMode === "passAndPlay") {
-            rotate = true;
-        }
     }
     game.updateUI = updateUI;
     function animationEndedCallback() {
@@ -136,7 +128,7 @@ var game;
             return;
         var audio = new Audio('sounds/piece_lift.mp3');
         audio.play();
-        var nextMove = aiService.createComputerMove(game.currentUpdateUI.move, rotate);
+        var nextMove = aiService.createComputerMove(game.currentUpdateUI.move);
         log.info("Computer move: ", nextMove);
         makeMove(nextMove);
     }
@@ -157,16 +149,10 @@ var game;
             // Inside gameArea. Let's find the containing square's row and col
             var col = Math.floor(8 * x / gameArea.clientWidth);
             var row = Math.floor(8 * y / gameArea.clientHeight);
-            var r_row = row;
-            var r_col = col;
-            if (rotate) {
-                r_row = 7 - r_row;
-                r_col = 7 - r_col;
-            }
             if (type === "touchstart" && !draggingStartedRowCol) {
                 // drag started
-                var PieceEmpty = (game.state.board[r_row][r_col] === '');
-                var PieceTeam = game.state.board[r_row][r_col].charAt(0);
+                var PieceEmpty = (game.state.board[row][col] === '');
+                var PieceTeam = game.state.board[row][col].charAt(0);
                 if (!PieceEmpty && PieceTeam === getTurn(yourPlayerIndex())) {
                     //valid drag
                     var audio = new Audio('sounds/piece_lift.mp3');
@@ -182,7 +168,7 @@ var game;
                         draggingPiece.style['z-index'] = 1;
                         draggingPiece.style.width = '60%';
                     }
-                    draggingPieceAvailableMoves = getDraggingPieceAvailableMoves(r_row, r_col);
+                    draggingPieceAvailableMoves = getDraggingPieceAvailableMoves(row, col);
                     for (var i = 0; i < draggingPieceAvailableMoves.length; i++) {
                         draggingPieceAvailableMoves[i].style['stroke-width'] = '10';
                         draggingPieceAvailableMoves[i].style.stroke = 'rgba(255, 128, 0, 1)';
@@ -233,10 +219,6 @@ var game;
         if (index !== -1) {
             for (var i = 0; i < possibleMoves[index][1].length; i++) {
                 var availablePos = possibleMoves[index][1][i];
-                if (rotate) {
-                    availablePos.row = 7 - availablePos.row;
-                    availablePos.col = 7 - availablePos.col;
-                }
                 draggingPieceAvailableMoves.push(document.getElementById("MyBackground" +
                     availablePos.row +
                     "x" +
@@ -251,12 +233,6 @@ var game;
         }
         if (!isMyTurn()) {
             return;
-        }
-        if (rotate) {
-            fromPos.row = 7 - fromPos.row;
-            fromPos.col = 7 - fromPos.col;
-            toPos.row = 7 - toPos.row;
-            toPos.col = 7 - toPos.col;
         }
         game.state.delta.deltaFrom = fromPos;
         game.state.delta.deltaTo = toPos;
@@ -295,17 +271,9 @@ var game;
         }
     }
     game.shouldShowImage = function (row, col) {
-        if (rotate) {
-            row = 7 - row;
-            col = 7 - col;
-        }
         return game.state.board[row][col] !== "" || isProposal(row, col); //HELP
     };
     game.getImageSrc = function (row, col) {
-        if (rotate) {
-            row = 7 - row;
-            col = 7 - col;
-        }
         switch (game.state.board[row][col]) {
             case 'WK': return 'chess_graphics/chess_pieces/W_King.png';
             case 'WQ': return 'chess_graphics/chess_pieces/W_Queen.png';
@@ -324,10 +292,6 @@ var game;
     };
     game.getPieceKindInId = function (row, col) {
         if (game.state.board) {
-            if (rotate) {
-                row = 7 - row;
-                col = 7 - col;
-            }
             return game.state.board[row][col];
         }
     };
@@ -368,20 +332,12 @@ var game;
         if (!game.state.board) {
             return false;
         }
-        if (isComputerTurn()) {
+        else if (isComputerTurn()) {
             return false;
         }
-        if (isMyTurn()) {
-            if (rotate) {
-                row = 7 - row;
-                col = 7 - col;
-            }
+        else if (isMyTurn()) {
             if (game.state.board[row][col].charAt(0) === getTurn(yourPlayerIndex())) {
                 var select_Position = { row: row, col: col };
-                //if (!isUnderCheck) { isUnderCheck = [false, false]; }
-                //if (!canCastleKing) { canCastleKing = [true, true]; } ///XXXXXX
-                //if (!canCastleQueen) { canCastleQueen = [true, true]; }
-                //if (!enpassantPosition) { enpassantPosition = {row: null, col: null}; }
                 var possibleMoves = gameLogic.getPossibleMoves(game.state.board, yourPlayerIndex(), game.state.delta.isUnderCheck, game.state.delta.canCastleKing, game.state.delta.canCastleQueen, game.state.delta.enpassantPosition);
                 return cellInPossibleMoves(select_Position, possibleMoves) !== -1;
             }
@@ -403,10 +359,6 @@ var game;
         return -1;
     }
     function isPiece(row, col, turnIndex, pieceKind) {
-        if (rotate) {
-            row = 7 - row;
-            col = 7 - col;
-        }
         return game.state.board[row][col].charAt(0) === pieceKind ||
             (isProposal(row, col) && game.currentUpdateUI.move.turnIndexAfterMove == turnIndex);
     }
