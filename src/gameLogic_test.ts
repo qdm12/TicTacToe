@@ -167,6 +167,46 @@ describe("In Chess", function() {
         {row: null, col: null}); //enpassantPositionAfterMove
   });
   
+  it("Playing legally but setting the turn back to myself is illegal", function() {
+    expectMove(
+        ILLEGAL,
+        null, //endMatchScores
+        {row:1,col:0}, //deltaFrom
+        {row:2,col:0}, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        B_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+        ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+        ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+        ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ],
+        //boardAfterMove
+        [
+        ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+        ['', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+        ['BP',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+        ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ],
+        [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        {row: null, col: null}, //enpassantPositionBeforeMove
+        {row: null, col: null}); //enpassantPositionAfterMove
+  });
+  
   it("Not moving is illegal", function() {
     expectMove(
         ILLEGAL,
@@ -273,7 +313,7 @@ describe("In Chess", function() {
         ['',   '',   '',   '',   '',   '',   '',   ''],
         ['',   '',   '',   '',   '',   '',   '',   ''],
         ['',   '',   '',   '',   '',   '',   '',   ''],
-        ['WP',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
         ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
         ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
         ],
@@ -281,8 +321,8 @@ describe("In Chess", function() {
         [false, false], //isUnderCheckAfterMove
         [true, true], //canCastleKingBeforeMove
         [true, true], //canCastleKingAfterMove
-        [true, true], //canCastleQueenBeforeMove
-        [true, true], //canCastleQueenAfterMove
+        [false, false], //canCastleQueenBeforeMove
+        [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}); //enpassantPositionAfterMove
   });
@@ -326,6 +366,91 @@ describe("In Chess", function() {
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}); //enpassantPositionAfterMove
   });
+  
+  it("Playing without winning making you win is illegal", function() {
+    expectMove(
+        ILLEGAL,
+        [0,1], //endMatchScores
+        {row:1,col:0}, //deltaFrom
+        {row:2,col:0}, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        NO_ONE_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+        ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+        ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+        ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ],
+        //boardAfterMove
+        [
+        ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+        ['', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+        ['BP',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+        ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ],
+        [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [true, true], //canCastleQueenBeforeMove
+        [true, true], //canCastleQueenAfterMove
+        {row: null, col: null}, //enpassantPositionBeforeMove
+        {row: null, col: null}); //enpassantPositionAfterMove
+  });
+  
+  it("Moving a piece out of the board is illegal", function() {
+    expectMove(
+        ILLEGAL,
+        null, //endMatchScores
+        {row:0,col:7}, //deltaFrom
+        {row:0,col:8}, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+        ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
+        ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+        ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ],
+        //boardAfterMove
+        [
+        ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', '', 'BR'],
+        ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
+        ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ],
+        [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [true, true], //canCastleKingBeforeMove
+        [true, true], //canCastleKingAfterMove
+        [false, false], //canCastleQueenBeforeMove
+        [false, false], //canCastleQueenAfterMove
+        {row: null, col: null}, //enpassantPositionBeforeMove
+        {row: null, col: null}); //enpassantPositionAfterMove
+  });
+  
+
+  
+  
+  
   
   
   
@@ -814,10 +939,10 @@ describe("In Chess", function() {
         ],
         [false, false], //isUnderCheckBeforeMove
         [false, false], //isUnderCheckAfterMove
-        [true, true], //canCastleKingBeforeMove
-        [true, true], //canCastleKingAfterMove
-        [true, true], //canCastleQueenBeforeMove
-        [true, true], //canCastleQueenAfterMove
+        [false, false], //canCastleKingBeforeMove
+        [false, false], //canCastleKingAfterMove
+        [false, false], //canCastleQueenBeforeMove
+        [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}); //enpassantPositionAfterMove
   });
@@ -839,7 +964,206 @@ describe("In Chess", function() {
   
   
   
+  //ISTIE MOVEMENTS
+  it("IsTie: Only Pawns can move", function() {
+    expectMove(
+        OK,
+        null, //endMatchScores
+        {row:1,col:7}, //deltaFrom
+        {row:2,col:7}, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+        ['', '', '', '', '', '', '', ''],
+        ['BP', 'BP', '', '', '', '', '', 'BP'],
+        ['BK',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['BP',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   'WK',   '',   '',   '',   '']
+        ],
+        //boardAfterMove
+        [
+        ['', '', '', '', '', '', '', ''],
+        ['BP', 'BP', '', '', '', '', '', ''],
+        ['BK',   'BP',   '',   '',   '',   '',   '',   'BP'],
+        ['BP',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   'WK',   '',   '',   '',   '']
+        ],
+        [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [false, false], //canCastleKingBeforeMove
+        [false, false], //canCastleKingAfterMove
+        [false, false], //canCastleQueenBeforeMove
+        [false, false], //canCastleQueenAfterMove
+        {row: null, col: null}, //enpassantPositionBeforeMove
+        {row: null, col: null}); //enpassantPositionAfterMove
+  });
   
+  it("IsTie: Bishop can move", function() {
+    expectMove(
+        OK,
+        null, //endMatchScores
+        {row:1,col:7}, //deltaFrom
+        {row:0,col:6}, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+        ['', '', '', '', '', '', '', ''],
+        ['BP', 'BP', '', '', '', '', '', 'BB'],
+        ['BK',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['BP',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   'WK',   '',   '',   '',   '']
+        ],
+        //boardAfterMove
+        [
+        ['', '', '', '', '', '', 'BB', ''],
+        ['BP', 'BP', '', '', '', '', '', ''],
+        ['BK',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['BP',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   'WK',   '',   '',   '',   '']
+        ],
+        [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [false, false], //canCastleKingBeforeMove
+        [false, false], //canCastleKingAfterMove
+        [false, false], //canCastleQueenBeforeMove
+        [false, false], //canCastleQueenAfterMove
+        {row: null, col: null}, //enpassantPositionBeforeMove
+        {row: null, col: null}); //enpassantPositionAfterMove
+  });
+  
+  it("IsTie: Rook can move", function() {
+    expectMove(
+        OK,
+        null, //endMatchScores
+        {row:1,col:7}, //deltaFrom
+        {row:1,col:6}, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+        ['', '', '', '', '', '', '', ''],
+        ['BP', 'BP', '', '', '', '', '', 'BR'],
+        ['BK',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['BP',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   'WK',   '',   '',   '',   '']
+        ],
+        //boardAfterMove
+        [
+        ['', '', '', '', '', '', '', ''],
+        ['BP', 'BP', '', '', '', '', 'BR', ''],
+        ['BK',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['BP',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   'WK',   '',   '',   '',   '']
+        ],
+        [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [false, false], //canCastleKingBeforeMove
+        [false, false], //canCastleKingAfterMove
+        [false, false], //canCastleQueenBeforeMove
+        [false, false], //canCastleQueenAfterMove
+        {row: null, col: null}, //enpassantPositionBeforeMove
+        {row: null, col: null}); //enpassantPositionAfterMove
+  });
+  
+  it("IsTie: Queen can move", function() {
+    expectMove(
+        OK,
+        null, //endMatchScores
+        {row:1,col:7}, //deltaFrom
+        {row:1,col:6}, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+        ['', '', '', '', '', '', '', ''],
+        ['BP', 'BP', '', '', '', '', '', 'BQ'],
+        ['BK',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['BP',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   'WK',   '',   '',   '',   '']
+        ],
+        //boardAfterMove
+        [
+        ['', '', '', '', '', '', '', ''],
+        ['BP', 'BP', '', '', '', '', 'BQ', ''],
+        ['BK',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['BP',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   'WK',   '',   '',   '',   '']
+        ],
+        [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [false, false], //canCastleKingBeforeMove
+        [false, false], //canCastleKingAfterMove
+        [false, false], //canCastleQueenBeforeMove
+        [false, false], //canCastleQueenAfterMove
+        {row: null, col: null}, //enpassantPositionBeforeMove
+        {row: null, col: null}); //enpassantPositionAfterMove
+  });
+  
+  it("IsTie: None can move", function() { //XXX ERROR
+    expectMove(
+        OK,
+        [0,0], //endMatchScores
+        {row:5,col:1}, //deltaFrom
+        {row:6,col:1}, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        NO_ONE_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+        ['', '', '', '', '', '', 'WP', 'WK'],
+        ['', '', '', '', '', '', 'WP', 'WP'],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['BP',   '',   '',   '',   '',   '',   '',   ''],
+        ['BK',   'BP',   '',   '',   '',   '',   '',   '']
+        ],
+        //boardAfterMove
+        [
+        ['', '', '', '', '', '', 'WP', 'WK'],
+        ['', '', '', '', '', '', 'WP', 'WP'],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['BP',   'BP',   '',   '',   '',   '',   '',   ''],
+        ['BK',   'BP',   '',   '',   '',   '',   '',   '']
+        ],
+        [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [false, false], //canCastleKingBeforeMove
+        [false, false], //canCastleKingAfterMove
+        [false, false], //canCastleQueenBeforeMove
+        [false, false], //canCastleQueenAfterMove
+        {row: null, col: null}, //enpassantPositionBeforeMove
+        {row: null, col: null}); //enpassantPositionAfterMove
+  });
   
   
   
@@ -881,10 +1205,10 @@ describe("In Chess", function() {
         ],
         [true, false], //isUnderCheckBeforeMove
         [true, false], //isUnderCheckAfterMove
-        [true, true], //canCastleKingBeforeMove
-        [true, true], //canCastleKingAfterMove
-        [true, true], //canCastleQueenBeforeMove
-        [true, true], //canCastleQueenAfterMove
+        [false, false], //canCastleKingBeforeMove
+        [false, false], //canCastleKingAfterMove
+        [false, false], //canCastleQueenBeforeMove
+        [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}); //enpassantPositionAfterMove
   });
@@ -921,10 +1245,10 @@ describe("In Chess", function() {
         ],
         [false, true], //isUnderCheckBeforeMove
         [false, true], //isUnderCheckAfterMove
-        [true, true], //canCastleKingBeforeMove
-        [true, true], //canCastleKingAfterMove
-        [true, true], //canCastleQueenBeforeMove
-        [true, true], //canCastleQueenAfterMove
+        [false, false], //canCastleKingBeforeMove
+        [false, false], //canCastleKingAfterMove
+        [false, false], //canCastleQueenBeforeMove
+        [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}); //enpassantPositionAfterMove
   });
@@ -961,10 +1285,10 @@ describe("In Chess", function() {
         ],
         [false, false], //isUnderCheckBeforeMove
         [true, false], //isUnderCheckAfterMove
-        [true, true], //canCastleKingBeforeMove
-        [true, true], //canCastleKingAfterMove
-        [true, true], //canCastleQueenBeforeMove
-        [true, true], //canCastleQueenAfterMove
+        [false, true], //canCastleKingBeforeMove
+        [false, true], //canCastleKingAfterMove
+        [false, true], //canCastleQueenBeforeMove
+        [false, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}); //enpassantPositionAfterMove
   });
@@ -1001,10 +1325,10 @@ describe("In Chess", function() {
         ],
         [false, false], //isUnderCheckBeforeMove
         [true, false], //isUnderCheckAfterMove
-        [true, true], //canCastleKingBeforeMove
-        [true, true], //canCastleKingAfterMove
-        [true, true], //canCastleQueenBeforeMove
-        [true, true], //canCastleQueenAfterMove
+        [false, true], //canCastleKingBeforeMove
+        [false, true], //canCastleKingAfterMove
+        [false, true], //canCastleQueenBeforeMove
+        [false, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}); //enpassantPositionAfterMove
   });
@@ -1041,10 +1365,10 @@ describe("In Chess", function() {
         ],
         [false, false], //isUnderCheckBeforeMove
         [true, false], //isUnderCheckAfterMove
-        [true, true], //canCastleKingBeforeMove
-        [true, true], //canCastleKingAfterMove
-        [true, true], //canCastleQueenBeforeMove
-        [true, true], //canCastleQueenAfterMove
+        [false, true], //canCastleKingBeforeMove
+        [false, true], //canCastleKingAfterMove
+        [false, true], //canCastleQueenBeforeMove
+        [false, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}); //enpassantPositionAfterMove
   });
@@ -1081,10 +1405,10 @@ describe("In Chess", function() {
         ],
         [false, false], //isUnderCheckBeforeMove
         [true, false], //isUnderCheckAfterMove
-        [true, true], //canCastleKingBeforeMove
-        [true, true], //canCastleKingAfterMove
-        [true, true], //canCastleQueenBeforeMove
-        [true, true], //canCastleQueenAfterMove
+        [false, true], //canCastleKingBeforeMove
+        [false, true], //canCastleKingAfterMove
+        [false, true], //canCastleQueenBeforeMove
+        [false, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}); //enpassantPositionAfterMove
   });
@@ -1121,10 +1445,10 @@ describe("In Chess", function() {
         ],
         [false, false], //isUnderCheckBeforeMove
         [true, false], //isUnderCheckAfterMove
-        [true, true], //canCastleKingBeforeMove
-        [true, true], //canCastleKingAfterMove
-        [true, true], //canCastleQueenBeforeMove
-        [true, true], //canCastleQueenAfterMove
+        [false, true], //canCastleKingBeforeMove
+        [false, true], //canCastleKingAfterMove
+        [false, true], //canCastleQueenBeforeMove
+        [false, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}); //enpassantPositionAfterMove
   });
@@ -1163,211 +1487,59 @@ describe("In Chess", function() {
         ],
         [false, false], //isUnderCheckBeforeMove
         [true, false], //isUnderCheckAfterMove
-        [true, true], //canCastleKingBeforeMove
-        [true, true], //canCastleKingAfterMove
-        [true, true], //canCastleQueenBeforeMove
-        [true, true], //canCastleQueenAfterMove
+        [true, false], //canCastleKingBeforeMove
+        [true, false], //canCastleKingAfterMove
+        [true, false], //canCastleQueenBeforeMove
+        [true, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}); //enpassantPositionAfterMove
   });
   
   
+  /*
   
-  /*  
-  it("placing WR in 5x0 from initial state is illegal", function() {
-    expectMove(
-        ILLEGAL,
-        null, //endMatchScores
-        {row:7,col:0}, //deltaFrom
-        {row:5,col:0}, //deltaTo
-        W_TURN, //turnIndexBeforeMove
-        B_TURN, //turnIndexAfterMove
-        //boardBeforeMove
-        [
-        ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
-        ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
-        ['',   '',   '',   '',   '',   '',   '',   ''],
-        ['',   '',   '',   '',   '',   '',   '',   ''],
-        ['',   '',   '',   '',   '',   '',   '',   ''],
-        ['',   '',   '',   '',   '',   '',   '',   ''],
-        ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
-        ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
-        ],
-        //boardAfterMove
-        [
-        ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
-        ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
-        ['',   '',   '',   '',   '',   '',   '',   ''],
-        ['',   '',   '',   '',   '',   '',   '',   ''],
-        ['',   '',   '',   '',   '',   '',   '',   ''],
-        ['WR',   '',   '',   '',   '',   '',   '',   ''],
-        ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
-        ['', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
-        ],
-        [false, false], //isUnderCheckBeforeMove
-        [false, false], //isUnderCheckAfterMove
-        [true, true], //canCastleKingBeforeMove
-        [true, true], //canCastleKingAfterMove
-        [true, true], //canCastleQueenBeforeMove
-        [true, true], //canCastleQueenAfterMove
-        {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
-  });
-  
-  it("placing WR in 5x0 from initial state is legal", function() {
+  //CASTLING MOVES
+  it("Castling king is legal", function() {
     expectMove(
         OK,
         null, //endMatchScores
-        {row:7,col:0}, //deltaFrom
-        {row:5,col:0}, //deltaTo
-        W_TURN, //turnIndexBeforeMove
-        B_TURN, //turnIndexAfterMove
+        {row:1,col:4}, //deltaFrom
+        {row:2,col:4}, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        W_TURN, //turnIndexAfterMove
         //boardBeforeMove
         [
-        ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
-        ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+        ['BR', '', '', '', 'BK', '', '', ''],
+        ['', '', '', '', 'BP', '', '', ''],
         ['',   '',   '',   '',   '',   '',   '',   ''],
         ['',   '',   '',   '',   '',   '',   '',   ''],
-        ['',   'WP',   '',   '',   '',   '',   '',   ''],
         ['',   '',   '',   '',   '',   '',   '',   ''],
-        ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
-        ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['', '', '', '', '', '', '', ''],
+        ['', '', '', '', 'WK', '', '', '']
         ],
         //boardAfterMove
         [
-        ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
-        ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
+        ['BR', '', '', '', 'BK', '', '', ''],
+        ['', '', '', '', '', '', '', ''],
+        ['',   '',   '',   '',   'BP',   '',   '',   ''],
         ['',   '',   '',   '',   '',   '',   '',   ''],
         ['',   '',   '',   '',   '',   '',   '',   ''],
-        ['',   'WP',   '',   '',   '',   '',   '',   ''],
-        ['WR',   '',   '',   '',   '',   '',   '',   ''],
-        ['', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
-        ['', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['', '', '', '', '', '', '', ''],
+        ['', '', '', '', 'WK', '', '', '']
         ],
         [false, false], //isUnderCheckBeforeMove
         [false, false], //isUnderCheckAfterMove
         [true, true], //canCastleKingBeforeMove
-        [true, true], //canCastleKingAfterMove
+        [true, false], //canCastleKingAfterMove
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}); //enpassantPositionAfterMove
-  });
-  
-
+  });*/
   
   
   
 
-  */
-  /*
-  it("placing X in 0x0 from initial state but setting the turn to yourself is illegal", function() {
-    expectMove(ILLEGAL, X_TURN, null, 0, 0,
-      [['X', '', ''],
-       ['', '', ''],
-       ['', '', '']], X_TURN, NO_ONE_WINS);
-  });
-
-  it("placing X in 0x0 from initial state and winning is illegal", function() {
-    expectMove(ILLEGAL, X_TURN, null, 0, 0,
-      [['X', '', ''],
-       ['', '', ''],
-       ['', '', '']], NO_ONE_TURN, X_WIN_SCORES);
-  });
-
-  it("placing X in 0x0 from initial state and setting the wrong board is illegal", function() {
-    expectMove(ILLEGAL, X_TURN, null, 0, 0,
-      [['X', 'X', ''],
-       ['', '', ''],
-       ['', '', '']], O_TURN, NO_ONE_WINS);
-  });
-
-  it("placing O in 0x1 after X placed X in 0x0 is legal", function() {
-    expectMove(OK, O_TURN,
-      [['X', '', ''],
-       ['', '', ''],
-       ['', '', '']], 0, 1,
-      [['X', 'O', ''],
-       ['', '', ''],
-       ['', '', '']], X_TURN, NO_ONE_WINS);
-  });
-
-  it("placing an O in a non-empty position is illegal", function() {
-    expectMove(ILLEGAL, O_TURN,
-      [['X', '', ''],
-       ['', '', ''],
-       ['', '', '']], 0, 0,
-      [['O', '', ''],
-       ['', '', ''],
-       ['', '', '']], X_TURN, NO_ONE_WINS);
-  });
-
-  it("cannot move after the game is over", function() {
-    expectMove(ILLEGAL, O_TURN,
-      [['X', 'O', ''],
-       ['X', 'O', ''],
-       ['X', '', '']], 2, 1,
-      [['X', 'O', ''],
-       ['X', 'O', ''],
-       ['X', 'O', '']], X_TURN, NO_ONE_WINS);
-  });
-
-  it("placing O in 2x1 is legal", function() {
-    expectMove(OK, O_TURN,
-      [['O', 'X', ''],
-       ['X', 'O', ''],
-       ['X', '', '']], 2, 1,
-      [['O', 'X', ''],
-       ['X', 'O', ''],
-       ['X', 'O', '']], X_TURN, NO_ONE_WINS);
-  });
-
-  it("X wins by placing X in 2x0 is legal", function() {
-    expectMove(OK, X_TURN,
-      [['X', 'O', ''],
-       ['X', 'O', ''],
-       ['', '', '']], 2, 0,
-      [['X', 'O', ''],
-       ['X', 'O', ''],
-       ['X', '', '']], NO_ONE_TURN, X_WIN_SCORES);
-  });
-
-  it("O wins by placing O in 1x1 is legal", function() {
-    expectMove(OK, O_TURN,
-      [['X', 'X', 'O'],
-       ['X', '', ''],
-       ['O', '', '']], 1, 1,
-      [['X', 'X', 'O'],
-       ['X', 'O', ''],
-       ['O', '', '']], NO_ONE_TURN, O_WIN_SCORES);
-  });
-
-  it("the game ties when there are no more empty cells", function() {
-    expectMove(OK, X_TURN,
-      [['X', 'O', 'X'],
-       ['X', 'O', 'O'],
-       ['O', 'X', '']], 2, 2,
-      [['X', 'O', 'X'],
-       ['X', 'O', 'O'],
-       ['O', 'X', 'X']], NO_ONE_TURN, TIE_SCORES);
-  });
-
-  it("move without board is illegal", function() {
-    expectMove(ILLEGAL, X_TURN,
-      [['X', 'O', 'X'],
-       ['X', 'O', 'O'],
-       ['O', 'X', '']], 2, 2,
-      null, NO_ONE_TURN, TIE_SCORES);
-  });
-
-  it("placing X outside the board (in 0x3) is illegal", function() {
-    expectMove(ILLEGAL, X_TURN,
-      [['', '', ''],
-       ['', '', ''],
-       ['', '', '']], 0, 3,
-      [['', '', '', 'X'],
-       ['', '', ''],
-       ['', '', '']], O_TURN, NO_ONE_WINS);
-  });
-  */
 });

@@ -177,25 +177,24 @@ module gameLogic {
         if (isCastlingKing(board, deltaFrom, deltaTo, turnIndex, stateBeforeMove.delta.canCastleKing)) {
           stateAfterMove.board[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
           stateAfterMove.board[deltaFrom.row][deltaFrom.col] = '';
-          stateAfterMove.board[deltaTo.row][deltaTo.col - 1] = getTurn(turnIndex) + 'R';
+          stateAfterMove.board[deltaTo.row][deltaTo.col - 1] = board[deltaTo.row][7];
           stateAfterMove.board[deltaTo.row][7] = '';
-          stateAfterMove.delta.canCastleKing[turnIndex] = false;
-          stateAfterMove.delta.canCastleQueen[turnIndex] = false;
         }
         else if (isCastlingQueen(board, deltaFrom, deltaTo, turnIndex, stateBeforeMove.delta.canCastleQueen)) {
           stateAfterMove.board[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
           stateAfterMove.board[deltaFrom.row][deltaFrom.col] = '';
-          stateAfterMove.board[deltaTo.row][deltaTo.col + 1] = getTurn(turnIndex) + 'R';
+          stateAfterMove.board[deltaTo.row][deltaTo.col + 1] = board[deltaTo.row][0];
           stateAfterMove.board[deltaTo.row][0] = '';
-          stateAfterMove.delta.canCastleKing[turnIndex] = false;
-          stateAfterMove.delta.canCastleQueen[turnIndex] = false;
         }
         else if(canKingMove(board, deltaFrom, deltaTo, turnIndex)) {
           stateAfterMove.board[deltaTo.row][deltaTo.col] = board[deltaFrom.row][deltaFrom.col];
           stateAfterMove.board[deltaFrom.row][deltaFrom.col] = '';
         } else {
-          throw new Error("Illegal move for king.");
+          throw new Error("Illegal move for King");
         }
+        //as soon as King moves, we can't castle anymore
+        stateAfterMove.delta.canCastleKing[turnIndex] = false;
+        stateAfterMove.delta.canCastleQueen[turnIndex] = false;
         break;
       case 'Q':
         if(canQueenMove(board, deltaFrom, deltaTo, turnIndex)) {
@@ -212,6 +211,21 @@ module gameLogic {
         } else {
           throw new Error("Illegal move for Rook");
         }
+        //Check for castling...
+        let castling_row:number = 0;
+        if(getTurn(turnIndex) === 'W'){
+            castling_row = 7; //White team is at the bottom
+        }
+        //as soon as Rook moves, we can't castle anymore (on 1/2 sides)
+        if(deltaFrom.row === castling_row){
+            if(deltaFrom.col === 0){
+                stateAfterMove.delta.canCastleQueen[turnIndex] = false;
+            }else if(deltaFrom.col === 7){
+                stateAfterMove.delta.canCastleKing[turnIndex] = false;
+            }
+        }
+        
+        
         break;
       case 'B':
         if(canBishopMove(board, deltaFrom, deltaTo, turnIndex)) {
@@ -450,52 +464,62 @@ module gameLogic {
   
   // Returns true if the conditions of castle to king side satisfied
   function isCastlingKing(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndex:number, canCastleKing:[boolean,boolean]) {
-    let caslingRow = 0;
-    if (getTurn(turnIndex) === 'W'){
-      caslingRow = 7;
+    if(!canCastleKing[turnIndex]){
+        return false;
     }
     if (isPositionUnderAttack(board, turnIndex, deltaFrom)) {
-      return false;
+        return false;
     }
-    if (canCastleKing[turnIndex] &&
-        deltaFrom.row === caslingRow &&
-        deltaFrom.col === 4 &&
-        deltaTo.col - deltaFrom.col === 2) {
-      for (let j = 5; j <= 6; j++) {
-        if (board[deltaFrom.row][j] !== '') {
-          return false;
+    let castling_row = 0;
+    if (getTurn(turnIndex) === 'W'){
+        castling_row = 7;
+    }
+    if (deltaFrom.row === castling_row && deltaFrom.col === 4 &&
+        deltaTo.row === castling_row && deltaTo.col === 6){
+        if(board[castling_row][7] !== getTurn(turnIndex) + 'R'){
+            return false; //checks for rook presence
         }
-        if (isPositionUnderAttack(board, turnIndex, {row: deltaFrom.row, col: j})) {
-          return false;
+        if(board[castling_row][5] !== '' || board[castling_row][6] !== ''){
+            return false; //check cells between king and rook are empty
         }
-      }
-      return board[caslingRow][7] === getTurn(turnIndex) + 'R';
+        if(isPositionUnderAttack(board, turnIndex, {row: castling_row, col: 5})
+            ||
+           isPositionUnderAttack(board, turnIndex, {row: castling_row, col: 6})){
+            return false; //check those empty cells can't be under attack
+        }
+        return true;
     }
     return false;
   }
-
+  
   // Returns true if the conditions of castle to queen side satisfied
   function isCastlingQueen(board:Board, deltaFrom:Pos, deltaTo:Pos, turnIndex:number, canCastleQueen:[boolean,boolean]) {
-    let caslingRow = 0;
-    if (getTurn(turnIndex) === 'W'){
-      caslingRow = 7;
+    if(!canCastleQueen[turnIndex]){
+        return false;
     }
     if (isPositionUnderAttack(board, turnIndex, deltaFrom)) {
-      return false;
+        return false;
     }
-    if (canCastleQueen[turnIndex] &&
-        deltaFrom.row === caslingRow &&
-        deltaFrom.col === 4 &&
-        deltaFrom.col - deltaTo.col === 2) {
-      for (let j = 1; j < 4; j++) {
-        if (board[deltaFrom.row][j] !== '') {
-          return false;
+    let castling_row = 0;
+    if (getTurn(turnIndex) === 'W'){
+        castling_row = 7;
+    }
+    if (deltaFrom.row === castling_row && deltaFrom.col === 4 &&
+        deltaTo.row === castling_row && deltaTo.col === 2){
+        if(board[castling_row][0] !== getTurn(turnIndex) + 'R'){
+            return false; //checks for rook presence
         }
-        if (isPositionUnderAttack(board, turnIndex, {row: deltaFrom.row, col: j})) {
-          return false;
+        if(board[castling_row][1] !== '' || board[castling_row][2] !== '' || board[castling_row][3] !== ''){
+            return false; //check cells between king and rook are empty
         }
-      }
-      return board[caslingRow][0] === getTurn(turnIndex) + 'R';
+        if(isPositionUnderAttack(board, turnIndex, {row: castling_row, col: 1})
+            ||
+           isPositionUnderAttack(board, turnIndex, {row: castling_row, col: 2})
+            ||
+           isPositionUnderAttack(board, turnIndex, {row: castling_row, col: 3})){
+            return false; //check those empty cells can't be under attack
+        }
+        return true; //all checks passed !
     }
     return false;
   }
