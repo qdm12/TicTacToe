@@ -15,15 +15,9 @@ interface IState {
 }
 
 module gameLogic {
-  let fiftymovecounter:number = 0;
+  let fiftymovecounter:number = 0; //XXX to put in delta
 
   export function getInitialState(): IState {
-    let delta:BoardDelta = {deltaFrom: null,
-                            deltaTo: null, 
-                            isUnderCheck: [false, false],
-                            canCastleKing: [true, true],
-                            canCastleQueen: [true, true],
-                            enpassantPosition: {row: null, col: null}};
     return {board: [
                    ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
                    ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'],
@@ -34,7 +28,13 @@ module gameLogic {
                    ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'],
                    ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR']
                    ],
-            delta: delta
+            delta: {deltaFrom: null,
+                    deltaTo: null, 
+                    isUnderCheck: [false, false],
+                    canCastleKing: [true, true],
+                    canCastleQueen: [true, true],
+                    enpassantPosition: {row: null, col: null}
+                   }
            };
   }
 
@@ -52,38 +52,32 @@ module gameLogic {
       for (let j = 0; j < 8; j++) {
         if (board[i][j] !== '' && board[i][j].charAt(0) === getTurn(turnIndex)) {
           let curPos = {row: i, col: j};
-          switch (board[i][j].charAt(1)) {
-            case 'K':
+          let pieceType:string = board[i][j].charAt(1);
+          if(pieceType === 'K'){
               if (canKingMoveAnywhere(board, turnIndex, curPos,
-                  isUnderCheck, canCastleKing, canCastleQueen)) {
+                isUnderCheck, canCastleKing, canCastleQueen)) {
                 return false;
               }
-              break;
-            case 'Q':
+          }else if(pieceType === 'Q'){
               if (canQueenMoveAnywhere(board, turnIndex, curPos)) {
                 return false;
               }
-              break;
-            case 'R':
+          }else if(pieceType === 'R'){
               if (canRookMoveAnywhere(board, turnIndex, curPos)) {
                 return false;
               }
-              break;
-            case 'B':
+          }else if(pieceType === 'B'){
               if (canBishopMoveAnywhere(board, turnIndex, curPos)) {
                 return false;
               }
-              break;
-            case 'N':
+          }else if(pieceType === 'N'){
               if (canKnightMoveAnywhere(board, turnIndex, curPos)) {
                 return false;
               }
-              break;
-            case 'P':
+          }else if(pieceType === 'P'){
               if (canPawnMoveAnywhere(board, turnIndex, curPos, enpassantPosition)) {
                 return false;
               }
-              break;
           }
         }
       }
@@ -349,7 +343,7 @@ module gameLogic {
     }
   }
 
-  export function forSimpleTestHtml() {
+  /* export function forSimpleTestHtml() {
     var move = gameLogic.createMove(null, 0); //XXX to change
     log.log("move=", move);
     var params: IStateTransition = {
@@ -358,7 +352,7 @@ module gameLogic {
       move: move,
       numberOfPlayers: 2};
     gameLogic.checkMoveOk(params);
-  }
+  } */
   
   /* Returns all the possible moves for the given state and turnIndex.
    * Returns an empty array if the game is over. */
@@ -367,9 +361,6 @@ module gameLogic {
                                    canCastleKing:[boolean,boolean],
                                    canCastleQueen:[boolean,boolean],
                                    enpassantPosition:Pos) {
-    if (!board) {
-      return [];
-    }
     let possibleMoves:any = [];
     let localpossibleMoves:any = [];
     for (let i = 0; i < 8; i++) {
