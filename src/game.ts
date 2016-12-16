@@ -21,7 +21,6 @@ module game {
   let maybeSendComputerMoveTimeout: ng.IPromise<any> = null;
   export let state: IState = null;
   // For community games.
-  export let proposals: number[][] = null;
   export let yourPlayerInfo: IPlayerInfo = null;
   
   let gameArea:any;
@@ -41,8 +40,6 @@ module game {
       maxNumberOfPlayers: 2,
       checkMoveOk: gameLogic.checkMoveOk,
       updateUI: updateUI,
-      communityUI: communityUI,
-      getStateForOgImage: null,
     });
     dragAndDropService.addDragListener("gameArea", handleDragEvent);
     gameArea = document.getElementById("gameArea");
@@ -64,52 +61,6 @@ module game {
     function getTranslations(): Translations {
         return {}; //XXX to fill in
     }
-
-  export function communityUI(communityUI: ICommunityUI) { //HELP
-    log.info("Game got communityUI:", communityUI);
-    // If only proposals changed, then do NOT call updateUI. Then update proposals.
-    let nextUpdateUI: IUpdateUI = {
-        playersInfo: [],
-        playMode: communityUI.yourPlayerIndex,
-        move: communityUI.move,
-        numberOfPlayers: communityUI.numberOfPlayers,
-        stateBeforeMove: communityUI.stateBeforeMove,
-        turnIndexBeforeMove: communityUI.turnIndexBeforeMove,
-        yourPlayerIndex: communityUI.yourPlayerIndex,
-      };
-    if (angular.equals(yourPlayerInfo, communityUI.yourPlayerInfo) &&
-        currentUpdateUI && angular.equals(currentUpdateUI, nextUpdateUI)) {
-      // We're not calling updateUI to avoid disrupting the player if he's in the middle of a move.
-    } else {
-      // Things changed, so call updateUI.
-      updateUI(nextUpdateUI);
-    }
-    // This must be after calling updateUI, because we nullify things there (like playerIdToProposal&proposals&etc)
-    yourPlayerInfo = communityUI.yourPlayerInfo;
-    let playerIdToProposal = communityUI.playerIdToProposal; 
-    didMakeMove = !!playerIdToProposal[communityUI.yourPlayerInfo.playerId];
-    proposals = [];
-    for (let i = 0; i < 8; i++) {
-      proposals[i] = [];
-      for (let j = 0; j < 8; j++) {
-        proposals[i][j] = 0;
-      }
-    }
-    for (let playerId in playerIdToProposal) {
-      let proposal = playerIdToProposal[playerId];
-      let delta = proposal.data;
-      proposals[delta.deltaFrom.row][delta.deltaFrom.col]++; //XXX that might be wrong
-    }
-  }
-  export function isProposal(row: number, col: number) {
-    return proposals && proposals[row][col] > 0;
-  } 
-  export function isProposal1(row: number, col: number) {
-    return proposals && proposals[row][col] == 1;
-  } 
-  export function isProposal2(row: number, col: number) {
-    return proposals && proposals[row][col] == 2;
-  }
   
   export function updateUI(params: IUpdateUI): void {
     log.info("Game got updateUI:", params);
@@ -319,24 +270,10 @@ module game {
     if(gameOver(move.endMatchScores)){
         return;
     }
-    if (!proposals) {
-      moveService.makeMove(move);
-    } else {
-      let delta = move.stateAfterMove.delta;
-      let myProposal:IProposal = {
-        data: delta,
-        chatDescription: '' + (delta.deltaTo.row + 1) + 'x' + (delta.deltaTo.col + 1),
-        playerInfo: yourPlayerInfo,
-      };
-      // Decide whether we make a move or not (if we have 2 other proposals supporting the same thing).
-      if (proposals[delta.deltaTo.row][delta.deltaTo.col] < 2) { //XXX That might be wrong HELP
-        move = null;
-      }
-      moveService.communityMove(myProposal, move);
-    }
+    moveService.makeMove(move);
   }
   
-  function gameOver(endMatchScores:number[]):boolean{
+  function gameOver(endMatchScores:number[]):boolean{ //XXX ERROR here
     let message:string = "Game over ! ";
     if(angular.equals(endMatchScores, [0,0])){
         message += "Game ended in a Tie";
@@ -345,7 +282,7 @@ module game {
     }else if(angular.equals(endMatchScores, [0,1])){
         message += "Black team has won";
     }
-    if(endMatchScores){ //to change for community use
+    if(endMatchScores){
         alert(message);
         return true;
     }
@@ -353,7 +290,7 @@ module game {
   }
   
     export let shouldShowImage = function(row:number, col:number) {
-        return state.board[row][col] !== "" || isProposal(row, col); //HELP
+        return state.board[row][col] !== "";
     };
 
     export let getImageSrc = function(row:number, col:number) {
@@ -457,8 +394,7 @@ module game {
         return -1;
     }
     function isPiece(row: number, col: number, turnIndex: number, pieceKind: string): boolean {
-        return state.board[row][col].charAt(0) === pieceKind ||
-                (isProposal(row, col) && currentUpdateUI.move.turnIndexAfterMove == turnIndex);
+        return state.board[row][col].charAt(0) === pieceKind;
     }
   
   export function isBlackPiece(row: number, col: number): boolean {
