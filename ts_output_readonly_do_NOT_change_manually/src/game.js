@@ -16,6 +16,7 @@ var game;
     var draggingPiece = null;
     var draggingPieceAvailableMoves = null;
     var rotated = false;
+    var game_is_over = false;
     var waitTime_RotateBoard = 300;
     var waitTime_PlayAIlift = 1500;
     var waitTime_SendComputerMove = 2200;
@@ -130,7 +131,7 @@ var game;
         makeMove(nextMove);
     }
     function handleDragEvent(type, clientX, clientY) {
-        if (isComputerTurn()) {
+        if (isComputerTurn() || game_is_over) {
             return; //We can't drag a piece that has to be played by AI.
         }
         // Center point in gameArea
@@ -253,7 +254,7 @@ var game;
         game.didMakeMove = true;
         var audio = new Audio('sounds/piece_drop.wav');
         audio.play();
-        gameOver(move.endMatchScores);
+        game_is_over = gameOver(move.endMatchScores);
         moveService.makeMove(move);
     }
     function gameOver(endMatchScores) {

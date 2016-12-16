@@ -1,6 +1,5 @@
 var gameLogic;
 (function (gameLogic) {
-    var fiftymovecounter = 0; //XXX to put in delta
     function getInitialState() {
         return { board: [
                 ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
@@ -132,7 +131,10 @@ var gameLogic;
         }
         if (getWinner(board, turnIndex, stateBeforeMove.delta.isUnderCheck, stateBeforeMove.delta.canCastleKing, stateBeforeMove.delta.canCastleQueen, enpassantPosition)
             ||
-                isTie(board, turnIndex, stateBeforeMove.delta.isUnderCheck, stateBeforeMove.delta.canCastleKing, stateBeforeMove.delta.canCastleQueen, enpassantPosition)) {
+                isTie(board, turnIndex, stateBeforeMove.delta.isUnderCheck, stateBeforeMove.delta.canCastleKing, stateBeforeMove.delta.canCastleQueen, enpassantPosition)
+            ||
+                //Note: A chess "move" = 2 turns so 50 moves are reached when fiftymovecounter = 100.
+                stateAfterMove.delta.fiftymovecounter >= 100) {
             throw new Error("Can only make a move if the game is not over!");
         }
         if (getTurn(turnIndex) !== board[deltaFrom.row][deltaFrom.col].charAt(0)) {

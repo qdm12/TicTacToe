@@ -26,6 +26,7 @@ module game {
   let draggingPiece:any = null;
   let draggingPieceAvailableMoves:any = null;
   let rotated:boolean = false;
+  let game_is_over:boolean = false;
   let waitTime_RotateBoard:number = 300;
   let waitTime_PlayAIlift:number = 1500;
   let waitTime_SendComputerMove:number = 2200;
@@ -149,7 +150,7 @@ module game {
   
   
     function handleDragEvent(type:string, clientX:number, clientY:number) {
-        if(isComputerTurn()){
+        if(isComputerTurn() || game_is_over){
             return; //We can't drag a piece that has to be played by AI.
         }
         // Center point in gameArea
@@ -280,7 +281,7 @@ module game {
     didMakeMove = true;
     let audio = new Audio('sounds/piece_drop.wav');
     audio.play();
-    gameOver(move.endMatchScores);
+    game_is_over = gameOver(move.endMatchScores);
     moveService.makeMove(move);
   }
   
