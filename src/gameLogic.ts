@@ -44,9 +44,33 @@ module gameLogic {
                  isUnderCheck:[boolean,boolean],
                  canCastleKing:[boolean,boolean],
                  canCastleQueen:[boolean,boolean], 
-                 enpassantPosition:Pos):boolean{
+                 enpassantPosition:Pos,
+                 fiftymovecounter:number):boolean{
     if (isUnderCheck[turnIndex]) {
       return false;
+    }
+    //Note: A chess "move" = 2 turns so 50 moves are reached when fiftymovecounter = 100.
+    if(fiftymovecounter >= 100){
+        let white_n_pieces:number = 0;
+        let black_n_pieces:number = 0;
+        for (let i = 0; i < 8; i++) {
+          for (let j = 0; j < 8; j++) {
+              if(board[i][j]){
+                  //there is another piece than the King in the game
+                  //Find out which team has the most pieces
+                  if(board[i][j].charAt(0) === 'W'){
+                      white_n_pieces++;
+                  }else{
+                      black_n_pieces++;
+                  }
+              }
+          }
+        }
+        if(white_n_pieces === black_n_pieces){
+            return true; //2 kings or N number of pieces in each team not doing anything.
+        }
+        
+        return false; //Because there is a team with more pieces, this team should win.
     }
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
@@ -91,7 +115,33 @@ module gameLogic {
                      isUnderCheck:[boolean,boolean],
                      canCastleKing:[boolean,boolean],
                      canCastleQueen:[boolean,boolean],
-                     enpassantPosition:Pos): string {
+                     enpassantPosition:Pos,
+                     fiftymovecounter:number): string {
+    //Note: A chess "move" = 2 turns so 50 moves are reached when fiftymovecounter = 100.
+    if(fiftymovecounter >= 100){
+        let white_n_pieces:number = 0;
+        let black_n_pieces:number = 0;
+        for (let i = 0; i < 8; i++) {
+          for (let j = 0; j < 8; j++) {
+              if(board[i][j]){
+                  //there is another piece than the King in the game
+                  //Find out which team has the most pieces
+                  if(board[i][j].charAt(0) === 'W'){
+                      white_n_pieces++;
+                  }else{
+                      black_n_pieces++;
+                  }
+              }
+          }
+        }
+        if(white_n_pieces > black_n_pieces){
+            return 'W';
+        }else if(white_n_pieces < black_n_pieces){
+            return 'B';
+        }else{ //white_n_pieces === black_n_pieces game is tie
+            return '';
+        }
+    }
     if (!isUnderCheck[turnIndex]) {
       return '';
     }
@@ -155,13 +205,10 @@ module gameLogic {
       throw new Error("One can only make a move in an empty position or capture opponent's piece!");
     }
     if (getWinner(board, turnIndex, stateBeforeMove.delta.isUnderCheck, stateBeforeMove.delta.canCastleKing,
-                  stateBeforeMove.delta.canCastleQueen, enpassantPosition)
+                  stateBeforeMove.delta.canCastleQueen, enpassantPosition, stateBeforeMove.delta.fiftymovecounter)
         ||
         isTie(board, turnIndex, stateBeforeMove.delta.isUnderCheck, stateBeforeMove.delta.canCastleKing,
-              stateBeforeMove.delta.canCastleQueen, enpassantPosition)
-        ||
-        //Note: A chess "move" = 2 turns so 50 moves are reached when fiftymovecounter = 100.
-        stateAfterMove.delta.fiftymovecounter >= 100){
+              stateBeforeMove.delta.canCastleQueen, enpassantPosition, stateBeforeMove.delta.fiftymovecounter)){
       throw new Error("Can only make a move if the game is not over!");
     }
     if (getTurn(turnIndex) !== board[deltaFrom.row][deltaFrom.col].charAt(0)) {
@@ -287,8 +334,10 @@ module gameLogic {
     if(stateBeforeMove.board[deltaFrom.row][deltaFrom.col] === getTurn(turnIndex) + 'P'){
         stateAfterMove.delta.fiftymovecounter = 0; //If this was a pawn move, reset the counter
     }
-    if(getOpponent(turnIndex) === stateBeforeMove.board[deltaTo.row][deltaTo.col].charAt(0)){
-        stateAfterMove.delta.fiftymovecounter = 0; //If this was an attack move, reset the counter
+    if(stateBeforeMove.board[deltaTo.row][deltaTo.col]){
+        if(getOpponent(turnIndex) === stateBeforeMove.board[deltaTo.row][deltaTo.col].charAt(0)){
+            stateAfterMove.delta.fiftymovecounter = 0; //If this was an attack move, reset the counter
+        }
     }
     turnIndex = 1 - turnIndex;
     if (isUnderCheckByPositions(stateAfterMove.board, turnIndex)) {
@@ -299,12 +348,13 @@ module gameLogic {
                            stateAfterMove.delta.isUnderCheck,
                            stateAfterMove.delta.canCastleKing,
                            stateAfterMove.delta.canCastleQueen,
-                           stateAfterMove.delta.enpassantPosition);
+                           stateAfterMove.delta.enpassantPosition,
+                           stateAfterMove.delta.fiftymovecounter);
     let endMatchScores: number[];
     if (winner === 'W'){
       endMatchScores = [1,0];
       turnIndex = -1;
-    } else if (winner == 'B'){
+    } else if (winner === 'B'){
       endMatchScores = [0,1];
       turnIndex = -1;
     } else if (isTie(stateAfterMove.board,
@@ -312,10 +362,8 @@ module gameLogic {
                      stateAfterMove.delta.isUnderCheck,
                      stateAfterMove.delta.canCastleKing,
                      stateAfterMove.delta.canCastleQueen,
-                     stateAfterMove.delta.enpassantPosition)
-                ||
-                //Note: A chess "move" = 2 turns so 50 moves are reached when fiftymovecounter = 100.
-                stateAfterMove.delta.fiftymovecounter >= 100){
+                     stateAfterMove.delta.enpassantPosition,
+                     stateAfterMove.delta.fiftymovecounter)){
       endMatchScores = [0,0];
       turnIndex = -1;
     }else{
