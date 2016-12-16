@@ -13,7 +13,7 @@ Vagrant.configure(2) do |config|
     sudo apt-get install -y nodejs
     sudo apt-get -y autoremove
     cd /vagrant
-    sudo npm install --no-optional
+    sudo npm install --no-optional --no-bin-links
     # Make vi look nice
     echo "colorscheme desert" > ~/.vimrc
   SHELL
