@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for src/aiService.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">src/</a> aiService.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>81/81</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>22/22</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>6/6</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>81/81</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-yes">150×</span>
+<span class="cline-any cline-yes">150×</span>
+<span class="cline-any cline-yes">32×</span>
+<span class="cline-any cline-yes">32×</span>
+<span class="cline-any cline-yes">67×</span>
+<span class="cline-any cline-yes">67×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">67×</span>
+<span class="cline-any cline-yes">67×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">67×</span>
+<span class="cline-any cline-yes">67×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">65×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">var aiService;
+(function (aiService) {
+    //10 Pawns, 5 Knight, 3 Bishops, 3 rooks, 2 queen, 1 king
+    var RandomList = ['P', 'N', 'P', 'B', 'P', 'N', 'P', 'B', 'N', 'P', 'B', 'P', 'R', 'P', 'N', 'R', 'Q', 'N', 'P', 'Q', 'P', 'R', 'K', 'P'];
+    aiService.RListSize = RandomList.length;
+    aiService.pieceTypeIndex = Math.floor(Math.random() * RandomList.length);
+    //overwrite initial pieceTypeIndex for unit testing    
+    /** Returns the move that the computer player should do for the given state in move. */
+    function createComputerMove(move) {
+        var next_move;
+        next_move = findAttackMove(move);
+        if (next_move === null) {
+            next_move = findRingMove(move); //find a "random" move
+        }
+        //if there is no move possible at all, next_move is null
+        return next_move;
+    }
+    aiService.createComputerMove = createComputerMove;
+    function findAttackMove(move) {
+        var board = move.stateAfterMove.board;
+        var turnIndex = move.turnIndexAfterMove;
+        var isUnderCheck = move.stateAfterMove.delta.isUnderCheck;
+        var canCastleKing = move.stateAfterMove.delta.canCastleKing;
+        var canCastleQueen = move.stateAfterMove.delta.canCastleQueen;
+        var enpassantPosition = move.stateAfterMove.delta.enpassantPosition;
+        var possible_moves = gameLogic.getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
+        if (!possible_moves.length) {
+            throw new Error("AI: There is no possible move anymore.");
+        }
+        //Searches for attack move
+        var deltaFrom;
+        var deltaTo;
+        var PriorityList = ['P', 'N', 'B', 'R', 'Q', 'K'];
+        var possible_destinations;
+        for (var p = 0; p &lt; PriorityList.length; p++) {
+            for (var i = 0; i &lt; possible_moves.length; i++) {
+                deltaFrom = possible_moves[i][0];
+                if (board[deltaFrom.row][deltaFrom.col].charAt(1) === PriorityList[p]) {
+                    possible_destinations = possible_moves[i][1];
+                    for (var j = 0; j &lt; possible_destinations.length; j++) {
+                        deltaTo = possible_destinations[j];
+                        if (isEnnemyCell(turnIndex, board, deltaTo)) {
+                            move.stateAfterMove.delta.deltaFrom = deltaFrom;
+                            move.stateAfterMove.delta.deltaTo = deltaTo;
+                            return gameLogic.createMove(move.stateAfterMove, turnIndex);
+                        }
+                    }
+                }
+            }
+        }
+        return null; //No attack move found
+    }
+    function isEnnemyCell(turnIndex, board, deltaTo) {
+        var teamIndex = findCellTeamIndex(board, deltaTo);
+        return teamIndex === 1 - turnIndex;
+    }
+    function findCellTeamIndex(board, deltaTo) {
+        var team = board[deltaTo.row][deltaTo.col].charAt(0);
+        if (team === 'W') {
+            return 0;
+        }
+        else if (team === 'B') {
+            return 1; //Black team
+        }
+        else {
+            return -1; //Empty cell
+        }
+    }
+    function findRingMove(move) {
+        var board = move.stateAfterMove.board;
+        var turnIndex = move.turnIndexAfterMove;
+        var isUnderCheck = move.stateAfterMove.delta.isUnderCheck;
+        var canCastleKing = move.stateAfterMove.delta.canCastleKing;
+        var canCastleQueen = move.stateAfterMove.delta.canCastleQueen;
+        var enpassantPosition = move.stateAfterMove.delta.enpassantPosition;
+        var possible_moves = gameLogic.getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
+        var deltaFrom;
+        var deltaTo;
+        var possible_destinations;
+        var possible_origin_indexes = [];
+        while (possible_origin_indexes.length === 0) {
+            for (var i = 0; i &lt; possible_moves.length; i++) {
+                deltaFrom = possible_moves[i][0];
+                if (board[deltaFrom.row][deltaFrom.col].charAt(1) === RandomList[aiService.pieceTypeIndex]) {
+                    possible_origin_indexes.push(i);
+                }
+            }
+            if (possible_origin_indexes.length === 0) {
+                aiService.pieceTypeIndex++;
+                if (aiService.pieceTypeIndex === aiService.RListSize) {
+                    aiService.pieceTypeIndex = 0;
+                }
+            }
+        }
+        //We have found at least one origin for the type RandomList[pieceTypeIndex]
+        var origin_index = aiService.pieceTypeIndex % possible_origin_indexes.length; //"Random"
+        var pm_index = possible_origin_indexes[origin_index];
+        deltaFrom = possible_moves[pm_index][0];
+        possible_destinations = possible_moves[pm_index][1];
+        var pd_index = aiService.pieceTypeIndex % possible_destinations.length; //"Random"
+        deltaTo = possible_destinations[pd_index];
+        move.stateAfterMove.delta.deltaFrom = deltaFrom;
+        move.stateAfterMove.delta.deltaTo = deltaTo;
+        aiService.pieceTypeIndex++; //changes the piece Type for next AI move
+        if (aiService.pieceTypeIndex === aiService.RListSize) {
+            aiService.pieceTypeIndex = 0; //reset the index when it reaches its max
+        }
+        return gameLogic.createMove(move.stateAfterMove, turnIndex);
+    }
+})(aiService || (aiService = {}));
+//# sourceMappingURL=aiService.js.map</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Dec 15 2016 22:54:48 GMT-0500 (EST)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>
