@@ -31,9 +31,6 @@
     "protractor": "*",
     "typescript": "*"
   },
-  "optionalDependencies": {
-    "fsevents": "*"
-  },
   "scripts": {
     "postinstall": "webdriver-manager update",
     "prestart": "npm install",
