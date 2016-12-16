@@ -41,7 +41,8 @@ describe("In Chess", function() {
                       canCastleQueenBeforeMove: [boolean, boolean],
                       canCastleQueenAfterMove: [boolean, boolean],
                       enpassantPositionBeforeMove:Pos,
-                      enpassantPositionAfterMove:Pos):void{
+                      enpassantPositionAfterMove:Pos,
+                      fiftymovecounterAfterMove:number):void{
     let stateBeforeMove:IState = {
         board:boardBeforeMove,
         delta:{
@@ -50,7 +51,8 @@ describe("In Chess", function() {
             isUnderCheck:isUnderCheckBeforeMove,
             canCastleKing:canCastleKingBeforeMove,
             canCastleQueen:canCastleQueenBeforeMove,
-            enpassantPosition:enpassantPositionBeforeMove
+            enpassantPosition:enpassantPositionBeforeMove,
+            fiftymovecounter:0
         }
     };
     let stateTransition: IStateTransition = {
@@ -65,7 +67,8 @@ describe("In Chess", function() {
                                       isUnderCheck:isUnderCheckAfterMove,
                                       canCastleKing:canCastleKingAfterMove,
                                       canCastleQueen:canCastleQueenAfterMove,
-                                      enpassantPosition:enpassantPositionAfterMove}
+                                      enpassantPosition:enpassantPositionAfterMove,
+                                      fiftymovecounter:fiftymovecounterAfterMove}
                               }
              }
     };
@@ -164,7 +167,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        0); //enpassantPositionAfterMove
   });
   
   it("Playing legally but setting the turn back to myself is illegal", function() {
@@ -204,7 +208,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        0); //enpassantPositionAfterMove
   });
   
   it("Not moving is illegal", function() {
@@ -244,7 +249,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        0); //enpassantPositionAfterMove
   });
   
   it("Moving and cloning is illegal", function() {
@@ -284,7 +290,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        0); //enpassantPositionAfterMove
   });
   
   it("Moving to a friendly piece is illegal", function() {
@@ -324,7 +331,8 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        1); //enpassantPositionAfterMove
   });
   
   it("Illegal piece type is illegal", function() {
@@ -364,7 +372,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        0); //enpassantPositionAfterMove
   });
   
   it("Playing without winning making you win is illegal", function() {
@@ -404,7 +413,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        0); //enpassantPositionAfterMove
   });
   
   it("Moving a piece out of the board is illegal", function() {
@@ -444,7 +454,8 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        1); //enpassantPositionAfterMove
   });
   
 
@@ -499,7 +510,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        0); //enpassantPositionAfterMove
   });
   
   it("Pawn: Moving WP from 6x0 to 4x0 is legal", function() {
@@ -539,7 +551,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        0); //enpassantPositionAfterMove
   });
   
   it("Pawn: Attacking with WP from 6x0 to 5x1 is legal", function() {
@@ -579,7 +592,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        0); //enpassantPositionAfterMove
   });
   
   it("Pawn: Attacking en passant with WP from 4x0 to 3x1 is legal", function() {
@@ -619,7 +633,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: 4, col: 1}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        0); //enpassantPositionAfterMove
   });
   
   it("Pawn: Moving to an en passant attack position (black) is legal", function() {
@@ -659,7 +674,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: 3, col: 1}); //enpassantPositionAfterMove
+        {row: 3, col: 1},
+        0); //enpassantPositionAfterMove
   });
   
   it("Pawn: Moving to an en passant attack position (white) is legal", function() {
@@ -699,7 +715,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: 4, col: 0}); //enpassantPositionAfterMove
+        {row: 4, col: 0},
+        0); //enpassantPositionAfterMove
   });
   
   it("Pawn: Promoting pawn to Queen is legal", function() {
@@ -739,7 +756,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        0); //enpassantPositionAfterMove
   });
   
   it("Pawn: Moving WP from 5x0 to 3x0 is illegal", function() {
@@ -779,7 +797,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        0); //enpassantPositionAfterMove
   });
   
   //BISHOP MOVEMENTS
@@ -820,7 +839,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        1); //enpassantPositionAfterMove
   });
   
   it("Bishop: Move of bishop is illegal", function() {
@@ -860,7 +880,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        1); //enpassantPositionAfterMove
   });
   
   
@@ -905,7 +926,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        1); //enpassantPositionAfterMove
   });
   
   it("Queen: Move of queen is illegal", function() {
@@ -945,7 +967,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        1); //enpassantPositionAfterMove
   });
   
  
@@ -987,7 +1010,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        1); //enpassantPositionAfterMove
   });
   
   it("Knight: Attacking an ennemy piece is legal", function() {
@@ -1027,7 +1051,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        0); //enpassantPositionAfterMove
   });
   
   it("Knight: Moving in a straight line is illegal", function() {
@@ -1067,7 +1092,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        1); //enpassantPositionAfterMove
   });
   
   
@@ -1111,7 +1137,8 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        1); //enpassantPositionAfterMove
   });
   
   it("King: Move of king is illegal", function() {
@@ -1151,7 +1178,8 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        1); //enpassantPositionAfterMove
   });
 
 
@@ -1195,7 +1223,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        1); //enpassantPositionAfterMove
   });
   
   it("Rook: Move of rook (Black, King side) is legal", function() {
@@ -1235,7 +1264,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null},
+        1); //enpassantPositionAfterMove
   });
   
   it("Rook: Move of rook is illegal", function() {
@@ -1275,7 +1305,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
   });
   
   
@@ -1327,7 +1358,8 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("IsTie: Bishop can move", function() {
@@ -1367,7 +1399,8 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("IsTie: Rook can move", function() {
@@ -1407,7 +1440,8 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("IsTie: Queen can move", function() {
@@ -1447,7 +1481,8 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("IsTie: None can move", function() { //XXX ERROR
@@ -1487,7 +1522,8 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove
   });
 
 
@@ -1538,7 +1574,8 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
   });
   
   
@@ -1579,7 +1616,8 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("Undercheck Black winner with extra white Queen", function() {
@@ -1619,7 +1657,8 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("Undercheck Black winner with extra white rook", function() {
@@ -1659,7 +1698,8 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("Undercheck Black winner with extra white bishop", function() {
@@ -1699,7 +1739,8 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("Undercheck Black winner with extra white knight", function() {
@@ -1739,7 +1780,8 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
   });
   
  
@@ -1780,7 +1822,8 @@ describe("In Chess", function() {
         [false, true], //canCastleQueenBeforeMove
         [false, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Undercheck but Rook can save the King is legal", function() {
@@ -1820,7 +1863,8 @@ describe("In Chess", function() {
         [false, true], //canCastleQueenBeforeMove
         [false, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Undercheck but Bishop can save the King is legal", function() {
@@ -1860,7 +1904,8 @@ describe("In Chess", function() {
         [false, true], //canCastleQueenBeforeMove
         [false, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Undercheck but Knight can save the King is legal", function() {
@@ -1900,7 +1945,8 @@ describe("In Chess", function() {
         [false, true], //canCastleQueenBeforeMove
         [false, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Undercheck but Pawn can save the King is legal", function() {
@@ -1940,7 +1986,8 @@ describe("In Chess", function() {
         [false, true], //canCastleQueenBeforeMove
         [false, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove
   });
   
 
@@ -1982,7 +2029,8 @@ describe("In Chess", function() {
         [true, false], //canCastleQueenBeforeMove
         [true, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove)
   });
   
 
@@ -2027,7 +2075,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("Castling king on the queen side is legal", function() {
@@ -2067,7 +2116,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("Castling king if king is already under attack is illegal", function() {
@@ -2107,7 +2157,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("Castling king on the king side if any empty cell is under attack is illegal", function() {
@@ -2147,7 +2198,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("Castling king on the queen side if any empty cell is under attack is illegal", function() {
@@ -2187,7 +2239,8 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null}); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
   });
   
 

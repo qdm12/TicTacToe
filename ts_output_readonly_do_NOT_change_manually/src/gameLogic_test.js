@@ -26,7 +26,7 @@ describe("In Chess", function () {
             }
         }
     }
-    function expectMove(isOk, endMatchScores, deltaFrom, deltaTo, turnIndexBeforeMove, turnIndexAfterMove, boardBeforeMove, boardAfterMove, isUnderCheckBeforeMove, isUnderCheckAfterMove, canCastleKingBeforeMove, canCastleKingAfterMove, canCastleQueenBeforeMove, canCastleQueenAfterMove, enpassantPositionBeforeMove, enpassantPositionAfterMove) {
+    function expectMove(isOk, endMatchScores, deltaFrom, deltaTo, turnIndexBeforeMove, turnIndexAfterMove, boardBeforeMove, boardAfterMove, isUnderCheckBeforeMove, isUnderCheckAfterMove, canCastleKingBeforeMove, canCastleKingAfterMove, canCastleQueenBeforeMove, canCastleQueenAfterMove, enpassantPositionBeforeMove, enpassantPositionAfterMove, fiftymovecounterAfterMove) {
         var stateBeforeMove = {
             board: boardBeforeMove,
             delta: {
@@ -35,7 +35,8 @@ describe("In Chess", function () {
                 isUnderCheck: isUnderCheckBeforeMove,
                 canCastleKing: canCastleKingBeforeMove,
                 canCastleQueen: canCastleQueenBeforeMove,
-                enpassantPosition: enpassantPositionBeforeMove
+                enpassantPosition: enpassantPositionBeforeMove,
+                fiftymovecounter: 0
             }
         };
         var stateTransition = {
@@ -50,7 +51,8 @@ describe("In Chess", function () {
                         isUnderCheck: isUnderCheckAfterMove,
                         canCastleKing: canCastleKingAfterMove,
                         canCastleQueen: canCastleQueenAfterMove,
-                        enpassantPosition: enpassantPositionAfterMove }
+                        enpassantPosition: enpassantPositionAfterMove,
+                        fiftymovecounter: fiftymovecounterAfterMove }
                 }
             }
         };
@@ -143,7 +145,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 0); //enpassantPositionAfterMove
     });
     it("Playing legally but setting the turn back to myself is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -179,7 +181,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 0); //enpassantPositionAfterMove
     });
     it("Not moving is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -215,7 +217,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 0); //enpassantPositionAfterMove
     });
     it("Moving and cloning is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -251,7 +253,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 0); //enpassantPositionAfterMove
     });
     it("Moving to a friendly piece is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -287,7 +289,7 @@ describe("In Chess", function () {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 1); //enpassantPositionAfterMove
     });
     it("Illegal piece type is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -323,7 +325,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 0); //enpassantPositionAfterMove
     });
     it("Playing without winning making you win is illegal", function () {
         expectMove(ILLEGAL, [0, 1], //endMatchScores
@@ -359,7 +361,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 0); //enpassantPositionAfterMove
     });
     it("Moving a piece out of the board is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -395,7 +397,7 @@ describe("In Chess", function () {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 1); //enpassantPositionAfterMove
     });
     //PAWN MOVEMENTS  
     it("Pawn: Moving WP from 6x0 to 5x0 is legal", function () {
@@ -432,7 +434,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 0); //enpassantPositionAfterMove
     });
     it("Pawn: Moving WP from 6x0 to 4x0 is legal", function () {
         expectMove(OK, null, //endMatchScores
@@ -468,7 +470,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 0); //enpassantPositionAfterMove
     });
     it("Pawn: Attacking with WP from 6x0 to 5x1 is legal", function () {
         expectMove(OK, null, //endMatchScores
@@ -504,7 +506,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 0); //enpassantPositionAfterMove
     });
     it("Pawn: Attacking en passant with WP from 4x0 to 3x1 is legal", function () {
         expectMove(OK, null, //endMatchScores
@@ -540,7 +542,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: 4, col: 1 }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 0); //enpassantPositionAfterMove
     });
     it("Pawn: Moving to an en passant attack position (black) is legal", function () {
         expectMove(OK, null, //endMatchScores
@@ -576,7 +578,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: 3, col: 1 }); //enpassantPositionAfterMove
+        { row: 3, col: 1 }, 0); //enpassantPositionAfterMove
     });
     it("Pawn: Moving to an en passant attack position (white) is legal", function () {
         expectMove(OK, null, //endMatchScores
@@ -612,7 +614,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: 4, col: 0 }); //enpassantPositionAfterMove
+        { row: 4, col: 0 }, 0); //enpassantPositionAfterMove
     });
     it("Pawn: Promoting pawn to Queen is legal", function () {
         expectMove(OK, null, //endMatchScores
@@ -648,7 +650,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 0); //enpassantPositionAfterMove
     });
     it("Pawn: Moving WP from 5x0 to 3x0 is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -684,7 +686,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 0); //enpassantPositionAfterMove
     });
     //BISHOP MOVEMENTS
     it("Bishop: Move of bishop is legal", function () {
@@ -721,7 +723,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 1); //enpassantPositionAfterMove
     });
     it("Bishop: Move of bishop is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -757,7 +759,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 1); //enpassantPositionAfterMove
     });
     //QUEEN MOVEMENTS
     it("Queen: Move of queen is legal", function () {
@@ -794,7 +796,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 1); //enpassantPositionAfterMove
     });
     it("Queen: Move of queen is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -830,7 +832,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 1); //enpassantPositionAfterMove
     });
     //KNIGHT MOVEMENTS
     it("Knight: Moving above a piece is legal", function () {
@@ -867,7 +869,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 1); //enpassantPositionAfterMove
     });
     it("Knight: Attacking an ennemy piece is legal", function () {
         expectMove(OK, null, //endMatchScores
@@ -903,7 +905,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 0); //enpassantPositionAfterMove
     });
     it("Knight: Moving in a straight line is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -939,7 +941,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 1); //enpassantPositionAfterMove
     });
     //KING MOVEMENTS
     it("King: Move of king is legal", function () {
@@ -976,7 +978,7 @@ describe("In Chess", function () {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 1); //enpassantPositionAfterMove
     });
     it("King: Move of king is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -1012,7 +1014,7 @@ describe("In Chess", function () {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 1); //enpassantPositionAfterMove
     });
     //ROOK MOVEMENTS
     it("Rook: Move of rook (Black, Queen side) is legal", function () {
@@ -1049,7 +1051,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 1); //enpassantPositionAfterMove
     });
     it("Rook: Move of rook (Black, King side) is legal", function () {
         expectMove(OK, null, //endMatchScores
@@ -1085,7 +1087,7 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, 1); //enpassantPositionAfterMove
     });
     it("Rook: Move of rook is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -1121,7 +1123,8 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
     });
     //ISTIE MOVEMENTS
     it("IsTie: Only Pawns can move", function () {
@@ -1158,7 +1161,8 @@ describe("In Chess", function () {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove
     });
     it("IsTie: Bishop can move", function () {
         expectMove(OK, null, //endMatchScores
@@ -1194,7 +1198,8 @@ describe("In Chess", function () {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
     });
     it("IsTie: Rook can move", function () {
         expectMove(OK, null, //endMatchScores
@@ -1230,7 +1235,8 @@ describe("In Chess", function () {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
     });
     it("IsTie: Queen can move", function () {
         expectMove(OK, null, //endMatchScores
@@ -1266,7 +1272,8 @@ describe("In Chess", function () {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
     });
     it("IsTie: None can move", function () {
         expectMove(OK, [0, 0], //endMatchScores
@@ -1302,7 +1309,8 @@ describe("In Chess", function () {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove
     });
     //UNDERCHECK MOVEMENTS
     it("Undercheck Black winner", function () {
@@ -1339,7 +1347,8 @@ describe("In Chess", function () {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
     });
     it("Undercheck White winner", function () {
         expectMove(OK, [1, 0], //endMatchScores
@@ -1375,7 +1384,8 @@ describe("In Chess", function () {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
     });
     it("Undercheck Black winner with extra white Queen", function () {
         expectMove(OK, [0, 1], //endMatchScores
@@ -1411,7 +1421,8 @@ describe("In Chess", function () {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
     });
     it("Undercheck Black winner with extra white rook", function () {
         expectMove(OK, [0, 1], //endMatchScores
@@ -1447,7 +1458,8 @@ describe("In Chess", function () {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
     });
     it("Undercheck Black winner with extra white bishop", function () {
         expectMove(OK, [0, 1], //endMatchScores
@@ -1483,7 +1495,8 @@ describe("In Chess", function () {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
     });
     it("Undercheck Black winner with extra white knight", function () {
         expectMove(OK, [0, 1], //endMatchScores
@@ -1519,7 +1532,8 @@ describe("In Chess", function () {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
     });
     it("Undercheck but Queen can save the King is legal", function () {
         expectMove(OK, null, //endMatchScores
@@ -1555,7 +1569,8 @@ describe("In Chess", function () {
         [false, true], //canCastleQueenBeforeMove
         [false, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove
     });
     it("Undercheck but Rook can save the King is legal", function () {
         expectMove(OK, null, //endMatchScores
@@ -1591,7 +1606,8 @@ describe("In Chess", function () {
         [false, true], //canCastleQueenBeforeMove
         [false, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove
     });
     it("Undercheck but Bishop can save the King is legal", function () {
         expectMove(OK, null, //endMatchScores
@@ -1627,7 +1643,8 @@ describe("In Chess", function () {
         [false, true], //canCastleQueenBeforeMove
         [false, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove
     });
     it("Undercheck but Knight can save the King is legal", function () {
         expectMove(OK, null, //endMatchScores
@@ -1663,7 +1680,8 @@ describe("In Chess", function () {
         [false, true], //canCastleQueenBeforeMove
         [false, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove
     });
     it("Undercheck but Pawn can save the King is legal", function () {
         expectMove(OK, null, //endMatchScores
@@ -1699,7 +1717,8 @@ describe("In Chess", function () {
         [false, true], //canCastleQueenBeforeMove
         [false, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove
     });
     it("King is missing from game is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -1735,7 +1754,8 @@ describe("In Chess", function () {
         [true, false], //canCastleQueenBeforeMove
         [true, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        0); //fiftymovecounterAfterMove)
     });
     //CASTLING MOVES
     it("Castling king on the king side is legal", function () {
@@ -1772,7 +1792,8 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
     });
     it("Castling king on the queen side is legal", function () {
         expectMove(OK, null, //endMatchScores
@@ -1808,7 +1829,8 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
     });
     it("Castling king if king is already under attack is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -1844,7 +1866,8 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
     });
     it("Castling king on the king side if any empty cell is under attack is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -1880,7 +1903,8 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
     });
     it("Castling king on the queen side if any empty cell is under attack is illegal", function () {
         expectMove(ILLEGAL, null, //endMatchScores
@@ -1916,7 +1940,8 @@ describe("In Chess", function () {
         [true, true], //canCastleQueenBeforeMove
         [true, false], //canCastleQueenAfterMove
         { row: null, col: null }, //enpassantPositionBeforeMove
-        { row: null, col: null }); //enpassantPositionAfterMove
+        { row: null, col: null }, //enpassantPositionAfterMove
+        1); //fiftymovecounterAfterMove
     });
 });
 //# sourceMappingURL=gameLogic_test.js.map

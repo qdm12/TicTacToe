@@ -7,6 +7,7 @@ interface BoardDelta {
   canCastleKing: [boolean, boolean];
   canCastleQueen: [boolean, boolean];
   enpassantPosition:Pos;
+  fiftymovecounter:number
 }
 type IProposalData = BoardDelta;
 interface IState {
@@ -33,7 +34,8 @@ module gameLogic {
                     isUnderCheck: [false, false],
                     canCastleKing: [true, true],
                     canCastleQueen: [true, true],
-                    enpassantPosition: {row: null, col: null}
+                    enpassantPosition: {row: null, col: null},
+                    fiftymovecounter: 0
                    }
            };
   }
@@ -270,9 +272,9 @@ module gameLogic {
           if (deltaTo.row === 0 || deltaTo.row === 7) {
             let audio = new Audio('sounds/piece_promote.mp3');
             audio.play();
-            stateAfterMove.board[deltaTo.row][deltaTo.col] = getTurn(turnIndex) + "Q"; //XXX eventually give choice later on
+            //XXX eventually give choice later on
+            stateAfterMove.board[deltaTo.row][deltaTo.col] = getTurn(turnIndex) + "Q";
           }
-          fiftymovecounter = 0; //if a pawn move is done, reset the counter
         } else {
           throw new Error("Illegal move for Pawn");
         }
@@ -280,15 +282,12 @@ module gameLogic {
       default:
         throw new Error("Unknown piece type!");
     }
-    fiftymovecounter++; //by default, increase the counter
-    /*Note: The first move will only execute createMove once.
-      However, all the next turns will execute createMove twice because of 
-      the checkmoveok function. Hence, fiftymovecounter is also incremented 
-      twice per turn. On top of that, a chess "move" = 2 turns so 
-      50 moves are reached when fiftymovecounter = 2*50*2 - 1 = 199.
-    */
+    stateAfterMove.delta.fiftymovecounter++; //by default, increase the counter
+    if(stateBeforeMove.board[deltaFrom.row][deltaFrom.col] === getTurn(turnIndex) + 'P'){
+        stateAfterMove.delta.fiftymovecounter = 0; //If this was a pawn move, reset the counter
+    }
     if(getOpponent(turnIndex) === stateBeforeMove.board[deltaTo.row][deltaTo.col].charAt(0)){
-        fiftymovecounter = 0; //If this was an attack move, reset the counter
+        stateAfterMove.delta.fiftymovecounter = 0; //If this was an attack move, reset the counter
     }
     turnIndex = 1 - turnIndex;
     if (isUnderCheckByPositions(stateAfterMove.board, turnIndex)) {
@@ -314,7 +313,8 @@ module gameLogic {
                      stateAfterMove.delta.canCastleQueen,
                      stateAfterMove.delta.enpassantPosition)
                 ||
-                fiftymovecounter === 199){
+                //Note: A chess "move" = 2 turns so 50 moves are reached when fiftymovecounter = 100.
+                stateAfterMove.delta.fiftymovecounter >= 100){
       endMatchScores = [0,0];
       turnIndex = -1;
     }else{

@@ -20,14 +20,15 @@ module game {
   let maybePlayAIliftTimeout: ng.IPromise<any> = null;
   let maybeSendComputerMoveTimeout: ng.IPromise<any> = null;
   export let state: IState = null;
-  // For community games.
-  export let yourPlayerInfo: IPlayerInfo = null;
   
   let gameArea:any;
   let draggingStartedRowCol:any = null; // The {row: YY, col: XX} where dragging started.
   let draggingPiece:any = null;
   let draggingPieceAvailableMoves:any = null;
   let rotated:boolean = false;
+  let waitTime_RotateBoard:number = 300;
+  let waitTime_PlayAIlift:number = 1500;
+  let waitTime_SendComputerMove:number = 2200;
   
 
   export function init() {
@@ -68,16 +69,19 @@ module game {
     currentUpdateUI = params;
     clearTimeouts();
     state = params.move.stateAfterMove;
-    console.log("isFirstMove():"+isFirstMove());
     if (isFirstMove()) {
       state = gameLogic.getInitialState();
       currentUpdateUI.move.stateAfterMove = state;
+      if(currentUpdateUI.playMode === "onlyAIs"){ //make moves faster
+          waitTime_PlayAIlift = 0;
+          waitTime_SendComputerMove = 20;
+      }
     }else{
-        dragAnimationEndedTimeout = $timeout(maybeRotateBoard, 300);
+        dragAnimationEndedTimeout = $timeout(maybeRotateBoard, waitTime_RotateBoard);
     }
-    maybePlayAIliftTimeout = $timeout(maybePlayAIlift, 1500);
-    maybeSendComputerMoveTimeout = $timeout(maybeSendComputerMove, 2200);
-  }
+    maybePlayAIliftTimeout = $timeout(maybePlayAIlift, waitTime_PlayAIlift);
+    maybeSendComputerMoveTimeout = $timeout(maybeSendComputerMove, waitTime_SendComputerMove);
+  }  
 
   function clearTimeouts() {
     if (dragAnimationEndedTimeout) {
@@ -95,38 +99,47 @@ module game {
   }
 
   function maybeRotateBoard(){
-    console.log("isFirstMove():"+isFirstMove());
-    if(currentUpdateUI.playersInfo[0].playerId !== '' && currentUpdateUI.playersInfo[1].playerId !== ''){
-        let transform:string;
-        rotated = !rotated;
-        gameArea.classList.toggle('rotate180');
-        if(yourPlayerIndex()){ //black team, index 1
-            transform = 'rotate(180deg)';
-        }else{ //white team
-            transform = 'rotate(0deg) translate(-50%, -50%)';            
-        }
-        let piece:any;
-        for(let i = 0; i < 8; i++){
-            for(let j = 0; j < 8; j++){
-                piece = document.getElementById("e2e_test_img_" + getPieceKindInId(i, j) + '_' + + i + "x" + j);
-                piece.style['transform'] = transform;
-                piece.style['-moz-transform'] = transform;
-                piece.style['-webkit-transform'] = transform;
-                piece.style['-o-transform'] = transform;
-                piece.style['-ms-transform'] = transform;
-            }
+    //1. If there is at least one AI, the board is not rotated.
+    if(currentUpdateUI.playMode === "playAgainstTheComputer" || currentUpdateUI.playMode === "onlyAIs"){
+        return;
+    }
+    //2. Rotates the whole board with the pieces (without rotating the pieces themselves)
+    gameArea.classList.toggle('rotate180');
+    //3. Rotates all the pieces on themselves to have them at the right angle
+    let transform:string;
+    if(yourPlayerIndex()){ //black team, index 1
+        transform = 'rotate(180deg)';
+    }else{ //white team, index 0
+        transform = 'rotate(0deg) translate(-50%, -50%)'; //translate to keep them centered.           
+    }
+    let piece:any;
+    for(let i = 0; i < 8; i++){
+        for(let j = 0; j < 8; j++){
+            piece = document.getElementById("e2e_test_img_" + getPieceKindInId(i, j) + '_' + + i + "x" + j);
+            piece.style['transform'] = transform;
+            //Support for all browsers
+            piece.style['-moz-transform'] = transform;
+            piece.style['-webkit-transform'] = transform;
+            piece.style['-o-transform'] = transform;
+            piece.style['-ms-transform'] = transform;
         }
     }
+    //3. Switch the rotated boolean (used for finding the right dragging Piece)
+    rotated = !rotated;
   }
 
   function maybePlayAIlift(){
-      if (!isComputerTurn()) return;
+      if (!isComputerTurn()){
+          return;
+      }
       let audio = new Audio('sounds/piece_lift.mp3');
       audio.play();
   }
     
   function maybeSendComputerMove() {
-    if (!isComputerTurn()) return;
+    if (!isComputerTurn()){
+        return;
+    }
     let nextMove:IMove = aiService.createComputerMove(currentUpdateUI.move);
     log.info("Computer move: ", nextMove);
     makeMove(nextMove);
@@ -137,7 +150,7 @@ module game {
   
     function handleDragEvent(type:string, clientX:number, clientY:number) {
         if(isComputerTurn()){
-            return;
+            return; //We can't drag a piece that has to be played by AI.
         }
         // Center point in gameArea
         let x:number = clientX - gameArea.offsetLeft;
@@ -267,23 +280,21 @@ module game {
     didMakeMove = true;
     let audio = new Audio('sounds/piece_drop.wav');
     audio.play();
-    if(gameOver(move.endMatchScores)){
-        return;
-    }
+    gameOver(move.endMatchScores);
     moveService.makeMove(move);
   }
   
-  function gameOver(endMatchScores:number[]):boolean{ //XXX ERROR here
-    let message:string = "Game over ! ";
+  function gameOver(endMatchScores:number[]):boolean{ //XXX Possible error here
+    let message:string;
     if(angular.equals(endMatchScores, [0,0])){
-        message += "Game ended in a Tie";
+        message = "Game ended in a Tie";
     }else if(angular.equals(endMatchScores, [1,0])){
-        message += "White team has won";
+        message = "White team won";
     }else if(angular.equals(endMatchScores, [0,1])){
-        message += "Black team has won";
+        message = "Black team won";
     }
     if(endMatchScores){
-        alert(message);
+        alert(message); //XXX do better than alert
         return true;
     }
     return false;

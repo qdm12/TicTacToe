@@ -15,7 +15,8 @@ describe("aiService", function() {
                     isUnderCheck:isUnderCheck,
                     canCastleKing:canCastleKing,
                     canCastleQueen:canCastleQueen,
-                    enpassantPosition:enpassantPosition}
+                    enpassantPosition:enpassantPosition,
+                    fiftymovecounter:0}
            }
   }
 

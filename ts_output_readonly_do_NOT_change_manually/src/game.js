@@ -11,13 +11,14 @@ var game;
     var maybePlayAIliftTimeout = null;
     var maybeSendComputerMoveTimeout = null;
     game.state = null;
-    // For community games.
-    game.yourPlayerInfo = null;
     var gameArea;
     var draggingStartedRowCol = null; // The {row: YY, col: XX} where dragging started.
     var draggingPiece = null;
     var draggingPieceAvailableMoves = null;
     var rotated = false;
+    var waitTime_RotateBoard = 300;
+    var waitTime_PlayAIlift = 1500;
+    var waitTime_SendComputerMove = 2200;
     function init() {
         registerServiceWorker();
         translate.setTranslations(getTranslations());
@@ -54,16 +55,19 @@ var game;
         game.currentUpdateUI = params;
         clearTimeouts();
         game.state = params.move.stateAfterMove;
-        console.log("isFirstMove():" + isFirstMove());
         if (isFirstMove()) {
             game.state = gameLogic.getInitialState();
             game.currentUpdateUI.move.stateAfterMove = game.state;
+            if (game.currentUpdateUI.playMode === "onlyAIs") {
+                waitTime_PlayAIlift = 0;
+                waitTime_SendComputerMove = 20;
+            }
         }
         else {
-            dragAnimationEndedTimeout = $timeout(maybeRotateBoard, 300);
+            dragAnimationEndedTimeout = $timeout(maybeRotateBoard, waitTime_RotateBoard);
         }
-        maybePlayAIliftTimeout = $timeout(maybePlayAIlift, 1500);
-        maybeSendComputerMoveTimeout = $timeout(maybeSendComputerMove, 2200);
+        maybePlayAIliftTimeout = $timeout(maybePlayAIlift, waitTime_PlayAIlift);
+        maybeSendComputerMoveTimeout = $timeout(maybeSendComputerMove, waitTime_SendComputerMove);
     }
     game.updateUI = updateUI;
     function clearTimeouts() {
@@ -81,46 +85,53 @@ var game;
         }
     }
     function maybeRotateBoard() {
-        console.log("isFirstMove():" + isFirstMove());
-        if (game.currentUpdateUI.playersInfo[0].playerId !== '' && game.currentUpdateUI.playersInfo[1].playerId !== '') {
-            var transform = void 0;
-            rotated = !rotated;
-            gameArea.classList.toggle('rotate180');
-            if (yourPlayerIndex()) {
-                transform = 'rotate(180deg)';
-            }
-            else {
-                transform = 'rotate(0deg) translate(-50%, -50%)';
-            }
-            var piece = void 0;
-            for (var i = 0; i < 8; i++) {
-                for (var j = 0; j < 8; j++) {
-                    piece = document.getElementById("e2e_test_img_" + game.getPieceKindInId(i, j) + '_' + +i + "x" + j);
-                    piece.style['transform'] = transform;
-                    piece.style['-moz-transform'] = transform;
-                    piece.style['-webkit-transform'] = transform;
-                    piece.style['-o-transform'] = transform;
-                    piece.style['-ms-transform'] = transform;
-                }
+        //1. If there is at least one AI, the board is not rotated.
+        if (game.currentUpdateUI.playMode === "playAgainstTheComputer" || game.currentUpdateUI.playMode === "onlyAIs") {
+            return;
+        }
+        //2. Rotates the whole board with the pieces (without rotating the pieces themselves)
+        gameArea.classList.toggle('rotate180');
+        //3. Rotates all the pieces on themselves to have them at the right angle
+        var transform;
+        if (yourPlayerIndex()) {
+            transform = 'rotate(180deg)';
+        }
+        else {
+            transform = 'rotate(0deg) translate(-50%, -50%)'; //translate to keep them centered.           
+        }
+        var piece;
+        for (var i = 0; i < 8; i++) {
+            for (var j = 0; j < 8; j++) {
+                piece = document.getElementById("e2e_test_img_" + game.getPieceKindInId(i, j) + '_' + +i + "x" + j);
+                piece.style['transform'] = transform;
+                //Support for all browsers
+                piece.style['-moz-transform'] = transform;
+                piece.style['-webkit-transform'] = transform;
+                piece.style['-o-transform'] = transform;
+                piece.style['-ms-transform'] = transform;
             }
         }
+        //3. Switch the rotated boolean (used for finding the right dragging Piece)
+        rotated = !rotated;
     }
     function maybePlayAIlift() {
-        if (!isComputerTurn())
+        if (!isComputerTurn()) {
             return;
+        }
         var audio = new Audio('sounds/piece_lift.mp3');
         audio.play();
     }
     function maybeSendComputerMove() {
-        if (!isComputerTurn())
+        if (!isComputerTurn()) {
             return;
+        }
         var nextMove = aiService.createComputerMove(game.currentUpdateUI.move);
         log.info("Computer move: ", nextMove);
         makeMove(nextMove);
     }
     function handleDragEvent(type, clientX, clientY) {
         if (isComputerTurn()) {
-            return;
+            return; //We can't drag a piece that has to be played by AI.
         }
         // Center point in gameArea
         var x = clientX - gameArea.offsetLeft;
@@ -242,24 +253,22 @@ var game;
         game.didMakeMove = true;
         var audio = new Audio('sounds/piece_drop.wav');
         audio.play();
-        if (gameOver(move.endMatchScores)) {
-            return;
-        }
+        gameOver(move.endMatchScores);
         moveService.makeMove(move);
     }
     function gameOver(endMatchScores) {
-        var message = "Game over ! ";
+        var message;
         if (angular.equals(endMatchScores, [0, 0])) {
-            message += "Game ended in a Tie";
+            message = "Game ended in a Tie";
         }
         else if (angular.equals(endMatchScores, [1, 0])) {
-            message += "White team has won";
+            message = "White team won";
         }
         else if (angular.equals(endMatchScores, [0, 1])) {
-            message += "Black team has won";
+            message = "Black team won";
         }
         if (endMatchScores) {
-            alert(message);
+            alert(message); //XXX do better than alert
             return true;
         }
         return false;
