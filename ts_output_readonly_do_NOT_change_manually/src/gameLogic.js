@@ -24,9 +24,6 @@ var gameLogic;
     gameLogic.getInitialState = getInitialState;
     // Returns true if the game ended in a tie because there are no available moves for any pieces
     function isTie(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition, fiftymovecounter) {
-        if (isUnderCheck[turnIndex]) {
-            return false;
-        }
         //Note: A chess "move" = 2 turns so 50 moves are reached when fiftymovecounter = 100.
         if (fiftymovecounter >= 100) {
             var white_n_pieces = 0;
@@ -49,6 +46,9 @@ var gameLogic;
                 return true; //2 kings or N number of pieces in each team not doing anything.
             }
             return false; //Because there is a team with more pieces, this team should win.
+        }
+        if (isUnderCheck[turnIndex]) {
+            return false;
         }
         for (var i = 0; i < 8; i++) {
             for (var j = 0; j < 8; j++) {
@@ -180,9 +180,9 @@ var gameLogic;
         if (!PieceEmpty && PieceTeam === getTurn(turnIndex)) {
             throw new Error("One can only make a move in an empty position or capture opponent's piece!");
         }
-        if (getWinner(board, turnIndex, stateBeforeMove.delta.isUnderCheck, stateBeforeMove.delta.canCastleKing, stateBeforeMove.delta.canCastleQueen, enpassantPosition, stateBeforeMove.delta.fiftymovecounter)
+        if (isTie(board, turnIndex, stateBeforeMove.delta.isUnderCheck, stateBeforeMove.delta.canCastleKing, stateBeforeMove.delta.canCastleQueen, enpassantPosition, stateBeforeMove.delta.fiftymovecounter)
             ||
-                isTie(board, turnIndex, stateBeforeMove.delta.isUnderCheck, stateBeforeMove.delta.canCastleKing, stateBeforeMove.delta.canCastleQueen, enpassantPosition, stateBeforeMove.delta.fiftymovecounter)) {
+                getWinner(board, turnIndex, stateBeforeMove.delta.isUnderCheck, stateBeforeMove.delta.canCastleKing, stateBeforeMove.delta.canCastleQueen, enpassantPosition, stateBeforeMove.delta.fiftymovecounter)) {
             throw new Error("Can only make a move if the game is not over!");
         }
         if (getTurn(turnIndex) !== board[deltaFrom.row][deltaFrom.col].charAt(0)) {
