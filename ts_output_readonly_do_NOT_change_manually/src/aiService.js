@@ -1,8 +1,29 @@
 var aiService;
 (function (aiService) {
-    //10 Pawns, 5 Knight, 3 Bishops, 3 rooks, 2 queen, 1 king
-    var probabilities = { pawn: 33, rook: 14, knight: 22,
-        bishop: 15, queen: 11, king: 5 };
+    var probabilities = { pawn: 33,
+        rook: 14,
+        knight: 22,
+        bishop: 15,
+        queen: 11,
+        king: 5 };
+    aiService.acc_probabilities = {
+        pawn: -1, rook: -1, knight: -1, bishop: -1, queen: -1, king: -1
+    }; //this is for tests
+    set_acc_probabilities();
+    function set_acc_probabilities() {
+        var acc_prob = probabilities.pawn;
+        aiService.acc_probabilities.pawn = acc_prob / 100;
+        acc_prob += probabilities.rook;
+        aiService.acc_probabilities.rook = acc_prob / 100;
+        acc_prob += probabilities.knight;
+        aiService.acc_probabilities.knight = acc_prob / 100;
+        acc_prob += probabilities.bishop;
+        aiService.acc_probabilities.bishop = acc_prob / 100;
+        acc_prob += probabilities.queen;
+        aiService.acc_probabilities.queen = acc_prob / 100;
+        acc_prob += probabilities.king;
+        aiService.acc_probabilities.king = acc_prob / 100;
+    }
     function get_random(max) {
         return Math.floor(Math.random() * max); //between 0 and max
     }
@@ -32,7 +53,7 @@ var aiService;
             return 'K';
         }
     }
-    /** Returns the move that the computer player should do for the given state in move. */
+    //Returns the move that the computer player should do for the given state in move.
     function createComputerMove(move) {
         var next_move;
         next_move = findAttackMove(move);
@@ -44,13 +65,11 @@ var aiService;
     }
     aiService.createComputerMove = createComputerMove;
     function findAttackMove(move) {
-        var board = move.stateAfterMove.board;
         var turnIndex = move.turnIndexAfterMove;
-        var isUnderCheck = move.stateAfterMove.delta.isUnderCheck;
-        var canCastleKing = move.stateAfterMove.delta.canCastleKing;
-        var canCastleQueen = move.stateAfterMove.delta.canCastleQueen;
-        var enpassantPosition = move.stateAfterMove.delta.enpassantPosition;
-        var possible_moves = gameLogic.getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
+        var state = move.stateAfterMove;
+        var board = state.board;
+        var delta = state.delta;
+        var possible_moves = gameLogic.getPossibleMoves(board, turnIndex, delta.isUnderCheck, delta.canCastleKing, delta.canCastleQueen, delta.enpassantPosition);
         if (!possible_moves.length) {
             throw new Error("AI: There is no possible move anymore.");
         }
@@ -67,9 +86,9 @@ var aiService;
                     for (var j = 0; j < possible_destinations.length; j++) {
                         deltaTo = possible_destinations[j];
                         if (isEnnemyCell(turnIndex, board, deltaTo)) {
-                            move.stateAfterMove.delta.deltaFrom = deltaFrom;
-                            move.stateAfterMove.delta.deltaTo = deltaTo;
-                            return gameLogic.createMove(move.stateAfterMove, turnIndex);
+                            state.delta.deltaFrom = deltaFrom;
+                            state.delta.deltaTo = deltaTo;
+                            return gameLogic.createMove(state, turnIndex);
                         }
                     }
                 }
@@ -94,13 +113,11 @@ var aiService;
         }
     }
     function findProbabilisticMove(move) {
-        var board = move.stateAfterMove.board;
         var turnIndex = move.turnIndexAfterMove;
-        var isUnderCheck = move.stateAfterMove.delta.isUnderCheck;
-        var canCastleKing = move.stateAfterMove.delta.canCastleKing;
-        var canCastleQueen = move.stateAfterMove.delta.canCastleQueen;
-        var enpassantPosition = move.stateAfterMove.delta.enpassantPosition;
-        var possible_moves = gameLogic.getPossibleMoves(board, turnIndex, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition);
+        var state = move.stateAfterMove;
+        var board = state.board;
+        var delta = state.delta;
+        var possible_moves = gameLogic.getPossibleMoves(board, turnIndex, delta.isUnderCheck, delta.canCastleKing, delta.canCastleQueen, delta.enpassantPosition);
         var deltaFrom;
         var deltaTo;
         var possible_destinations;
@@ -128,9 +145,9 @@ var aiService;
         possible_destinations = possible_moves[pm_index][1];
         var pd_index = random % possible_destinations.length;
         deltaTo = possible_destinations[pd_index];
-        move.stateAfterMove.delta.deltaFrom = deltaFrom;
-        move.stateAfterMove.delta.deltaTo = deltaTo;
-        return gameLogic.createMove(move.stateAfterMove, turnIndex);
+        state.delta.deltaFrom = deltaFrom;
+        state.delta.deltaTo = deltaTo;
+        return gameLogic.createMove(state, turnIndex);
     }
 })(aiService || (aiService = {}));
 //# sourceMappingURL=aiService.js.map

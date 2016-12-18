@@ -1,7 +1,6 @@
 describe("aiService", function () {
     var W_TURN = 0;
     var B_TURN = 1;
-    var random_start_value = 0.2; //for pawn
     function createState(board, isUnderCheck, canCastleKing, canCastleQueen, enpassantPosition) {
         return { board: board,
             delta: { deltaFrom: null,
@@ -21,17 +20,18 @@ describe("aiService", function () {
         };
         return aiService.createComputerMove(move);
     }
+    var random_start_value = 0.00; //for pawn  
     var numberOfTimesCalledRandom = 0;
     Math.random = function () {
         numberOfTimesCalledRandom++;
         if (numberOfTimesCalledRandom >= 100) {
             //we are stuck, we need to change value (no more possible moves)
-            return 0.65; //for knight
+            return aiService.acc_probabilities.knight; //for knight (that's what's tested)
         }
         return random_start_value;
     };
     it("createComputerMove returns deterministic random move for Pawn from White", function () {
-        random_start_value = 0.2; //for pawn
+        random_start_value = aiService.acc_probabilities.pawn;
         var next_move = createComputerMove(W_TURN, null, //endMatchScores
         [
             ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
@@ -47,12 +47,12 @@ describe("aiService", function () {
         [true, true], //canCastleQueen
         { row: null, col: null }); //enpassantPosition
         expect(next_move.stateAfterMove.delta.deltaFrom.row).toBe(6);
-        expect(next_move.stateAfterMove.delta.deltaFrom.col).toBe(4);
-        expect(next_move.stateAfterMove.delta.deltaTo.row).toBe(5);
-        expect(next_move.stateAfterMove.delta.deltaTo.col).toBe(4);
+        expect(next_move.stateAfterMove.delta.deltaFrom.col).toBe(1);
+        expect(next_move.stateAfterMove.delta.deltaTo.row).toBe(4);
+        expect(next_move.stateAfterMove.delta.deltaTo.col).toBe(1);
     });
     it("createComputerMove returns deterministic random move for Rook from White", function () {
-        random_start_value = 0.45; //for rook
+        random_start_value = aiService.acc_probabilities.rook;
         var next_move = createComputerMove(W_TURN, null, //endMatchScores
         [
             ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
@@ -70,10 +70,10 @@ describe("aiService", function () {
         expect(next_move.stateAfterMove.delta.deltaFrom.row).toBe(7);
         expect(next_move.stateAfterMove.delta.deltaFrom.col).toBe(0);
         expect(next_move.stateAfterMove.delta.deltaTo.row).toBe(7);
-        expect(next_move.stateAfterMove.delta.deltaTo.col).toBe(1);
+        expect(next_move.stateAfterMove.delta.deltaTo.col).toBe(3);
     });
     it("createComputerMove returns deterministic random move for Knight from White", function () {
-        random_start_value = 0.51; //for knight
+        random_start_value = aiService.acc_probabilities.knight;
         var next_move = createComputerMove(W_TURN, null, //endMatchScores
         [
             ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
@@ -94,7 +94,7 @@ describe("aiService", function () {
         expect(next_move.stateAfterMove.delta.deltaTo.col).toBe(2);
     });
     it("createComputerMove returns deterministic random move for Bishop from White", function () {
-        random_start_value = 0.75; //for bishop
+        random_start_value = aiService.acc_probabilities.bishop;
         var next_move = createComputerMove(W_TURN, null, //endMatchScores
         [
             ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
@@ -115,7 +115,7 @@ describe("aiService", function () {
         expect(next_move.stateAfterMove.delta.deltaTo.col).toBe(1);
     });
     it("createComputerMove returns deterministic random move for Queen from White", function () {
-        random_start_value = 0.87; //for queen
+        random_start_value = aiService.acc_probabilities.queen;
         var next_move = createComputerMove(W_TURN, null, //endMatchScores
         [
             ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
@@ -136,7 +136,7 @@ describe("aiService", function () {
         expect(next_move.stateAfterMove.delta.deltaTo.col).toBe(1);
     });
     it("createComputerMove returns deterministic random move for King from White", function () {
-        random_start_value = 0.96; //for king
+        random_start_value = aiService.acc_probabilities.king;
         var next_move = createComputerMove(W_TURN, null, //endMatchScores
         [
             ['BR', 'BN', 'BB', 'BQ', 'BK', 'BB', 'BN', 'BR'],
@@ -154,10 +154,10 @@ describe("aiService", function () {
         expect(next_move.stateAfterMove.delta.deltaFrom.row).toBe(7);
         expect(next_move.stateAfterMove.delta.deltaFrom.col).toBe(0);
         expect(next_move.stateAfterMove.delta.deltaTo.row).toBe(6);
-        expect(next_move.stateAfterMove.delta.deltaTo.col).toBe(0);
+        expect(next_move.stateAfterMove.delta.deltaTo.col).toBe(1);
     });
     it("createComputerMove returns deterministic random move for knight after trying pawn from White", function () {
-        random_start_value = 0.2; //Start with pawn
+        random_start_value = aiService.acc_probabilities.pawn;
         //then it will reach 100 and go to the knight choice
         var next_move = createComputerMove(W_TURN, null, //endMatchScores
         [
@@ -219,6 +219,7 @@ describe("aiService", function () {
         expect(next_move.stateAfterMove.delta.deltaTo.col).toBe(2);
     });
     it("createComputerMove no possible moves", function () {
+        random_start_value = aiService.acc_probabilities.pawn;
         var error = false;
         try {
             var next_move = createComputerMove(W_TURN, null, //endMatchScores
