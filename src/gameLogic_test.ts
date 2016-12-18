@@ -42,6 +42,7 @@ describe("In Chess", function() {
                       canCastleQueenAfterMove: [boolean, boolean],
                       enpassantPositionBeforeMove:Pos,
                       enpassantPositionAfterMove:Pos,
+                      fiftymovecounterBeforeMove:number,
                       fiftymovecounterAfterMove:number):void{
     let stateBeforeMove:IState = {
         board:boardBeforeMove,
@@ -52,7 +53,7 @@ describe("In Chess", function() {
             canCastleKing:canCastleKingBeforeMove,
             canCastleQueen:canCastleQueenBeforeMove,
             enpassantPosition:enpassantPositionBeforeMove,
-            fiftymovecounter:0
+            fiftymovecounter:fiftymovecounterBeforeMove
         }
     };
     let stateTransition: IStateTransition = {
@@ -167,8 +168,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        0); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Playing legally but setting the turn back to myself is illegal", function() {
@@ -208,8 +210,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        0); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Not moving is illegal", function() {
@@ -249,8 +252,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        0); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Moving and cloning is illegal", function() {
@@ -290,8 +294,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        0); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Moving to a friendly piece is illegal", function() {
@@ -331,8 +336,9 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        1); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("Illegal piece type is illegal", function() {
@@ -372,8 +378,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        0); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Playing without winning making you win is illegal", function() {
@@ -413,8 +420,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        0); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Moving a piece out of the board is illegal", function() {
@@ -454,8 +462,9 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        1); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        1); //fiftymovecounterAfterMove
   });
   
 
@@ -510,8 +519,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        0); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Pawn: Moving WP from 6x0 to 4x0 is legal", function() {
@@ -551,8 +561,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        0); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Pawn: Attacking with WP from 6x0 to 5x1 is legal", function() {
@@ -592,8 +603,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        0); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Pawn: Attacking en passant with WP from 4x0 to 3x1 is legal", function() {
@@ -633,8 +645,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: 4, col: 1}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        0); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Pawn: Moving to an en passant attack position (black) is legal", function() {
@@ -674,8 +687,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: 3, col: 1},
-        0); //enpassantPositionAfterMove
+        {row: 3, col: 1}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Pawn: Moving to an en passant attack position (white) is legal", function() {
@@ -715,8 +729,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: 4, col: 0},
-        0); //enpassantPositionAfterMove
+        {row: 4, col: 0}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Pawn: Promoting pawn to Queen is legal", function() {
@@ -756,8 +771,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        0); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Pawn: Moving WP from 5x0 to 3x0 is illegal", function() {
@@ -797,8 +813,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        0); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
   //BISHOP MOVEMENTS
@@ -839,8 +856,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        1); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("Bishop: Move of bishop is illegal", function() {
@@ -880,8 +898,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        1); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        1); //fiftymovecounterAfterMove
   });
   
   
@@ -926,8 +945,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        1); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("Queen: Move of queen is illegal", function() {
@@ -967,8 +987,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        1); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        1); //fiftymovecounterAfterMove
   });
   
  
@@ -1010,8 +1031,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        1); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("Knight: Attacking an ennemy piece is legal", function() {
@@ -1051,8 +1073,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        0); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
   it("Knight: Moving in a straight line is illegal", function() {
@@ -1092,10 +1115,10 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        1); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        1); //fiftymovecounterAfterMove
   });
-  
   
   
   
@@ -1137,8 +1160,9 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        1); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("King: Move of king is illegal", function() {
@@ -1178,8 +1202,9 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenBeforeMove
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        1); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        1); //fiftymovecounterAfterMove
   });
 
 
@@ -1223,8 +1248,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        1); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("Rook: Move of rook (Black, King side) is legal", function() {
@@ -1264,8 +1290,9 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenBeforeMove
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
-        {row: null, col: null},
-        1); //enpassantPositionAfterMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
+        1); //fiftymovecounterAfterMove
   });
   
   it("Rook: Move of rook is illegal", function() {
@@ -1306,6 +1333,7 @@ describe("In Chess", function() {
         [true, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         1); //fiftymovecounterAfterMove
   });
   
@@ -1359,6 +1387,7 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         0); //fiftymovecounterAfterMove
   });
   
@@ -1400,6 +1429,7 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         1); //fiftymovecounterAfterMove
   });
   
@@ -1441,6 +1471,7 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         1); //fiftymovecounterAfterMove
   });
   
@@ -1482,6 +1513,7 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         1); //fiftymovecounterAfterMove
   });
   
@@ -1523,6 +1555,7 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         0); //fiftymovecounterAfterMove
   });
 
@@ -1575,6 +1608,7 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         1); //fiftymovecounterAfterMove
   });
   
@@ -1617,6 +1651,7 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         1); //fiftymovecounterAfterMove
   });
   
@@ -1658,6 +1693,7 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         1); //fiftymovecounterAfterMove
   });
   
@@ -1699,6 +1735,7 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         1); //fiftymovecounterAfterMove
   });
   
@@ -1740,6 +1777,7 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         1); //fiftymovecounterAfterMove
   });
   
@@ -1781,6 +1819,7 @@ describe("In Chess", function() {
         [false, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         1); //fiftymovecounterAfterMove
   });
   
@@ -1823,6 +1862,7 @@ describe("In Chess", function() {
         [false, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         0); //fiftymovecounterAfterMove
   });
   
@@ -1864,6 +1904,7 @@ describe("In Chess", function() {
         [false, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         0); //fiftymovecounterAfterMove
   });
   
@@ -1905,6 +1946,7 @@ describe("In Chess", function() {
         [false, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         0); //fiftymovecounterAfterMove
   });
   
@@ -1946,6 +1988,7 @@ describe("In Chess", function() {
         [false, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         0); //fiftymovecounterAfterMove
   });
   
@@ -1987,6 +2030,7 @@ describe("In Chess", function() {
         [false, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         0); //fiftymovecounterAfterMove
   });
   
@@ -2030,7 +2074,8 @@ describe("In Chess", function() {
         [true, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
-        0); //fiftymovecounterAfterMove)
+        0, //fiftymovecounterBeforeMove
+        0); //fiftymovecounterAfterMove
   });
   
 
@@ -2076,6 +2121,7 @@ describe("In Chess", function() {
         [true, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         1); //fiftymovecounterAfterMove
   });
   
@@ -2117,6 +2163,7 @@ describe("In Chess", function() {
         [true, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         1); //fiftymovecounterAfterMove
   });
   
@@ -2158,6 +2205,7 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         1); //fiftymovecounterAfterMove
   });
   
@@ -2199,6 +2247,7 @@ describe("In Chess", function() {
         [true, true], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         1); //fiftymovecounterAfterMove
   });
   
@@ -2240,9 +2289,137 @@ describe("In Chess", function() {
         [true, false], //canCastleQueenAfterMove
         {row: null, col: null}, //enpassantPositionBeforeMove
         {row: null, col: null}, //enpassantPositionAfterMove
+        0, //fiftymovecounterBeforeMove
         1); //fiftymovecounterAfterMove
   });
   
+  
+  //FIFTY MOVES RULE MOVEMENTS
+  it("Fifty moves, tie 1king vs 1king", function() {
+    expectMove(
+        OK,
+        [0,0], //endMatchScores
+        {row:0,col:7}, //deltaFrom
+        {row:0,col:6}, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        NO_ONE_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+        ['WK',   '',   '',   '',   '',   '',   '',   'BK'],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ],
+        //boardAfterMove
+        [
+        ['WK',   '',   '',   '',   '',   '',   'BK',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ],
+        [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [false, false], //canCastleKingBeforeMove
+        [false, false], //canCastleKingAfterMove
+        [false, false], //canCastleQueenBeforeMove
+        [false, false], //canCastleQueenAfterMove
+        {row: null, col: null}, //enpassantPositionBeforeMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        99, //fiftymovecounterBeforeMove
+        100); //fiftymovecounterAfterMove
+  });
+  
+  it("Fifty moves, black wins (more pieces)", function() {
+    expectMove(
+        OK,
+        [0,1], //endMatchScores
+        {row:0,col:7}, //deltaFrom
+        {row:0,col:6}, //deltaTo
+        B_TURN, //turnIndexBeforeMove
+        NO_ONE_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+        ['WK',   '',   '',   '',   '',   '',   '',   'BK'],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   'BP',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ],
+        //boardAfterMove
+        [
+        ['WK',   '',   '',   '',   '',   '',   'BK',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   'BP',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ],
+        [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [false, false], //canCastleKingBeforeMove
+        [false, false], //canCastleKingAfterMove
+        [false, false], //canCastleQueenBeforeMove
+        [false, false], //canCastleQueenAfterMove
+        {row: null, col: null}, //enpassantPositionBeforeMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        99, //fiftymovecounterBeforeMove
+        100); //fiftymovecounterAfterMove
+  });
+  
+  it("Fifty moves, white wins (more pieces)", function() {
+    expectMove(
+        OK,
+        [1,0], //endMatchScores
+        {row:0,col:7}, //deltaFrom
+        {row:0,col:6}, //deltaTo
+        W_TURN, //turnIndexBeforeMove
+        NO_ONE_TURN, //turnIndexAfterMove
+        //boardBeforeMove
+        [
+        ['BK',   '',   '',   '',   '',   '',   '',   'WK'],
+        ['',   '',   '',   '',   '',   '',   '',   'WP'],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ],
+        //boardAfterMove
+        [
+        ['BK',   '',   '',   '',   '',   '',   'WK',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   'WP'],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ['',   '',   '',   '',   '',   '',   '',   ''],
+        ],
+        [false, false], //isUnderCheckBeforeMove
+        [false, false], //isUnderCheckAfterMove
+        [false, false], //canCastleKingBeforeMove
+        [false, false], //canCastleKingAfterMove
+        [false, false], //canCastleQueenBeforeMove
+        [false, false], //canCastleQueenAfterMove
+        {row: null, col: null}, //enpassantPositionBeforeMove
+        {row: null, col: null}, //enpassantPositionAfterMove
+        99, //fiftymovecounterBeforeMove
+        100); //fiftymovecounterAfterMove
+  });
 
   
   

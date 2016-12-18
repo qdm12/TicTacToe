@@ -46,9 +46,6 @@ module gameLogic {
                  canCastleQueen:[boolean,boolean], 
                  enpassantPosition:Pos,
                  fiftymovecounter:number):boolean{
-    if (isUnderCheck[turnIndex]) {
-      return false;
-    }
     //Note: A chess "move" = 2 turns so 50 moves are reached when fiftymovecounter = 100.
     if(fiftymovecounter >= 100){
         let white_n_pieces:number = 0;
@@ -69,8 +66,11 @@ module gameLogic {
         if(white_n_pieces === black_n_pieces){
             return true; //2 kings or N number of pieces in each team not doing anything.
         }
-        
-        return false; //Because there is a team with more pieces, this team should win.
+        //return false; //Because there is a team with more pieces, this team should win.
+        //This never occurs as getWinner is checked before isTie
+    }
+    if (isUnderCheck[turnIndex]) {
+      return false;
     }
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
@@ -204,11 +204,12 @@ module gameLogic {
     if (!PieceEmpty && PieceTeam === getTurn(turnIndex)){
       throw new Error("One can only make a move in an empty position or capture opponent's piece!");
     }
-    if (getWinner(board, turnIndex, stateBeforeMove.delta.isUnderCheck, stateBeforeMove.delta.canCastleKing,
-                  stateBeforeMove.delta.canCastleQueen, enpassantPosition, stateBeforeMove.delta.fiftymovecounter)
-        ||
-        isTie(board, turnIndex, stateBeforeMove.delta.isUnderCheck, stateBeforeMove.delta.canCastleKing,
-              stateBeforeMove.delta.canCastleQueen, enpassantPosition, stateBeforeMove.delta.fiftymovecounter)){
+    if (isTie(board, turnIndex, stateBeforeMove.delta.isUnderCheck, stateBeforeMove.delta.canCastleKing,
+              stateBeforeMove.delta.canCastleQueen, enpassantPosition, stateBeforeMove.delta.fiftymovecounter)
+           ||
+        getWinner(board, turnIndex, stateBeforeMove.delta.isUnderCheck, stateBeforeMove.delta.canCastleKing,
+                  stateBeforeMove.delta.canCastleQueen, enpassantPosition, stateBeforeMove.delta.fiftymovecounter))
+    {
       throw new Error("Can only make a move if the game is not over!");
     }
     if (getTurn(turnIndex) !== board[deltaFrom.row][deltaFrom.col].charAt(0)) {
