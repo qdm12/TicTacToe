@@ -66,7 +66,8 @@ module gameLogic {
         if(white_n_pieces === black_n_pieces){
             return true; //2 kings or N number of pieces in each team not doing anything.
         }
-        return false; //Because there is a team with more pieces, this team should win.
+        //return false; //Because there is a team with more pieces, this team should win.
+        //This never occurs as getWinner is checked before isTie
     }
     if (isUnderCheck[turnIndex]) {
       return false;
