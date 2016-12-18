@@ -23,6 +23,9 @@ var aiService;
         aiService.acc_probabilities.queen = acc_prob / 100;
         acc_prob += probabilities.king;
         aiService.acc_probabilities.king = acc_prob / 100;
+        if (acc_prob != 100) {
+            throw new Error("All the probabilities have to sum to 100 !");
+        }
     }
     function get_random(max) {
         return Math.floor(Math.random() * max); //between 0 and max

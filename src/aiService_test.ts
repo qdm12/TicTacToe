@@ -297,4 +297,33 @@ describe("aiService", function() {
     }
     expect(error).toBe(true);
   });
+  
+  it("aiService has probabilities not summing to 100", function() {
+    random_start_value = 0;
+    let error:boolean = false;
+    try{
+        let next_move:IMove = createComputerMove(
+            W_TURN,
+            B_TURN, //endMatchScores
+            [
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['',   '',   '',   '',   '',   '',   '',   ''],
+            ['',   '',   'BP',   '',   '',   '',   '',   ''],
+            ['',   '',   '',   '',   '',   '',   '',   ''],
+            ['',   '',   '',   '',   '',   '',   '',   ''],
+            ['', '', '', 'WP', '', '', '', ''],
+            ['', '', '', '', '', '', '', '']
+            ],
+            [false,false], //isUnderCheck
+            [true,true], //canCastleKing
+            [true,true], //canCastleQueen
+            {row:null, col:null}); //enpassantPosition
+    }catch (e){
+        error = true; //probabilities not summing to 100
+    }
+    expect(error).toBe(true);
+  });
+  
+  
 });

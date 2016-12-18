@@ -242,5 +242,29 @@ describe("aiService", function () {
         }
         expect(error).toBe(true);
     });
+    it("aiService has probabilities not summing to 100", function () {
+        random_start_value = 0;
+        var error = false;
+        try {
+            var next_move = createComputerMove(W_TURN, B_TURN, //endMatchScores
+            [
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', 'BP', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', 'WP', '', '', '', ''],
+                ['', '', '', '', '', '', '', '']
+            ], [false, false], //isUnderCheck
+            [true, true], //canCastleKing
+            [true, true], //canCastleQueen
+            { row: null, col: null }); //enpassantPosition
+        }
+        catch (e) {
+            error = true; //probabilities not summing to 100
+        }
+        expect(error).toBe(true);
+    });
 });
 //# sourceMappingURL=aiService_test.js.map
