@@ -120,7 +120,7 @@ module.exports = function(grunt) {
     copy: {
       imgs: {
         expand: true,
-        src: 'imgs/*.*',
+        src: 'chess_graphics/chess_pieces/*.*',
         dest: 'dist/'
       },
       sw: {
@@ -162,8 +162,8 @@ module.exports = function(grunt) {
       },
       dist: {
         src: ['css/game.css',
-         'css/bootstrap.min.css', 
-         'css/bootstrap-theme.min.css'],
+              'css/bootstrap.min.css', 
+              'css/bootstrap-theme.min.css'],
         dest: 'dist/css/everything.min.css',
       }
     },
