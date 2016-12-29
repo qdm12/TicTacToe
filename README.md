@@ -1,6 +1,6 @@
 # **Chess** 2016, NYU
 
-## I - What is implemented
+## I - What has been done
 - Chess game with all classic rules and advanced rules (even enPassant, castling, etc.)
 - AI which selects an attack move or a random move, favorising low importance pieces such as the pawn.
 - Rotation (only when there is a player vs player)
@@ -23,6 +23,7 @@
 - Online website at [pgbomit.com](https://www.pgbomit.com)
   - Screenshot of the pgbomit.com website ![pgbomit](/readme/pgbomit.com.jpg)
 - PhoneGap present at [github.com/tropicdragon/phonegap-tictactoe](https://github.com/tropicdragon/phonegap-tictactoe)
+- Dist version
 
 ## II - How to run tests
 To run tests with Karma:
@@ -31,14 +32,13 @@ To run tests with Karma:
 
 ## III - Future work
 - Write end-to-end tests
-- Produce dist with Grunt
-- Finish up GoDaddy server setup, the Facebook App and PhoneGap.
+- Use more plugins for PhoneGap and add the app on Apple store, Play store and so on
 - Setup Jenkins with Markdown badge to show the code coverage.
 - Finish integrating the chat with Firebase.
 - Improve AI with "one move ahead thinking".
 - Add translations and text (there is no text for now)
 - Show a nice display message when the game is over, instead of just the JS alert.
-- Add AI animations.
+- Add AI animations instead of instantaneous moves.
 - Display a Promotion menu in Javascript when a pawn reaches the other side.
 - Fix up checkmoveok eventually to reach 100% code coverage.
 - Show pieces removed from the game
@@ -46,5 +46,5 @@ To run tests with Karma:
 
 ## Authors
 - Quentin McGaw
-- TianMao Jiang / Javons / Jeremy 
+- Tianmao Jiang / Javons / Jeremy 
 - Alexandra Serralta
