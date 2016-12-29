@@ -20,7 +20,9 @@
 - Karma unit tests for gameLogic (95%), aiService (100%)
   - Screenshot of the 58 unit tests passing ![tests passing](/readme/karma_pass.jpg)
   - Screenshot of the total code coverage ![coverage](/readme/coverage.jpg)
-
+- Online website at [pgbomit.com](https://www.pgbomit.com)
+  - Screenshot of the pgbomit.com website ![pgbomit](/readme/pgbomit.com.jpg)
+- PhoneGap present at [github.com/tropicdragon/phonegap-tictactoe](https://github.com/tropicdragon/phonegap-tictactoe)
 
 ## II - How to run tests
 To run tests with Karma:
