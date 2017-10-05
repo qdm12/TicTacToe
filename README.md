@@ -7,7 +7,7 @@
 - Three different modes supported:
   - Normal mode ([Player vs Player](https://qdm12.github.io/Chess_2016/))
   
-  ![Chess pvp](gifs/chess_normal.gif)
+  ![Chess pvp](readme/chess_normal.gif)
   
   - Player vs AI ([?playAgainstComputer](https://qdm12.github.io/Chess_2016/?playAgainstTheComputer))
   
