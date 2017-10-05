@@ -1,6 +1,6 @@
-# **Chess** 2016, NYU
+# Chess 2016, NYU
 
-## I - What has been done
+## What has been done
 - Chess game with all classic rules and advanced rules (even enPassant, castling, etc.)
 - AI which selects an attack move or a random move, favorising low importance pieces such as the pawn.
 - Rotation (only when there is a player vs player)
@@ -25,12 +25,12 @@
 - PhoneGap present at [github.com/tropicdragon/phonegap-tictactoe](https://github.com/tropicdragon/phonegap-tictactoe)
 - Dist version
 
-## II - How to run tests
+## How to run tests
 To run tests with Karma:
 - Install npm and grunt somehow
 - `grunt karma` in the working directory
 
-## III - Future work
+## Future work
 - Write end-to-end tests
 - Use more plugins for PhoneGap and add the app on Apple store, Play store and so on
 - Setup Jenkins with Markdown badge to show the code coverage.
