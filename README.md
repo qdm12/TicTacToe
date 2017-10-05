@@ -7,15 +7,15 @@
 - Three different modes supported:
   - Normal mode ([Player vs Player](https://qdm12.github.io/Chess_2016/))
   
-  ![Chess pvp](https://www.dropbox.com/s/14k8rsisrs03ak5/chess_normal.gif?dl=1)
+  ![Chess pvp](gifs/chess_normal.gif)
   
   - Player vs AI ([?playAgainstComputer](https://qdm12.github.io/Chess_2016/?playAgainstTheComputer))
   
-  ![Chess pvAI](https://www.dropbox.com/s/9z8ycj9hgcywfz7/chess_againstAI.gif?dl=1)
+  ![Chess pvAI](readme/chess_againstAI.gif)
   
   - AI vs AI ([?onlyAIs](https://qdm12.github.io/Chess_2016/?onlyAIs))
 
-  ![Chess AIvAI](https://www.dropbox.com/s/obep1zxdgdci5g0/chess_onlyAI.gif?dl=1)
+  ![Chess AIvAI](readme/chess_onlyAI.gif)
 
 - Karma unit tests for gameLogic (95%), aiService (100%)
   - Screenshot of the 58 unit tests passing ![tests passing](/readme/karma_pass.jpg)
