@@ -120,7 +120,7 @@ module.exports = function(grunt) {
     copy: {
       imgs: {
         expand: true,
-        src: 'imgs/*.*',
+        src: 'chess_graphics/chess_pieces/*.*',
         dest: 'dist/'
       },
       sw: {
@@ -141,6 +141,8 @@ module.exports = function(grunt) {
         src: [
           'lib/angular.js',
           'lib/turnBasedServices.3.js',
+          'lib/ui-bootstrap-tpls.min.js',
+          'lib/angular-touch.min.js',
           'ts_output_readonly_do_NOT_change_manually/src/gameLogic.js',
           'ts_output_readonly_do_NOT_change_manually/src/game.js',
           'ts_output_readonly_do_NOT_change_manually/src/aiService.js'],
@@ -159,7 +161,9 @@ module.exports = function(grunt) {
         ]
       },
       dist: {
-        src: 'css/game.css',
+        src: ['css/game.css',
+              'css/bootstrap.min.css', 
+              'css/bootstrap-theme.min.css'],
         dest: 'dist/css/everything.min.css',
       }
     },

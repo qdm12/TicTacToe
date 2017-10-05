@@ -139,11 +139,13 @@ img.isWhitePiece.canSelect {
     -webkit-filter: brightness(1.1);
     -webkit-box-shadow:0 0 18px #4C0000;
 }
+}
 @-moz-keyframes black-blink {
   50% {
     filter: brightness(1.1);
     -webkit-filter: brightness(1.1);
     -webkit-box-shadow:0 0 18px #4C0000;
+}
 }
 
 

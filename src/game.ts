@@ -28,8 +28,8 @@ module game {
   let rotated:boolean = false;
   let game_is_over:boolean = false;
   let waitTime_RotateBoard:number = 300;
-  let waitTime_PlayAIlift:number = 1500;
-  let waitTime_SendComputerMove:number = 2200;
+  let waitTime_PlayAIlift:number = 800;
+  let waitTime_SendComputerMove:number = 1600;
   
 
   export function init() {

@@ -18,8 +18,8 @@ var game;
     var rotated = false;
     var game_is_over = false;
     var waitTime_RotateBoard = 300;
-    var waitTime_PlayAIlift = 1500;
-    var waitTime_SendComputerMove = 2200;
+    var waitTime_PlayAIlift = 800;
+    var waitTime_SendComputerMove = 1600;
     function init() {
         registerServiceWorker();
         translate.setTranslations(getTranslations());
